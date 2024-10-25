@@ -1,0 +1,116 @@
+html {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: white;
+    margin: calc(-50vw + 50%);
+    padding: 20px 30px;
+}
+
+.logo {
+    height: 35px;
+}
+
+.navbar ul {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navbar ul li a {
+    font-size: 15px;
+    color: rgb(53, 53, 53);
+    text-decoration: none;
+    padding: 0 2vw;
+}
+
+.navbar ul li a:hover {
+    color: #63ba5d;
+}
+
+.user {
+    background-image: url("../images/LinkedIn_1x1_1000px.jpg");
+    background-size: cover;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    margin-left: 1vw;
+    border: 2px solid white;
+}
+
+.user:hover {
+    border: 2px solid #63ba5d;
+}
+
+.main-container {
+    margin: calc(-50vw + 50%);
+    padding: 0px 30px 25px 30px;
+}
+
+.page-highlight {
+    background-image: url("../images/pexels-emrecan-2078867.jpg");
+    background-size: cover;
+    background-position: center;
+    border-radius: 25px;
+    height: 30vw;
+    display: flex;
+    align-items: center;
+}
+
+.highlight-paragraph {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 10vw;
+    margin: 0;
+    padding: 0vw 3vw;
+}
+
+.footer-container {
+    margin: calc(-50vw + 50%);
+}
+
+.footer-top {
+    font-size: 18px;
+    display: flex;
+    color: rgb(146, 146, 146);
+    background-color: #373737;
+    justify-content: space-around;
+    padding: 0px 50px 20px 50px;
+}
+
+.footer-top h2 {
+    display: grid;
+    color: rgb(228, 228, 228);
+    text-decoration: none;
+}
+
+.footer-top p {
+    line-height: 1.5;
+}
+
+.footer-top a {
+    display: grid;
+    color: rgb(146, 146, 146);
+    text-decoration: none;
+    line-height: 1.5;
+}
+
+.footer-top a:hover {
+    color: #63ba5d;
+    text-decoration: underline;
+}
+
+.footer-down {
+    font-size: 12px;
+    text-align: center;
+    align-items: center;
+    color: rgb(146, 146, 146);
+    background-color: #242424;
+    padding: 1px;
+}
