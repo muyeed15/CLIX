@@ -7,11 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CLIX: Convenient Living trough Integrated Experience</title>
     <link rel="stylesheet" href="./styles/index.css">
+    <script src="./scripts/index.js"></script>
 </head>
 
 <body>
 
-    <!-- Header Section -->
     <header>
         <div class="header-container">
             <img class="logo" src="./images/CLIX.svg">
@@ -23,26 +23,29 @@
                     <li><a href="#">Contact</a></li>
                 </ul>
             </nav>
-            <section class="user"></section>
+            <section class="user" onclick="dropDownShow()"></section>
+            <section id="dropdown-menu" class="dropdown-menu">
+                <a href="#">Profile</a>
+                <a href="#">Settings</a>
+                <a href="#">Logout</a>
+            </section>
         </div>
     </header>
 
-    <!-- Main Content Section -->
     <main>
         <div class="main-container">
-            <section class="page-highlight">
-                <p class="highlight-paragraph">
+            <video autoplay muted loop id="page-highlight-video" class="page-highlight">
+                <source src="./videos/page_highlight.mp4" type="video/mp4">
+            </video>
+            <div class="overlay-text">
+                <p>
                     Conserve <br>
                     Energy
                 </p>
-            </section>
-            <section>
-                <!-- Second section content -->
-            </section>
+            </div>
         </div>
     </main>
 
-    <!-- Footer Section -->
     <footer>
         <div class="footer-container">
             <div class="footer-top">
