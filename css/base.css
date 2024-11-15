@@ -1,0 +1,21 @@
+#header-section {
+    padding: 1vw 0vw 1vw 0vw;
+}
+
+#header-logo {
+    width: 80px;
+}
+
+#notification-icon {
+    padding: 0vw 2vw 0vw 0vw;
+    z-index: 10001;
+}
+
+#user-picture {
+    z-index: 10000;
+}
+
+#footer-section {
+    padding: 0vw 5vw;
+    color: #202020;
+}

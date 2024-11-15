@@ -5,3 +5,36 @@
     border: 1px solid rgb(219, 219, 219);
     border-radius: 10px
 }
+
+#main-section {
+    padding: 0vw 5vw;
+}
+
+#map-section {
+    padding: 1vw 0vw;
+}
+
+#sub-div-header {
+    padding: 0vw 0vw 1vw 0vw;
+    color: #202020;
+}
+
+#map-gas {
+    color: red;
+}
+
+#map-water {
+    color: blue;
+}
+
+#map-electricity {
+    color: green;
+}
+
+#table-section {
+    font-size: small;
+}
+
+#pagination-section nav ul li a {
+    font-size: x-small
+}

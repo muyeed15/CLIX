@@ -11,8 +11,9 @@
     <title>CLIX: Convenient Living & Integrated Experience</title>
 
     <!-- css -->
-    <link href="../css/bootstrap.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/leaflet.css">
     <link rel="stylesheet" href="../css/outage.css">
 </head>
 
@@ -20,24 +21,23 @@
 
 <body>
     <!-- header -->
-    <header class="border-bottom" style="padding: 1vw 0vw 1vw 0vw">
+    <header class="border-bottom" id="header-section">
         <div class="container">
-            <div class="d-flex flex-wrap align-items-center" style="justify-content:space-between;">
-                <a href="/">
-                    <img class="py-2" src="../img/CLIX.svg" width="80">
+            <div class="d-flex flex-wrap align-items-center justify-content-between">
+                <a href="#">
+                    <img class="py-2" src="../img/CLIX.svg" id="header-logo">
                 </a>
 
                 <ul class="nav small py-2">
-                    <li><a href="#" class="nav-link px-3 link-body-emphasis">Home</a></li>
-                    <li><a href="#" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
-                    <li><a href="#" class="nav-link px-3 link-body-emphasis">Pay Bill</a></li>
-                    <li><a href="#" class="nav-link px-3 link-secondary">Outage Area</a></li>
+                    <li><a href="../" class="nav-link px-3 link-body-emphasis">Home</a></li>
+                    <li><a href="./dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
+                    <li><a href="./pay.php" class="nav-link px-3 link-body-emphasis">Pay Bill</a></li>
+                    <li><a href="./outage.php" class="nav-link px-3 link-secondary">Outage Area</a></li>
                 </ul>
 
                 <div class="d-flex py-2">
-                    <div class="dropdown text-end" style="padding:0vw 2vw 0vw 0vw; z-index:10001;">
-                        <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle"
-                            data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="dropdown text-end" id="notification-icon">
+                        <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
                                 class="bi bi-bell" viewBox="0 0 16 16">
                                 <path
@@ -45,34 +45,27 @@
                             </svg>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class=" dropdown-item small" href="#">Your electricity bill is due tomorrow.</a></li>
-                            <li><a class="dropdown-item small" href="#">Gas service will be disrupted from 10:00 AM to
-                                    1:00
-                                    PM.</a></li>
-                            <li><a class="dropdown-item small" href="#">Your water usage is higher than usual today.</a>
-                            </li>
-                            <li><a class=" dropdown-item small" href="#">Check your gas connections for leaks.</a></li>
-                            <li><a class=" dropdown-item small" href="#">There may be low water pressure today.</a></li>
-                            <li><a class=" dropdown-item small" href="#">Reduce usage during peak hours.</a></li>
-                            <li><a class=" dropdown-item small" href="#">Power outage expected from 3:00 PM to 5:00
-                                    PM.</a></li>
-                            <li><a class=" dropdown-item small" href="#">Your gas bill is due in 3 days.</a></li>
-                            <li><a class=" dropdown-item small" href="#">Water supply will be disrupted tomorrow.</a>
+                            <li><a class="dropdown-item small" href="#">Your electricity bill is due tomorrow.</a></li>
+                            <li><a class="dropdown-item small" href="#">Gas service will be disrupted from 10:00 AM to 1:00 PM.</a></li>
+                            <li><a class="dropdown-item small" href="#">Your water usage is higher than usual today.</a></li>
+                            <li><a class="dropdown-item small" href="#">Check your gas connections for leaks.</a></li>
+                            <li><a class="dropdown-item small" href="#">There may be low water pressure today.</a></li>
+                            <li><a class="dropdown-item small" href="#">Reduce usage during peak hours.</a></li>
+                            <li><a class="dropdown-item small" href="#">Power outage expected from 3:00 PM to 5:00 PM.</a></li>
+                            <li><a class="dropdown-item small" href="#">Your gas bill is due in 3 days.</a></li>
+                            <li><a class="dropdown-item small" href="#">Water supply will be disrupted tomorrow.</a>
                             </li>
                         </ul>
                     </div>
-                    <div class="dropdown text-end" style="z-index:10000;">
+                    <div class="dropdown text-end" id="user-picture">
                         <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="../img/LinkedIn_1x1_1000px.jpg" alt="mdo" width="32" height="32"
-                                class="rounded-circle">
+                            <img src="../img/LinkedIn_1x1_1000px.jpg" alt="mdo" width="32" height="32" class="rounded-circle">
                         </a>
                         <ul class="dropdown-menu text-small">
                             <li><a class="dropdown-item small" href="#">Profile</a></li>
                             <li><a class="dropdown-item small" href="#">Settings</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item small" href="#">Sign out</a></li>
                         </ul>
                     </div>
@@ -82,20 +75,20 @@
     </header>
 
     <!-- main -->
-    <main style="padding: 0vw 5vw">
-        <div style="padding: 1vw 0vw">
-            <h2 style="padding: 0vw 0vw 1vw 0vw; color:#202020">Outage Map</h2>
+    <main id="main-section">
+        <div id="map-section">
+            <h2 id="sub-div-header">Outage Map</h2>
             <div id="map"></div>
             <div class="d-flex justify-content-center">
-                <div class="px-3" style="color:red">■ Gas</div>
-                <div class="px-3" style="color:blue">■ Water</div>
-                <div class="px-3" style="color:green">■ Electricity</div>
+                <div class="px-3" id="map-gas">■ Gas</div>
+                <div class="px-3" id="map-water">■ Water</div>
+                <div class="px-3" id="map-electricity">■ Electricity</div>
             </div>
         </div>
 
-        <div>
-            <h2 style="padding: 0vw 0vw 1vw 0vw; color:#202020">Outage List</h2>
-            <table class="table table-striped table-bordered" style="font-size:small;">
+        <div id="table-section">
+            <h2 id="sub-div-header">Outage List</h2>
+            <table class="table table-striped table-bordered">
                 <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -171,19 +164,19 @@
                     </tr>
                 </tbody>
             </table>
-            <div class="d-flex justify-content-center">
+            <div class="d-flex justify-content-center" id="pagination-section">
                 <nav aria-label="Page navigation example">
                     <ul class="pagination">
                         <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Previous" style="font-size:x-small;">
+                            <a class="page-link" href="#" aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>
                             </a>
                         </li>
-                        <li class="page-item"><a class="page-link" href="#" style="font-size:x-small;">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#" style="font-size:x-small;">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#" style="font-size:x-small;">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
                         <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Next" style="font-size:x-small;">
+                            <a class="page-link" href="#" aria-label="Next">
                                 <span aria-hidden="true">&raquo;</span>
                             </a>
                         </li>
@@ -194,8 +187,8 @@
     </main>
 
     <!-- footer -->
-    <footer class="border-top border-bottom" style="padding: 0vw 5vw;">
-        <div class="row justify-content-between py-2" style="color:#202020">
+    <footer class="border-top border-bottom" id="footer-section">
+        <div class="row justify-content-between py-2">
             <div class="col-3">
                 <img src="../img/CLIX.svg" width="46">
                 <small class="d-block mb-3 text-body-secondary">©2024</small>
@@ -211,21 +204,16 @@
                     <li><a class="link-secondary text-decoration-none small" href="#">About Us</a></li>
                     <li><a class="link-secondary text-decoration-none small" href="#">Contact Us</a></li>
                     <li><a class="link-secondary text-decoration-none small" href="#">Privacy Policy</a></li>
-                    <li><a class="link-secondary text-decoration-none small" href="#">Terms & Conditions</a>
-                    </li>
+                    <li><a class="link-secondary text-decoration-none small" href="#">Terms & Conditions</a></li>
                     <li><a class="link-secondary text-decoration-none small" href="#">FAQ & Help</a></li>
                 </ul>
             </div>
             <div class="col-3">
                 <h5>Contact</h5>
                 <ul class="list-unstyled text-small">
-                    <li><a class="link-secondary text-decoration-none small" href="#">Address: Dhaka,
-                            Bangladesh</a>
-                    </li>
-                    <li><a class="link-secondary text-decoration-none small" href="#">Email: clix@mail.com</a>
-                    </li>
-                    <li><a class="link-secondary text-decoration-none small" href="#">Phone: +8801712345678</a>
-                    </li>
+                    <li><a class="link-secondary text-decoration-none small" href="#">Address: Dhaka, Bangladesh</a></li>
+                    <li><a class="link-secondary text-decoration-none small" href="#">Email: clix@mail.com</a></li>
+                    <li><a class="link-secondary text-decoration-none small" href="#">Phone: +8801712345678</a></li>
                 </ul>
             </div>
         </div>
@@ -233,7 +221,7 @@
 
     <!-- script -->
     <script src="../js/bootstrap.bundle.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="../js/leaflet.js"></script>
     <script src="../js/outage.js"></script>
 </body>
 
