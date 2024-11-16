@@ -25,14 +25,14 @@
                     <li><a href="./admin-outage.php" class="nav-link px-3 link-body-emphasis">Outage</a></li>
                     <li><a href="./admin-IoT-control.php" class="nav-link px-3 link-body-emphasis">IoT</a></li>
                     <li><a href="./admin-notification.php" class="nav-link px-3 link-secondary">Notification</a></li>
-                    <li><a href="./" class="nav-link px-3 link-body-emphasis">Payment</a></li>
-                    <li><a href="./" class="nav-link px-3 link-body-emphasis">Seasion</a></li>
+                    <li><a href="./admin-login-season.php" class="nav-link px-3 link-body-emphasis">Seasion</a></li>
                     <li><a href="./" class="nav-link px-3 link-body-emphasis">User</a></li>
                 </ul>
 
                 <div class="d-flex py-2">
                     <div class="dropdown text-end" id="notification-icon">
-                        <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle"
+                            data-bs-toggle="dropdown" aria-expanded="false">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
                                 class="bi bi-bell" viewBox="0 0 16 16">
                                 <path
@@ -41,12 +41,15 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item small" href="#">Your electricity bill is due tomorrow.</a></li>
-                            <li><a class="dropdown-item small" href="#">Gas service will be disrupted from 10:00 AM to 1:00 PM.</a></li>
-                            <li><a class="dropdown-item small" href="#">Your water usage is higher than usual today.</a></li>
+                            <li><a class="dropdown-item small" href="#">Gas service will be disrupted from 10:00 AM to
+                                    1:00 PM.</a></li>
+                            <li><a class="dropdown-item small" href="#">Your water usage is higher than usual today.</a>
+                            </li>
                             <li><a class="dropdown-item small" href="#">Check your gas connections for leaks.</a></li>
                             <li><a class="dropdown-item small" href="#">There may be low water pressure today.</a></li>
                             <li><a class="dropdown-item small" href="#">Reduce usage during peak hours.</a></li>
-                            <li><a class="dropdown-item small" href="#">Power outage expected from 3:00 PM to 5:00 PM.</a></li>
+                            <li><a class="dropdown-item small" href="#">Power outage expected from 3:00 PM to 5:00
+                                    PM.</a></li>
                             <li><a class="dropdown-item small" href="#">Your gas bill is due in 3 days.</a></li>
                             <li><a class="dropdown-item small" href="#">Water supply will be disrupted tomorrow.</a>
                             </li>
@@ -55,12 +58,15 @@
                     <div class="dropdown text-end" id="user-picture">
                         <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="../img/LinkedIn_1x1_1000px.jpg" alt="mdo" width="32" height="32" class="rounded-circle">
+                            <img src="../img/LinkedIn_1x1_1000px.jpg" alt="mdo" width="32" height="32"
+                                class="rounded-circle">
                         </a>
                         <ul class="dropdown-menu text-small">
                             <li><a class="dropdown-item small" href="#">Profile</a></li>
                             <li><a class="dropdown-item small" href="#">Settings</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li><a class="dropdown-item small" href="#">Sign out</a></li>
                         </ul>
                     </div>
@@ -91,7 +97,8 @@
                     </div>
                     <div class="mb-3">
                         <label for="notification-message" class="form-label">Message</label>
-                        <textarea class="form-control" id="notification-message" rows="3" placeholder="Enter message"></textarea>
+                        <textarea class="form-control" id="notification-message" rows="3"
+                            placeholder="Enter message"></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="notification-date-time" class="form-label">Date and Time</label>
@@ -106,7 +113,7 @@
             <label for="search-notifications" class="form-label">Search Notifications</label>
             <input type="text" class="form-control" id="search-notifications" placeholder="🔍 Search notification">
         </div>
-        
+
         <div class="card mb-4" id="create-notification-card">
             <div class="card-body">
                 <table class="table table-borderless small" id="notifications-table">
@@ -118,7 +125,6 @@
                             <th>Message</th>
                             <th>Time</th>
                             <th>Date</th>
-                            <th>Edit</th>
                         </tr>
                     </thead>
                     <tbody id="notifications-table-body">
@@ -129,7 +135,6 @@
                             <td>Power outage expected from 3:00 PM to 5:00 PM.</td>
                             <td>15:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>2</td>
@@ -138,7 +143,6 @@
                             <td>There may be low water pressure today.</td>
                             <td>10:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>3</td>
@@ -147,7 +151,6 @@
                             <td>Check your gas connections for leaks.</td>
                             <td>08:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>4</td>
@@ -156,7 +159,6 @@
                             <td>Electricity maintenance from 2:00 PM to 4:00 PM.</td>
                             <td>14:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>5</td>
@@ -165,7 +167,6 @@
                             <td>Water supply will be disrupted from 6:00 AM to 9:00 AM.</td>
                             <td>06:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>6</td>
@@ -174,7 +175,6 @@
                             <td>Gas services will be restored by 7:00 PM today.</td>
                             <td>19:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>7</td>
@@ -183,7 +183,6 @@
                             <td>Expected power outage from 3:30 PM to 5:30 PM.</td>
                             <td>15:30</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>8</td>
@@ -192,7 +191,6 @@
                             <td>Water pressure may be lower than usual in some areas.</td>
                             <td>09:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>9</td>
@@ -201,7 +199,6 @@
                             <td>Gas supply will be tested between 11:00 AM and 1:00 PM.</td>
                             <td>11:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>10</td>
@@ -210,7 +207,6 @@
                             <td>Planned power cut from 12:00 PM to 2:00 PM.</td>
                             <td>12:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>11</td>
@@ -219,7 +215,6 @@
                             <td>Water maintenance from 8:00 AM to 10:00 AM.</td>
                             <td>08:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>12</td>
@@ -228,7 +223,6 @@
                             <td>Gas maintenance work scheduled from 7:00 AM to 9:00 AM.</td>
                             <td>07:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>13</td>
@@ -237,7 +231,6 @@
                             <td>Unexpected power outage from 4:30 PM to 6:30 PM.</td>
                             <td>16:30</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>14</td>
@@ -246,7 +239,6 @@
                             <td>Expect low water supply in certain areas today.</td>
                             <td>13:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>15</td>
@@ -255,7 +247,6 @@
                             <td>Gas supply will be disrupted from 2:00 PM to 4:00 PM.</td>
                             <td>14:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>16</td>
@@ -264,7 +255,6 @@
                             <td>Power maintenance from 5:00 AM to 7:00 AM.</td>
                             <td>05:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>17</td>
@@ -273,7 +263,6 @@
                             <td>Water supply may be delayed by up to 2 hours today.</td>
                             <td>07:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>18</td>
@@ -282,7 +271,6 @@
                             <td>Gas supply pressure may fluctuate today.</td>
                             <td>09:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>19</td>
@@ -291,7 +279,6 @@
                             <td>Temporary outage expected in the next 30 minutes.</td>
                             <td>16:30</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                         <tr>
                             <td>20</td>
@@ -300,7 +287,6 @@
                             <td>Water supply will be restored by 11:00 AM.</td>
                             <td>11:00</td>
                             <td>2024-11-16</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -352,7 +338,8 @@
             <div class="col-3">
                 <h5>Contact</h5>
                 <ul class="list-unstyled text-small">
-                    <li><a class="link-secondary text-decoration-none small" href="#">Address: Dhaka, Bangladesh</a></li>
+                    <li><a class="link-secondary text-decoration-none small" href="#">Address: Dhaka, Bangladesh</a>
+                    </li>
                     <li><a class="link-secondary text-decoration-none small" href="#">Email: clix@mail.com</a></li>
                     <li><a class="link-secondary text-decoration-none small" href="#">Phone: +8801712345678</a></li>
                 </ul>

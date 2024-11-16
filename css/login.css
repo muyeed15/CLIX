@@ -42,12 +42,10 @@ body {
 }
 
 #rem-lab {
+    font-size: medium;
     color: rgb(82, 82, 82);
 }
 
-#floatingInput {
-    border-radius: 10px;
-}
 
 #floatingInputText {
     color: rgb(132, 132, 132);
@@ -59,4 +57,11 @@ body {
 
 #floatingPasswordText {
     color: rgb(132, 132, 132);
+}
+
+.sign-up {
+    color: rgb(104, 104, 104);
+    font-size: small;
+    text-decoration: underline;
+    padding: 2px;
 }

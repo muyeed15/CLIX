@@ -1,25 +1,18 @@
 <!doctype html>
-
-<!-- html -->
 <html lang="en">
-
-<!-- head -->
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CLIX: Convenient Living & Integrated Experience</title>
-
-    <!-- css -->
     <link rel="stylesheet" href="../css/bootstrap.css">
+    <link rel="stylesheet" href="../css/leaflet.css">
     <link rel="stylesheet" href="../css/base.css">
-    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/admin-outage.css">
 </head>
 
-<!-- body -->
-
 <body>
-    <!-- header -->
+    <!-- Header -->
     <header class="border-bottom" id="header-section">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
@@ -28,9 +21,9 @@
                 </a>
 
                 <ul class="nav small py-2">
-                    <li><a href="./admin-dashboard.php" class="nav-link px-3 link-secondary">Dashboard</a></li>
+                    <li><a href="./admin-dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
                     <li><a href="./admin-outage.php" class="nav-link px-3 link-body-emphasis">Outage</a></li>
-                    <li><a href="./" class="nav-link px-3 link-body-emphasis">IoT</a></li>
+                    <li><a href="./admin-IoT-control.php" class="nav-link px-3 link-body-emphasis">IoT</a></li>
                     <li><a href="./admin-notification.php" class="nav-link px-3 link-body-emphasis">Notification</a></li>
                     <li><a href="./admin-login-season.php" class="nav-link px-3 link-body-emphasis">Seasion</a></li>
                     <li><a href="./" class="nav-link px-3 link-body-emphasis">User</a></li>
@@ -75,105 +68,88 @@
         </div>
     </header>
 
-    <!-- main -->
+    <!-- Main Section -->
     <main id="main-section">
-        <h2 id="sub-div-header">Dashboard</h2>
-
-        <div style="display: flex; flex-wrap: wrap; justify-content: center;">
-            <div style="flex: 0 0 66.666%; padding: 0.5%;">
-                <div class="card">
+        <div class="d-flex justify-content-between align-items-start">
+            <div class="order-1 w-50 pe-2 pt-3 pb-2">
+                <div class="card mb-2">
                     <div class="card-body">
-                        <canvas id="chLine"></canvas>
+                        <h2 id="sub-div-header">IoT Control</h2>
+                        <form id="create-iot-form">
+                            <div class="mb-3">
+                                <label for="iot-type" class="form-label">Type</label>
+                                <select class="form-select" id="iot-type">
+                                    <option value="Electricity">Electricity</option>
+                                    <option value="Gas">Gas</option>
+                                    <option value="Water">Water</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="iot-id" class="form-label">IoT ID</label>
+                                <input type="text" class="form-control" id="iot-id" placeholder="Enter IoT ID">
+                            </div>
+                            <div class="mb-3">
+                                <label for="iot-id" class="form-label">User NID</label>
+                                <input type="text" class="form-control" id="iot-id" placeholder="Enter user NID">
+                            </div>
+                            <div class="mb-3">
+                                <label for="iot-label" class="form-label">Label</label>
+                                <input type="text" class="form-control" id="iot-label" placeholder="Enter label">
+                            </div>
+                            <div class="mb-3">
+                                <label for="iot-latitude" class="form-label">Latitude</label>
+                                <input type="text" class="form-control" id="iot-latitude" placeholder="Enter latitude">
+                            </div>
+                            <div class="mb-3">
+                                <label for="iot-longitude" class="form-label">Longitude</label>
+                                <input type="text" class="form-control" id="iot-longitude" placeholder="Enter longitude">
+                            </div>
+                            <div class="mb-3">
+                                <label for="iot-cost" class="form-label">Cost per unit</label>
+                                <input type="text" class="form-control" id="iot-cost" placeholder="Enter cost per unit">
+                            </div>
+                            <div class="mb-3">
+                                <label for="payment-status-type" class="form-label">Payment Status</label>
+                                <select class="form-select" id="payment-status-type">
+                                    <option value="Paid">Paid</option>
+                                    <option value="Unpaid">Unpaid</option>
+                                    <option value="Banned">Banned</option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary px-3 py-1">Apply</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
-            <div style="flex: 0 0 33.333%; padding: 0.5%;">
-                <div class="card">
+
+            <div class="order-2 ms-auto w-50 ps-2 pt-3">
+                <div class="card mb-4">
                     <div class="card-body">
-                        <canvas id="chDonut1"></canvas>
+                        <div class="mb-3">
+                            <input type="text" id="areaInput" class="form-control" placeholder="🔍 Search area" autocomplete="off" style="max-width: 100%;">
+                            <ul id="suggestions" class="list-group mt-2"></ul>
+                        </div>
+                        <div id="map" style="height: 300px; width: 100%;"></div>
+                        <div class="d-flex justify-content-center mt-3">
+                            <div class="px-3" id="map-gas">■ Gas</div>
+                            <div class="px-3" id="map-water">■ Water</div>
+                            <div class="px-3" id="map-electricity">■ Electricity</div>
+                        </div>
+                        <div class="mt-3 small">
+                            <h5>Selected Location</h5>
+                            <p>Area: <span id="areaName">N/A</span></p>
+                            <p>Latitude: <span id="latitude">N/A</span></p>
+                            <p>Longitude: <span id="longitude">N/A</span></p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div>
-            <h2 id="sub-div-header">Your Devices</h2>
-            <table class="table table-borderless" id="iot-table">
-                <thead id="iot-thead">
-                    <tr>
-                        <th scope="col" width=1vw>Device</th>
-                        <th scope="col">ID</th>
-                        <th scope="col">Label</th>
-                        <th scope="col">Type</th>
-                        <th scope="col">Outage</th>
-                        <th scope="col">Usage</th>
-                        <th scope="col">Total Usage</th>
-                        <th scope="col">Balance</th>
-                        <th scope="col">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/hydropower-coal-svgrepo-com.svg"></td>
-                        <td>123456789015</td>
-                        <td>Electricity Meter - Basement</td>
-                        <td>Electricity</td>
-                        <td>Yes</td>
-                        <td>↑0.20kW/sec</td>
-                        <td>820.60kW</td>
-                        <td>8,000tk</td>
-                        <td>Active</td>
-                    </tr>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/hydropower-coal-svgrepo-com.svg"></td>
-                        <td>123456789016</td>
-                        <td>Electricity Meter - 2nd Floor</td>
-                        <td>Electricity</td>
-                        <td>No</td>
-                        <td>↑86.00kW/sec</td>
-                        <td>132.65kW</td>
-                        <td>8,000tk</td>
-                        <td style="color:white; background-color:rgb(100, 100, 100);">Inactive</td>
-                    </tr>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/gas-costs-svgrepo-com.svg"></td>
-                        <td>223456789017</td>
-                        <td>Gas Meter - 4th Floor</td>
-                        <td>Gas</td>
-                        <td>Yes</td>
-                        <td>--</td>
-                        <td>782.10m<sup>3</sup></td>
-                        <td>8,000tk</td>
-                        <td>Active</td>
-                    </tr>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/gas-costs-svgrepo-com.svg"></td>
-                        <td>223456789018</td>
-                        <td>Gas Meter - Basement</td>
-                        <td>Gas</td>
-                        <td>No</td>
-                        <td>↑2.00m<sup>3</sup>/sec</td>
-                        <td>250.68m<sup>3</sup></td>
-                        <td>8,000tk</td>
-                        <td style="color:white; background-color:rgb(100, 100, 100);">Inactive</td>
-                    </tr>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/water-fee-svgrepo-com.svg"></td>
-                        <td>323456789019</td>
-                        <td>Water Meter - 1st Floor</td>
-                        <td>Water</td>
-                        <td>No</td>
-                        <td>↑0.30L/sec</td>
-                        <td>1200.32L</td>
-                        <td>8,000tk</td>
-                        <td>Active</td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
     </main>
 
-    <!-- footer -->
+    <!-- Footer -->
     <footer class="border-top border-bottom" id="footer-section">
         <div class="row justify-content-between py-2">
             <div class="col-3">
@@ -206,10 +182,10 @@
         </div>
     </footer>
 
-    <!-- script -->
+    <!-- Scripts -->
     <script src="../js/bootstrap.bundle.js"></script>
-    <script src="../js/chart.js"></script>
-    <script src="../js/chart.script.js"></script>
+    <script src="../js/leaflet.js"></script>
+    <script src="../js/iot.js"></script>
 </body>
 
 </html>

@@ -29,7 +29,7 @@
 
     <main class="form-signin w-100 m-auto">
         <form>
-            <h1 class="h3 mb-3 fw-normal text-center" id="sign-h1">Sign In</h1>
+            <h1 class="h3 mt-4 mb-4 fw-normal text-center" id="sign-h1">Sign In</h1>
             <div class="form-floating">
                 <input class="form-control" id="floatingInput" placeholder="1234567890">
                 <label for="floatingInput" id="floatingInputText">NID</label>
@@ -38,12 +38,14 @@
                 <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
                 <label for="floatingPassword" id="floatingPasswordText">Password</label>
             </div>
-            <div class="form-check text-start my-3">
-                <input class="form-check-input" type="checkbox" value="remember-me" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckDefault" id="rem-lab">Remember me</label>
+            <div class="form-check text-start my-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <input class="form-check-input" type="checkbox" value="remember-me" id="flexCheckDefault">
+                    <label class="form-check-label" for="flexCheckDefault" id="rem-lab">Remember me</label>
+                </div>
+                <a class="sign-up" href="../index.php">New Here? Sign Up</a>
             </div>
-            <a href="../index.php" class="btn btn-primary w-100 py-2" role="button">Sign in</a>
-            <p class="mt-5 mb-3 text-body-secondary text-center">CLIX Inc. ©2024</p>
+            <a href="../index.php" class="btn btn-primary w-100 mt-3 mb-4" role="button">Sign in</a>
         </form>
     </main>
 </body>

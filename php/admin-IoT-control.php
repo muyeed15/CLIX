@@ -25,8 +25,7 @@
                     <li><a href="./admin-outage.php" class="nav-link px-3 link-body-emphasis">Outage</a></li>
                     <li><a href="./admin-iot.php" class="nav-link px-3 link-secondary">IoT</a></li>
                     <li><a href="./admin-notification.php" class="nav-link px-3 link-body-emphasis">Notification</a></li>
-                    <li><a href="./" class="nav-link px-3 link-body-emphasis">Payment</a></li>
-                    <li><a href="./" class="nav-link px-3 link-body-emphasis">Seasion</a></li>
+                    <li><a href="./admin-login-season.php" class="nav-link px-3 link-body-emphasis">Seasion</a></li>
                     <li><a href="./" class="nav-link px-3 link-body-emphasis">User</a></li>
                 </ul>
 
@@ -85,8 +84,12 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="iot-header" class="form-label">ID</label>
-                        <input type="text" class="form-control" id="iot-header" placeholder="Enter ID">
+                        <label for="iot-header" class="form-label">IoT ID</label>
+                        <input type="text" class="form-control" id="iot-header" placeholder="Enter IoT ID">
+                    </div>
+                    <div class="mb-3">
+                        <label for="iot-header" class="form-label">NID</label>
+                        <input type="text" class="form-control" id="iot-header" placeholder="Enter User NID">
                     </div>
                     <div class="mb-3">
                         <label for="iot-header" class="form-label">Label</label>
@@ -127,7 +130,7 @@
                 <table class="table table-borderless small" id="iot-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>IoT ID</th>
                             <th>Type</th>
                             <th>Label</th>
                             <th>Area</th>
@@ -160,7 +163,7 @@
                             <td>1 hour</td>
                             <td>60 hours</td>
                             <td>2024-11-16 15:30</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
+                            <td class="d-flex"><a href="./admin-IoT-edit.php"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></a></td>
                         </tr>
                         <tr>
                             <td>100000000004</td>
@@ -177,7 +180,7 @@
                             <td>2 hours</td>
                             <td>80 hours</td>
                             <td>2024-11-16 15:00</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
+                            <td class="d-flex"><a href="./admin-IoT-edit.php"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></a></td>
                         </tr>
                         <tr>
                             <td>300000000001</td>
@@ -194,7 +197,7 @@
                             <td>3 hours</td>
                             <td>150 hours</td>
                             <td>2024-11-16 14:00</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
+                            <td class="d-flex"><a href="./admin-IoT-edit.php"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></a></td>
                         </tr>
                         <tr>
                             <td>200000000008</td>
@@ -211,7 +214,7 @@
                             <td>6 hours</td>
                             <td>200 hours</td>
                             <td>2024-11-16 11:00</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
+                            <td class="d-flex"><a href="./admin-IoT-edit.php"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></a></td>
                         </tr>
                         <tr>
                             <td>300000000002</td>
@@ -228,7 +231,7 @@
                             <td>5 hours</td>
                             <td>60 hours</td>
                             <td>2024-11-16 10:00</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
+                            <td class="d-flex"><a href="./admin-IoT-edit.php"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></a></td>
                         </tr>
                         <tr>
                             <td>100000000003</td>
@@ -245,7 +248,7 @@
                             <td>1 hour</td>
                             <td>200 hours</td>
                             <td>2024-11-16 17:00</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
+                            <td class="d-flex"><a href="./admin-IoT-edit.php"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></a></td>
                         </tr>
                         <tr>
                             <td>100000000002</td>
@@ -262,7 +265,7 @@
                             <td>4 hours</td>
                             <td>120 hours</td>
                             <td>2024-11-16 16:00</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
+                            <td class="d-flex"><a href="./admin-IoT-edit.php"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></a></td>
                         </tr>
                         <tr>
                             <td>300000000003</td>
@@ -279,7 +282,7 @@
                             <td>1 hour</td>
                             <td>80 hours</td>
                             <td>2024-11-16 09:00</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
+                            <td class="d-flex"><a href="./admin-IoT-edit.php"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></a></td>
                         </tr>
                         <tr>
                             <td>200000000006</td>
@@ -296,7 +299,7 @@
                             <td>2 hours</td>
                             <td>50 hours</td>
                             <td>2024-11-16 13:00</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
+                            <td class="d-flex"><a href="./admin-IoT-edit.php"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></a></td>
                         </tr>
                         <tr>
                             <td>300000000004</td>
@@ -313,7 +316,7 @@
                             <td>2 hours</td>
                             <td>20 hours</td>
                             <td>2024-11-16 12:30</td>
-                            <td class="d-flex"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></td>
+                            <td class="d-flex"><a href="./admin-IoT-edit.php"><img id="edit-svg" src="../img/edit-svgrepo-com.svg"></a></td>
                         </tr>
                     </tbody>
                 </table>
