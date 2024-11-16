@@ -41,3 +41,22 @@
 .utility-svg {
     height: 2vw;
 }
+
+#radiusInput {
+    width: 13vw;
+}
+
+#edit-svg {
+    height: 20px;
+    padding-left: 0.5vw;
+}
+
+#radiusInput {
+    width: 11vw;
+    height: 2vw;
+}
+
+#radiusInput::placeholder {
+    font-size: 12px;
+    color: #999;
+}

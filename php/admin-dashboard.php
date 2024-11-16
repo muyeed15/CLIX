@@ -13,7 +13,7 @@
     <!-- css -->
     <link rel="stylesheet" href="../css/bootstrap.css">
     <link rel="stylesheet" href="../css/base.css">
-    <link rel="stylesheet" href="../css/pay.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
 </head>
 
 <!-- body -->
@@ -28,10 +28,13 @@
                 </a>
 
                 <ul class="nav small py-2">
-                    <li><a href="../" class="nav-link px-3 link-body-emphasis">Home</a></li>
-                    <li><a href="./dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
-                    <li><a href="./pay.php" class="nav-link px-3 link-secondary">Pay Bill</a></li>
-                    <li><a href="./outage.php" class="nav-link px-3 link-body-emphasis">Outage Area</a></li>
+                    <li><a href="./admin-dashboard.php" class="nav-link px-3 link-secondary">Dashboard</a></li>
+                    <li><a href="./admin-outage.php" class="nav-link px-3 link-body-emphasis">Outage</a></li>
+                    <li><a href="./" class="nav-link px-3 link-body-emphasis">IoT</a></li>
+                    <li><a href="./admin-notification.php" class="nav-link px-3 link-body-emphasis">Notification</a></li>
+                    <li><a href="./" class="nav-link px-3 link-body-emphasis">Payment</a></li>
+                    <li><a href="./" class="nav-link px-3 link-body-emphasis">Seasion</a></li>
+                    <li><a href="./" class="nav-link px-3 link-body-emphasis">User</a></li>
                 </ul>
 
                 <div class="d-flex py-2">
@@ -75,6 +78,25 @@
 
     <!-- main -->
     <main id="main-section">
+        <h2 id="sub-div-header">Dashboard</h2>
+
+        <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+            <div style="flex: 0 0 66.666%; padding: 0.5%;">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="chLine"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div style="flex: 0 0 33.333%; padding: 0.5%;">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="chDonut1"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div>
             <h2 id="sub-div-header">Your Devices</h2>
             <table class="table table-borderless" id="iot-table">
@@ -84,9 +106,11 @@
                         <th scope="col">ID</th>
                         <th scope="col">Label</th>
                         <th scope="col">Type</th>
+                        <th scope="col">Outage</th>
+                        <th scope="col">Usage</th>
+                        <th scope="col">Total Usage</th>
                         <th scope="col">Balance</th>
                         <th scope="col">Status</th>
-                        <th scope="col">Recharge</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -95,133 +119,60 @@
                         <td>123456789015</td>
                         <td>Electricity Meter - Basement</td>
                         <td>Electricity</td>
+                        <td>Yes</td>
+                        <td>↑0.20kW/sec</td>
+                        <td>820.60kW</td>
                         <td>8,000tk</td>
                         <td>Active</td>
-                        <td><a href="./payment.php" class="d-flex px-3"><img class="utility-svg" src="../img/creadit-card-debit-svgrepo-green.svg"></a></td>
                     </tr>
                     <tr>
                         <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/hydropower-coal-svgrepo-com.svg"></td>
                         <td>123456789016</td>
                         <td>Electricity Meter - 2nd Floor</td>
                         <td>Electricity</td>
+                        <td>No</td>
+                        <td>↑86.00kW/sec</td>
+                        <td>132.65kW</td>
                         <td>8,000tk</td>
                         <td style="color:white; background-color:rgb(100, 100, 100);">Inactive</td>
-                        <td><a href="./payment.php" class="d-flex px-3"><img class="utility-svg" src="../img/creadit-card-debit-svgrepo-green.svg"></a></td>
                     </tr>
                     <tr>
                         <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/gas-costs-svgrepo-com.svg"></td>
                         <td>223456789017</td>
                         <td>Gas Meter - 4th Floor</td>
                         <td>Gas</td>
+                        <td>Yes</td>
+                        <td>--</td>
+                        <td>782.10m<sup>3</sup></td>
                         <td>8,000tk</td>
                         <td>Active</td>
-                        <td><a href="./payment.php" class="d-flex px-3"><img class="utility-svg" src="../img/creadit-card-debit-svgrepo-green.svg"></a></td>
                     </tr>
                     <tr>
                         <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/gas-costs-svgrepo-com.svg"></td>
                         <td>223456789018</td>
                         <td>Gas Meter - Basement</td>
                         <td>Gas</td>
+                        <td>No</td>
+                        <td>↑2.00m<sup>3</sup>/sec</td>
+                        <td>250.68m<sup>3</sup></td>
                         <td>8,000tk</td>
                         <td style="color:white; background-color:rgb(100, 100, 100);">Inactive</td>
-                        <td><a href="./payment.php" class="d-flex px-3"><img class="utility-svg" src="../img/creadit-card-debit-svgrepo-green.svg"></a></td>
                     </tr>
                     <tr>
                         <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/water-fee-svgrepo-com.svg"></td>
                         <td>323456789019</td>
                         <td>Water Meter - 1st Floor</td>
                         <td>Water</td>
+                        <td>No</td>
+                        <td>↑0.30L/sec</td>
+                        <td>1200.32L</td>
                         <td>8,000tk</td>
                         <td>Active</td>
-                        <td><a href="./payment.php" class="d-flex px-3"><img class="utility-svg" src="../img/creadit-card-debit-svgrepo-green.svg"></a></td>
                     </tr>
                 </tbody>
             </table>
-        </div>
-        <div>
-            <h2 id="sub-div-header">Recharge History</h2>
-            <table class="table table-borderless" id="iot-table">
-                <thead id="iot-thead">
-                    <tr>
-                        <th scope="col" width=1vw>Device</th>
-                        <th scope="col">ID</th>
-                        <th scope="col">Label</th>
-                        <th scope="col">Type</th>
-                        <th scope="col">Amount</th>
-                        <th scope="col">Time</th>
-                        <th scope="col">Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/hydropower-coal-svgrepo-com.svg"></td>
-                        <td>123456789015</td>
-                        <td>Electricity Meter - Basement</td>
-                        <td>Electricity</td>
-                        <td>8,000tk</td>
-                        <td>09.41am</td>
-                        <td>31/07/2024</td>
-                    </tr>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/hydropower-coal-svgrepo-com.svg"></td>
-                        <td>123456789016</td>
-                        <td>Electricity Meter - 2nd Floor</td>
-                        <td>Electricity</td>
-                        <td>8,000tk</td>
-                        <td>09.41am</td>
-                        <td>31/07/2024</td>
-                    </tr>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/gas-costs-svgrepo-com.svg"></td>
-                        <td>223456789017</td>
-                        <td>Gas Meter - 4th Floor</td>
-                        <td>Gas</td>
-                        <td>8,000tk</td>
-                        <td>09.41am</td>
-                        <td>31/07/2024</td>
-                    </tr>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/gas-costs-svgrepo-com.svg"></td>
-                        <td>223456789018</td>
-                        <td>Gas Meter - Basement</td>
-                        <td>Gas</td>
-                        <td>8,000tk</td>
-                        <td>09.41am</td>
-                        <td>31/07/2024</td>
-                    </tr>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/water-fee-svgrepo-com.svg"></td>
-                        <td>323456789019</td>
-                        <td>Water Meter - 1st Floor</td>
-                        <td>Water</td>
-                        <td>8,000tk</td>
-                        <td>09.41am</td>
-                        <td>31/07/2024</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="d-flex justify-content-center" id="pagination-section">
-            <nav aria-label="Page navigation example">
-                <ul class="pagination no-border">
-                    <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
         </div>
     </main>
-
 
     <!-- footer -->
     <footer class="border-top border-bottom" id="footer-section">
@@ -258,6 +209,8 @@
 
     <!-- script -->
     <script src="../js/bootstrap.bundle.js"></script>
+    <script src="../js/chart.js"></script>
+    <script src="../js/chart.script.js"></script>
 </body>
 
 </html>

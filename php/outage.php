@@ -76,18 +76,31 @@
 
     <!-- main -->
     <main id="main-section">
-        <div id="map-section">
-            <h2 id="sub-div-header">Outage Map</h2>
-            <div id="map"></div>
-            <div class="d-flex justify-content-center">
-                <div class="px-3" id="map-gas">■ Gas</div>
-                <div class="px-3" id="map-water">■ Water</div>
-                <div class="px-3" id="map-electricity">■ Electricity</div>
-            </div>
+        <h2 id="sub-div-header">Outage Map</h2>
+        <div class="mb-3">
+            <input type="text" id="areaInput" class="form-control" placeholder="🔍 Search area" autocomplete="off">
+            <ul id="suggestions" class="list-group"></ul>
+        </div>
+        <div id="map"></div>
+        <div class="d-flex justify-content-center mt-3">
+            <div class="px-3" id="map-gas">■ Gas</div>
+            <div class="px-3" id="map-water">■ Water</div>
+            <div class="px-3" id="map-electricity">■ Electricity</div>
+        </div>
+        <div class="mt-3 small d-none">
+            <h5>Selected Location</h5>
+            <p>Area: <span id="areaName">N/A</span></p>
+            <p>Latitude: <span id="latitude">N/A</span></p>
+            <p>Longitude: <span id="longitude">N/A</span></p>
         </div>
 
         <div id="table-section">
-            <h2 id="sub-div-header">Outage List</h2>
+            <div>
+                <h2 id="sub-div-header">Outage List</h2>
+                <div class="py-1">
+                    <input class="form-control" id="client-search" type="search" placeholder="🔍 Search area" aria-label="Search" style="width: 300px;">
+                </div>
+            </div>
             <table class="table table-borderless">
                 <thead>
                     <tr>
