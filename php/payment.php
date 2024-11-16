@@ -76,8 +76,21 @@
     <main id="main-section">
         <div class="container p-4">
             <form class="card p-4">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4 class="mb-3">Your Device</h4>
+                        <label for="cc-name" class="form-label">21234567890 (Home Gas Meter)</label>
+                    </div>
+                    <div class="col-md-6">
+                        <h4 class="mb-3">Amount</h4>
+                        <input type="text" class="form-control" id="cc-name" placeholder="" required>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="container p-4">
+            <form class="card p-4">
                 <h4 class="mb-3">Payment</h4>
-
                 <div class="my-3">
                     <div class="form-check">
                         <input id="credit" name="paymentMethod" type="radio" class="form-check-input" checked required>

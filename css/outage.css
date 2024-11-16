@@ -2,21 +2,11 @@
     height: 400px;
     width: 100%;
     margin: 0vw 0vw 1vw 0vw;
-    border: 1px solid rgb(219, 219, 219);
     border-radius: 10px
-}
-
-#main-section {
-    padding: 0vw 5vw;
 }
 
 #map-section {
     padding: 1vw 0vw;
-}
-
-#sub-div-header {
-    padding: 0vw 0vw 1vw 0vw;
-    color: #202020;
 }
 
 #map-gas {
@@ -36,5 +26,18 @@
 }
 
 #pagination-section nav ul li a {
-    font-size: x-small
+    font-size: small
+}
+
+.pagination.no-border {
+    border: none;
+    box-shadow: none;
+}
+
+.pagination.no-border .page-item .page-link {
+    border: none;
+}
+
+.utility-svg {
+    height: 2vw;
 }

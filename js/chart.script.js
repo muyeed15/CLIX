@@ -8,34 +8,42 @@ if (chLine) {
         type: 'line',
         data: {
             labels: ["S", "M", "T", "W", "T", "F", "S"],
-            datasets:
-                [
-                    {
-                        data: [20, 42, 40, 57, 41, 100, 90],
-                        backgroundColor: 'transparent',
-                        borderColor: colors[4],
-                        borderWidth: 4,
-                        pointBackgroundColor: colors[4]
-                    },
-                    {
-                        data: [30, 56, 80, 91, 82, 60, 55],
-                        backgroundColor: 'transparent',
-                        borderColor: colors[0],
-                        borderWidth: 4,
-                        pointBackgroundColor: colors[0]
-                    },
-                    {
-                        data: [53, 18, 66, 76, 59, 89, 40],
-                        backgroundColor: 'transparent',
-                        borderColor: colors[1],
-                        borderWidth: 4,
-                        pointBackgroundColor: colors[1]
-                    }
-                ]
+            datasets: [
+                {
+                    label: "Gas",
+                    data: [20, 42, 40, 57, 41, 100, 90],
+                    backgroundColor: 'transparent',
+                    borderColor: colors[4],
+                    borderWidth: 4,
+                    pointBackgroundColor: colors[4]
+                },
+                {
+                    label: "Water",
+                    data: [30, 56, 80, 91, 82, 60, 55],
+                    backgroundColor: 'transparent',
+                    borderColor: colors[0],
+                    borderWidth: 4,
+                    pointBackgroundColor: colors[0]
+                },
+                {
+                    label: "Electricity",
+                    data: [53, 18, 66, 76, 59, 89, 40],
+                    backgroundColor: 'transparent',
+                    borderColor: colors[1],
+                    borderWidth: 4,
+                    pointBackgroundColor: colors[1]
+                }
+            ]
         },
         options: {
-            scales: { xAxes: [{ ticks: { beginAtZero: false } }] },
-            legend: { display: false },
+            scales: {
+                xAxes: [{
+                    ticks: { beginAtZero: false }
+                }]
+            },
+            legend: {
+                display: true
+            },
             responsive: true
         }
     });

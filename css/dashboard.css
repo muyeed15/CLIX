@@ -1,13 +1,24 @@
-#iot-thead tr th {
-    color: white;
-    background-color: rgb(57, 57, 57);
-}
-
-#sub-div-header {
-    padding: 0vw 0vw 1vw 0vw;
-    color: #202020;
-}
-
 #iot-table {
     font-size: small;
+}
+
+.card {
+    height: 34vw;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5%;
+    width: 100%;
+    height: 100%;
+}
+
+.utility-svg {
+    height: 2vw;
 }

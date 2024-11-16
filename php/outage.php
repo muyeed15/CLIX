@@ -88,75 +88,75 @@
 
         <div id="table-section">
             <h2 id="sub-div-header">Outage List</h2>
-            <table class="table table-striped table-bordered">
+            <table class="table table-borderless">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
+                        <th scope="col" width=1vw>Type</th>
                         <th scope="col">Area</th>
-                        <th scope="col">Type</th>
+                        <th scope="col">Outage</th>
                         <th scope="col">Start</th>
                         <th scope="col">End</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <th scope="row">1</th>
+                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/gas-costs-svgrepo-com.svg"></td>
                         <td>Dhanmondi, Dhaka</td>
                         <td>Gas Outage</td>
                         <td>10:00am (12-Nov-2024)</td>
                         <td>07:00pm (12-Nov-2024)</td>
                     </tr>
                     <tr>
-                        <th scope="row">2</th>
+                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/hydropower-coal-svgrepo-com.svg"></td>
                         <td>Banani, Dhaka</td>
                         <td>Electricity Outage</td>
                         <td>11:00am (11-Nov-2024)</td>
                         <td>07:00am (12-Nov-2024)</td>
                     </tr>
                     <tr>
-                        <th scope="row">3</th>
+                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/water-fee-svgrepo-com.svg"></td>
                         <td>Gulshan, Dhaka</td>
                         <td>Water Outage</td>
                         <td>03:00pm (16-Nov-2024)</td>
                         <td>05:00pm (17-Nov-2024)</td>
                     </tr>
                     <tr>
-                        <th scope="row">4</th>
+                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/gas-costs-svgrepo-com.svg"></td>
                         <td>Mohammadpur, Dhaka</td>
                         <td>Gas Outage</td>
                         <td>02:00pm (12-Nov-2024)</td>
                         <td>08:00pm (12-Nov-2024)</td>
                     </tr>
                     <tr>
-                        <th scope="row">5</th>
+                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/hydropower-coal-svgrepo-com.svg"></td>
                         <td>Mirpur, Dhaka</td>
                         <td>Electricity Outage</td>
                         <td>09:00am (10-Nov-2024)</td>
                         <td>03:00pm (10-Nov-2024)</td>
                     </tr>
                     <tr>
-                        <th scope="row">6</th>
+                       <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/water-fee-svgrepo-com.svg"></td>
                         <td>Uttara, Dhaka</td>
                         <td>Water Outage</td>
                         <td>01:00pm (13-Nov-2024)</td>
                         <td>09:00am (14-Nov-2024)</td>
                     </tr>
                     <tr>
-                        <th scope="row">7</th>
+                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/gas-costs-svgrepo-com.svg"></td>
                         <td>Bashundhara, Dhaka</td>
                         <td>Gas Outage</td>
                         <td>10:00am (11-Nov-2024)</td>
                         <td>04:00pm (11-Nov-2024)</td>
                     </tr>
                     <tr>
-                        <th scope="row">8</th>
+                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/hydropower-coal-svgrepo-com.svg"></td>
                         <td>Tejgaon, Dhaka</td>
                         <td>Electricity Outage</td>
                         <td>05:00pm (15-Nov-2024)</td>
                         <td>10:00pm (15-Nov-2024)</td>
                     </tr>
                     <tr>
-                        <th scope="row">9</th>
+                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/water-fee-svgrepo-com.svg"></td>
                         <td>Rampura, Dhaka</td>
                         <td>Water Outage</td>
                         <td>09:00am (14-Nov-2024)</td>
@@ -166,7 +166,7 @@
             </table>
             <div class="d-flex justify-content-center" id="pagination-section">
                 <nav aria-label="Page navigation example">
-                    <ul class="pagination">
+                    <ul class="pagination no-border">
                         <li class="page-item">
                             <a class="page-link" href="#" aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>

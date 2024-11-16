@@ -76,17 +76,18 @@
     <!-- main -->
     <main id="main-section">
         <h2 id="sub-div-header">Dashboard</h2>
-        <div class="d-flex">
-            <div class="col-md-7 p-1">
+
+        <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+            <div style="flex: 0 0 66.666%; padding: 0.5%;">
                 <div class="card">
-                    <div class="card-body p-5">
+                    <div class="card-body">
                         <canvas id="chLine"></canvas>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 p-1">
+            <div style="flex: 0 0 33.333%; padding: 0.5%;">
                 <div class="card">
-                    <div class="card-body p-5">
+                    <div class="card-body">
                         <canvas id="chDonut1"></canvas>
                     </div>
                 </div>
@@ -94,51 +95,75 @@
         </div>
 
         <div>
-            <h2 id="sub-div-header">IoT List</h2>
-            <table class="table table-bordered" id="iot-table">
+            <h2 id="sub-div-header">Your Devices</h2>
+            <table class="table table-borderless" id="iot-table">
                 <thead id="iot-thead">
                     <tr>
+                        <th scope="col" width=1vw>Device</th>
                         <th scope="col">ID</th>
                         <th scope="col">Label</th>
                         <th scope="col">Type</th>
-                        <th scope="col">Charge</th>
+                        <th scope="col">Outage</th>
+                        <th scope="col">Usage</th>
+                        <th scope="col">Total Usage</th>
+                        <th scope="col">Balance</th>
                         <th scope="col">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <th scope="row">123456789015</th>
+                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/hydropower-coal-svgrepo-com.svg"></td>
+                        <td>123456789015</td>
                         <td>Electricity Meter - Basement</td>
                         <td>Electricity</td>
-                        <td style="background-color:rgb(0, 255, 0);">85%</td>
+                        <td>Yes</td>
+                        <td>↑0.20kW/sec</td>
+                        <td>820.60kW</td>
+                        <td>8,000tk</td>
                         <td>Active</td>
                     </tr>
                     <tr>
-                        <th scope="row">123456789016</th>
+                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/hydropower-coal-svgrepo-com.svg"></td>
+                        <td>123456789016</td>
                         <td>Electricity Meter - 2nd Floor</td>
                         <td>Electricity</td>
-                        <td style="background-color:rgb(140, 255, 0);">74%</td>
+                        <td>No</td>
+                        <td>↑86.00kW/sec</td>
+                        <td>132.65kW</td>
+                        <td>8,000tk</td>
                         <td style="color:white; background-color:rgb(100, 100, 100);">Inactive</td>
                     </tr>
                     <tr>
-                        <th scope="row">223456789017</th>
+                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/gas-costs-svgrepo-com.svg"></td>
+                        <td>223456789017</td>
                         <td>Gas Meter - 4th Floor</td>
                         <td>Gas</td>
-                        <td style="background-color:rgb(255, 255, 0);">53%</td>
+                        <td>Yes</td>
+                        <td>--</td>
+                        <td>782.10m<sup>3</sup></td>
+                        <td>8,000tk</td>
                         <td>Active</td>
                     </tr>
                     <tr>
-                        <th scope="row">223456789018</th>
+                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/gas-costs-svgrepo-com.svg"></td>
+                        <td>223456789018</td>
                         <td>Gas Meter - Basement</td>
                         <td>Gas</td>
-                        <td style="background-color:rgb(255, 34, 0);">15%</td>
+                        <td>No</td>
+                        <td>↑2.00m<sup>3</sup>/sec</td>
+                        <td>250.68m<sup>3</sup></td>
+                        <td>8,000tk</td>
                         <td style="color:white; background-color:rgb(100, 100, 100);">Inactive</td>
                     </tr>
                     <tr>
-                        <th scope="row">323456789019</th>
+                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/water-fee-svgrepo-com.svg"></td>
+                        <td>323456789019</td>
                         <td>Water Meter - 1st Floor</td>
                         <td>Water</td>
-                        <td style="background-color:rgb(255, 217, 0);">31%</td>
+                        <td>No</td>
+                        <td>↑0.30L/sec</td>
+                        <td>1200.32L</td>
+                        <td>8,000tk</td>
                         <td>Active</td>
                     </tr>
                 </tbody>
