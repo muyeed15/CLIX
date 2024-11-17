@@ -95,7 +95,12 @@
         </div>
 
         <div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 id="sub-div-header">Your Devices</h2>
+            <a href="./iot.php">
+            <img src="../img/add-circle-svgrepo-com.svg" width=30px>
+            </a>
+        </div>
             <table class="table table-borderless" id="iot-table">
                 <thead id="iot-thead">
                     <tr>

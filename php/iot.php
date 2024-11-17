@@ -1,25 +1,18 @@
 <!doctype html>
-
-<!-- html -->
 <html lang="en">
-
-<!-- head -->
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CLIX: Convenient Living & Integrated Experience</title>
-
-    <!-- css -->
     <link rel="stylesheet" href="../css/bootstrap.css">
+    <link rel="stylesheet" href="../css/leaflet.css">
     <link rel="stylesheet" href="../css/base.css">
-    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/outage.css">
 </head>
 
-<!-- body -->
-
 <body>
-    <!-- header -->
+    <!-- Header -->
     <header class="border-bottom" id="header-section">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
@@ -28,12 +21,10 @@
                 </a>
 
                 <ul class="nav small py-2">
-                    <li><a href="./admin-dashboard.php" class="nav-link px-3 link-secondary">Dashboard</a></li>
-                    <li><a href="./admin-outage.php" class="nav-link px-3 link-body-emphasis">Outage</a></li>
-                    <li><a href="./admin-IoT-control.php" class="nav-link px-3 link-body-emphasis">IoT</a></li>
-                    <li><a href="./admin-notification.php" class="nav-link px-3 link-body-emphasis">Notification</a></li>
-                    <li><a href="./admin-login-season.php" class="nav-link px-3 link-body-emphasis">Seasion</a></li>
-                    <li><a href="./admin-user-control.php" class="nav-link px-3 link-body-emphasis">Client</a></li>
+                    <li><a href="../" class="nav-link px-3 link-body-emphasis">Home</a></li>
+                    <li><a href="./dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
+                    <li><a href="./pay.php" class="nav-link px-3 link-body-emphasis">Pay Bill</a></li>
+                    <li><a href="./outage.php" class="nav-link px-3 link-body-emphasis">Outage Area</a></li>
                 </ul>
 
                 <div class="d-flex py-2">
@@ -75,53 +66,29 @@
         </div>
     </header>
 
-    <!-- main -->
-    <main id="main-section">
-        <h2 id="sub-div-header">Dashboard</h2>
-
-        <div style="display: flex; flex-wrap: wrap; justify-content: center;">
-            <div style="flex: 0 0 66.666%; padding: 0.5%;">
-                <div class="card">
-                    <div class="card-body">
-                        <canvas id="chLine"></canvas>
+    <!-- Main Section -->
+    <main id="main-section" style="position: relative;">
+        <h2 id="sub-div-header">IoT on CLIX Network</h2>
+        <div class="card mb-4" id="create-iot-card" style="display: inline-block; vertical-align: top; width: 70%;">
+            <div class="card-body">
+                <h5 class="card-title">Register IoT</h5>
+                <form id="create-iot-form">
+                    <div class="mb-3">
+                        <label for="iot-header" class="form-label">IoT ID</label>
+                        <input type="text" class="form-control" id="iot-header" placeholder="Enter IoT ID">
                     </div>
-                </div>
-            </div>
-            <div style="flex: 0 0 33.333%; padding: 0.5%;">
-                <div class="card">
-                    <div class="card-body">
-                        <canvas id="chDonut1"></canvas>
+                    <div class="mb-3">
+                        <label for="iot-label" class="form-label">Label</label>
+                        <input type="text" class="form-control" id="iot-label" placeholder="Enter label">
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div style="display: flex; flex-wrap: wrap; justify-content: center;">
-            <div style="flex: 0 0 50%; padding: 0.5%;">
-                <div class="card">
-                    <div class="card-body">
-                        <canvas id="chBar"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div style="flex: 0 0 25%; padding: 0.5%;">
-                <div class="card">
-                    <div class="card-body">
-                        <canvas id="chDonut2"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div style="flex: 0 0 25%; padding: 0.5%;">
-                <div class="card">
-                    <div class="card-body">
-                        <canvas id="chDonut3"></canvas>
-                    </div>
-                </div>
+                    <button type="submit" class="btn btn-primary">Add Request</button>
+                </form>
             </div>
         </div>
+        <img src="../img/NicePng_meter-png_905785.png" alt="IoT Illustration" style="display: inline-block; vertical-align: top; margin-left: 80px; width: 19%; max-width: 300px;">
     </main>
 
-    <!-- footer -->
+    <!-- Footer -->
     <footer class="border-top border-bottom" id="footer-section">
         <div class="row justify-content-between py-2">
             <div class="col-3">
@@ -154,10 +121,10 @@
         </div>
     </footer>
 
-    <!-- script -->
+    <!-- Scripts -->
     <script src="../js/bootstrap.bundle.js"></script>
-    <script src="../js/chart.js"></script>
-    <script src="../js/chart.script.js"></script>
+    <script src="../js/leaflet.js"></script>
+    <script src="../js/admin-outage.js"></script>
 </body>
 
 </html>

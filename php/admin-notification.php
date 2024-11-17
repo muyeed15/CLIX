@@ -26,7 +26,7 @@
                     <li><a href="./admin-IoT-control.php" class="nav-link px-3 link-body-emphasis">IoT</a></li>
                     <li><a href="./admin-notification.php" class="nav-link px-3 link-secondary">Notification</a></li>
                     <li><a href="./admin-login-season.php" class="nav-link px-3 link-body-emphasis">Seasion</a></li>
-                    <li><a href="./" class="nav-link px-3 link-body-emphasis">User</a></li>
+                    <li><a href="./admin-user-control.php" class="nav-link px-3 link-body-emphasis">Client</a></li>
                 </ul>
 
                 <div class="d-flex py-2">
