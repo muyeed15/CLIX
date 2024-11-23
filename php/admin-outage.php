@@ -83,55 +83,57 @@
                     <div class="px-3" id="map-water">■ Water</div>
                     <div class="px-3" id="map-electricity">■ Electricity</div>
                 </div>
-                <div class="mt-3 small">
-                    <h5 class="mb-3">Selected Location</h5>
-                    <p>Area: <span id="areaName">N/A</span></p>
-                    <p>Latitude: <span id="latitude">N/A</span></p>
-                    <p>Longitude: <span id="longitude">N/A</span></p>
+                <form method="POST" action="add_outage.php">
+                    <div class="mt-3 small">
+                        <h5 class="mb-3">Selected Location</h5>
+                        <p>Area: <span id="areaName">N/A</span></p>
+                        <p>Latitude: <span id="latitude">N/A</span></p>
+                        <p>Longitude: <span id="longitude">N/A</span></p>
 
-                    <div class="mb-4">
-                        <h5 class="mb-2">Enter Range</h5>
-                        <input id="radiusInput" class="form-control" placeholder="Enter in meters">
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="notification-type" class="form-label">Type</label>
-                        <select class="form-select" id="notification-type">
-                            <option value="Electricity">Electricity</option>
-                            <option value="Gas">Gas</option>
-                            <option value="Water">Water</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
+                        <div class="mb-4">
+                            <h5 class="mb-2">Enter Range</h5>
+                            <input id="radiusInput" name="radiusInput" class="form-control" placeholder="Enter in meters">
+                        </div>
 
-                    <div class="mb-4">
-                        <h5 class="mb-2">Enter Start Time & Date</h5>
-                        <div class="row g-2">
-                            <div class="col">
-                                <input id="startDate" type="date" class="form-control" placeholder="Start Date">
-                            </div>
-                            <div class="col">
-                                <input id="startTime" type="time" class="form-control" placeholder="Start Time">
+                        <div class="mb-3">
+                            <label for="notification-type" class="form-label">Type</label>
+                            <select class="form-select" id="notification-type" name="notificationType">
+                                <option value="Electricity">Electricity</option>
+                                <option value="Gas">Gas</option>
+                                <option value="Water">Water</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5 class="mb-2">Enter Start Time & Date</h5>
+                            <div class="row g-2">
+                                <div class="col">
+                                    <input id="startDate" name="startDate" type="date" class="form-control" placeholder="Start Date">
+                                </div>
+                                <div class="col">
+                                    <input id="startTime" name="startTime" type="time" class="form-control" placeholder="Start Time">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="mb-4">
-                        <h5 class="mb-2">Enter End Time & Date</h5>
-                        <div class="row g-2">
-                            <div class="col">
-                                <input id="endDate" type="date" class="form-control" placeholder="End Date">
-                            </div>
-                            <div class="col">
-                                <input id="endTime" type="time" class="form-control" placeholder="End Time">
+                        <div class="mb-4">
+                            <h5 class="mb-2">Enter End Time & Date</h5>
+                            <div class="row g-2">
+                                <div class="col">
+                                    <input id="endDate" name="endDate" type="date" class="form-control" placeholder="End Date">
+                                </div>
+                                <div class="col">
+                                    <input id="endTime" name="endTime" type="time" class="form-control" placeholder="End Time">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="d-flex justify-content-center mt-4">
-                        <button id="addOutageButton" class="btn btn-primary px-4">Add Outage</button>
+                        <div class="d-flex justify-content-center mt-4">
+                            <button id="addOutageButton" class="btn btn-primary px-4">Add Outage</button>
+                        </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
         <div id="table-section">
@@ -141,7 +143,6 @@
                     <input class="form-control me-2" type="search" placeholder="🔍 Search area" aria-label="Search">
                 </div>
             </div>
-                    
             <div class="card mb-4" id="create-notification-card">
                 <div class="card-body">
                     <table class="table table-borderless">
