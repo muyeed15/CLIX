@@ -1,14 +1,11 @@
 #header-section {
-    padding: 1vw 0vw 1vw 0vw;
-}
-
-#header-logo {
-    width: 80px;
+    padding: 0.8vw 0vw 0.8vw 0vw;
+    font-size: 1.2vw;
 }
 
 #notification-icon {
-    padding: 0vw 2vw 0vw 0vw;
     z-index: 10001;
+    padding: 0.5vw 1vw 0vw 0vw;
 }
 
 #user-picture {
@@ -16,15 +13,33 @@
 }
 
 #footer-section {
-    padding: 0vw 5vw;
+    padding: 0vw 3vw;
     color: #202020;
+    font-size: 1.35vw;
+}
+
+#footer-section div div h5 {
+    font-size: 1.5vw;
 }
 
 #main-section {
-    padding: 0vw 5vw;
+    padding: 0vw 3vw;
 }
 
 #sub-div-header {
     padding: 1vw 0vw 1vw 0vw;
-    color: #202020;
+    font-size: 1.8vw;
+    color: #282828;
+}
+
+@media (max-width: 768px) {
+    #header-section {
+        font-size: 2vw;
+    }
+}
+
+@media (max-width: 576px) {
+    #header-section {
+        font-size: 3vw;
+    }
 }

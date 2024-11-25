@@ -9,7 +9,7 @@ CREATE TABLE user_t (
 	_phone_ VARCHAR(20) NOT NULL,
 	_address_ VARCHAR(255) NOT NULL,
 	_password_ VARCHAR(255) NOT NULL,
-	_picture_ BLOB,
+	_picture_ LONGBLOB,
 	PRIMARY KEY (_nid_),
 	UNIQUE KEY _email_ (_email_),
 	UNIQUE KEY _phone_ (_phone_)
