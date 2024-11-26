@@ -19,7 +19,7 @@ fetch('dashboard-usage.php')
                     labels: labels,
                     datasets: [
                         {
-                            label: "Gas Consumption (in cubic meters)",
+                            label: "Gas (in cubic meters)",
                             data: dailyConsumptionData.gas,
                             backgroundColor: 'transparent',
                             borderColor: colors[1],
@@ -27,7 +27,7 @@ fetch('dashboard-usage.php')
                             pointBackgroundColor: colors[1]
                         },
                         {
-                            label: "Water Consumption (in liters)",
+                            label: "Water (in liters)",
                             data: dailyConsumptionData.water,
                             backgroundColor: 'transparent',
                             borderColor: colors[0],
@@ -35,7 +35,7 @@ fetch('dashboard-usage.php')
                             pointBackgroundColor: colors[0]
                         },
                         {
-                            label: "Electricity Consumption (in kWh)",
+                            label: "Electricity (in kWh)",
                             data: dailyConsumptionData.electricity,
                             backgroundColor: 'transparent',
                             borderColor: colors[2],

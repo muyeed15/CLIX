@@ -27,7 +27,9 @@
     position: relative;
     height: 40vw;
     border-radius: 2vw;
+    margin: 0.5vw 0vw 0vw 0vw;
     overflow: hidden;
+    border: 1px solid rgb(224, 224, 224);
 }
 
 .hero-video {
@@ -92,8 +94,9 @@
     display: flex;
     justify-content: space-around;
     background-color: rgb(248, 248, 248);
+    border: 1px solid rgb(224, 224, 224);
     padding: 2vw;
-    border-radius: 25px;
+    border-radius: 2vw;
     margin: 20px 0px;
 }
 
@@ -108,12 +111,12 @@
 }
 
 .utility-header {
-    font-size: 1.5vw;
+    font-size: 2vw;
     padding: 1.5vw 0vw 0vw 0vw;
 }
 
 .utility-paragraph {
-    font-size: 1.0vw;
+    font-size: 1.3vw;
 }
 
 .utility-container {
@@ -121,7 +124,7 @@
 }
 
 .utility-link {
-    font-size: 1.4vw;
+    font-size: 1.5vw;
     color: rgb(83, 186, 83);
     text-decoration: none;
     transition: 200ms;
@@ -142,16 +145,17 @@
     width: 30vw;
     margin: 1vw;
     padding: 2vw;
+    border: 1px solid rgb(224, 224, 224);
     border-radius: 2vw;
     text-align: center;
 }
 
 .about-box-header {
-    font-size: 1.5vw;
+    font-size: 2vw;
 }
 
 .about-box-paragraph {
-    font-size: 1vw;
+    font-size: 1.3vw;
 }
 
 .about-box-container {
@@ -193,6 +197,7 @@
     height: 20vw;
     padding: 20vw 0vw;
     margin: 10px 0px;
+    border: 1px solid rgb(224, 224, 224);
 }
 
 .service-background:hover .service-label-container {
@@ -202,18 +207,20 @@
 
 .about-section-3 {
     text-align: center;
+    margin: 1vw 0vw 0vw 0vw;
 }
 
 .service-label-container {
     position: absolute;
     color: white;
     background: rgb(50, 50, 50);
-    padding: 1.2vw 2vw;
+    padding: 0vw 2vw;
     border-radius: 0vw 2vw 2vw 0vw;
     transition: 300ms;
 }
 
 .service-label-header {
+    padding: 1.3vw 0vw 0vw 0vw;
     font-size: 3vw;
 }
 
@@ -242,6 +249,7 @@
     border-radius: 2vw;
     transition: 300ms;
     margin: 0vw 1vw;
+    border: 1px solid rgb(224, 224, 224);
 }
 
 .profile-container:hover .profile-pic {
@@ -268,15 +276,17 @@
 
 .about-section-4 {
     text-align: center;
-    margin: 0vw 0vw 3vw 0vw;
+    margin: 3vw 0vw 0vw 0vw;
 }
 
 .stat-container {
     display: flex;
     justify-content: space-around;
     background-color: rgb(248, 248, 248);
-    padding: 2vw 7vw 0vw 0vw;
-    border-radius: 25px;
+    padding: 1vw 0vw 0vw 0vw;
+    margin: 2vw 0vw 1vw 0vw;
+    border-radius: 2vw;
+    border: 1px solid rgb(224, 224, 224);
 }
 
 .stat-header {

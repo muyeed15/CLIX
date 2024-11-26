@@ -1,6 +1,24 @@
+body {
+    margin-top: 5vw;
+    background-color: #ffffff;
+}
+
 #header-section {
-    padding: 0.8vw 0vw 0.8vw 0vw;
-    font-size: 1.2vw;
+    padding: 0vw 2.2vw;
+    font-size: 1vw;
+    background: rgba(248, 248, 248, 0.6);
+    backdrop-filter: blur(10px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+}
+
+#header-logo {
+    width: 6.5vw;
+    padding: 1vw 0vw;
 }
 
 #notification-icon {
@@ -13,9 +31,13 @@
 }
 
 #footer-section {
-    padding: 0vw 3vw;
+    padding: 3vw;
     color: #202020;
     font-size: 1.35vw;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 #footer-section div div h5 {
@@ -32,14 +54,65 @@
     color: #282828;
 }
 
+.footer-logo {
+    width: 4vw;
+}
+
 @media (max-width: 768px) {
+    #header-logo {
+        width: 11vw;
+    }
+
     #header-section {
+        padding: 0vw 1.5vw;
+        font-size: 2.2vw;
+    }
+
+    #sub-div-header {
+        padding: 1.5vw 0vw 0vw 0vw;
+        font-size: 3vw;
+        color: #282828;
+    }
+
+    #footer-section {
         font-size: 2vw;
+    }
+
+    #footer-section div div h5 {
+        font-size: 2.25vw;
+    }
+
+    .footer-logo {
+        width: 5.9vw;
     }
 }
 
 @media (max-width: 576px) {
-    #header-section {
-        font-size: 3vw;
+    #header-logo {
+        width: 17vw;
     }
+
+    #header-section {
+        padding: 0vw 1vw;
+        font-size: 2.3vw;
+    }
+
+    #sub-div-header {
+        padding: 1.5vw 0vw 0vw 0vw;
+        font-size: 3.5vw;
+        color: #282828;
+    }
+
+    #footer-section {
+        font-size: 2.5vw;
+    }
+
+    #footer-section div div h5 {
+        font-size: 2.75vw;
+    }
+
+    .footer-logo {
+        width: 8vw;
+    }
+
 }

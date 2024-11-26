@@ -15,7 +15,7 @@ try {
                         FROM (
                             SELECT * 
                             FROM notification_t 
-                            WHERE _nid_ = ? 
+                            WHERE (_nid_ = ? OR _nid_ IS NULL)
                             ORDER BY _date_ DESC, _time_ DESC 
                             LIMIT 10
                         ) AS _notifications_";
@@ -44,7 +44,6 @@ try {
     }
 
     mysqli_stmt_close($stmt);
-
 
     // IoT Usage
     $usageQuery = "SELECT 
@@ -106,11 +105,11 @@ try {
 <body>
     <!-- header -->
     <header class="border-bottom" id="header-section">
-        <div class="container-fluid px-5">
+        <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
                 <!-- Logo -->
-                <a href="#" class="d-flex align-items-center mb-lg-0">
-                    <img src="../img/CLIX.svg" id="header-logo" alt="Logo" class="img-fluid" style="width: 80px; height: 80px;">
+                <a href="../index.php" class="d-flex align-items-center mb-lg-0">
+                    <img src="../img/CLIX.svg" id="header-logo" alt="Logo" class="img-fluid">
                 </a>
                 
                 <!-- Navbar -->
@@ -123,8 +122,17 @@ try {
                     </ul>
                 </nav>
 
-                <!-- Notification and User Section -->
+                <!-- Notification, Mobile Navbar and User Section -->
                 <div class="d-flex align-items-center">
+                    <!-- Mobile Navbar Toggle -->
+                    <button class="navbar-toggler d-lg-none" type="button" style="width: 50px; height: 50px;" data-bs-toggle="collapse" data-bs-target="#mobileNav" aria-controls="mobileNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon d-flex align-items-center justify-content-center" style="width: 100%; height: 100%;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#000000" class="bi bi-list" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                            </svg>
+                        </span>
+                    </button>
+
                     <!-- Notifications -->
                     <div class="dropdown text-end me-2" id="notification-icon">
                         <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -145,22 +153,13 @@ try {
                             <img src="<?php echo $imageSrc; ?>" alt="User" class="rounded-circle" style="width: 36px; height: 36px;">
                         </a>
                         <ul class="dropdown-menu text-small">
-                            <li><a class="dropdown-item small" href="#">Profile</a></li>
-                            <li><a class="dropdown-item small" href="#">Settings</a></li>
+                            <li><a class="dropdown-item small" href="./profile.php">Profile</a></li>
+                            <li><a class="dropdown-item small" href="./settings.php">Settings</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item small" href="logout.php">Sign out</a></li>
+                            <li><a class="dropdown-item small" href="./logout.php">Sign out</a></li>
                         </ul>
                     </div>
                 </div>
-
-                <!-- Mobile Navbar Toggle -->
-                <button class="navbar-toggler d-lg-none" type="button" style="width: 50px; height: 50px;" data-bs-toggle="collapse" data-bs-target="#mobileNav" aria-controls="mobileNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon d-flex align-items-center justify-content-center" style="width: 100%; height: 100%;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
-                        </svg>
-                    </span>
-                </button>
 
             </div>
 
@@ -177,7 +176,6 @@ try {
             </div>
         </div>
     </header>
-
 
     <!-- main -->
     <main id="main-section">
@@ -276,7 +274,7 @@ try {
     <footer class="border-top border-bottom" id="footer-section">
         <div class="row justify-content-between py-2">
             <div class="col-3">
-                <img src="../img/CLIX.svg" width="20%">
+                <img class="footer-logo" src="../img/CLIX.svg">
                 <small class="d-block mb-3 text-body-secondary">©2024</small>
                 <p class="small text-body-secondary">
                     Why CLIX?<br>

@@ -20,15 +20,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if (password_verify($password, $user['_password_'])) {
             $_SESSION['nid'] = $user['_nid_'];
-            $_SESSION['name'] = $user['_first_name_'] . ' ' . $user['_last_name_'];
-            $_SESSION['email'] = $user['_email_'];
 
             header("Location: dashboard.php");
             exit;
         } elseif ($user['_password_'] === $password) {
             $_SESSION['nid'] = $user['_nid_'];
-            $_SESSION['name'] = $user['_first_name_'] . ' ' . $user['_last_name_'];
-            $_SESSION['email'] = $user['_email_'];
 
             header("Location: dashboard.php");
             exit;

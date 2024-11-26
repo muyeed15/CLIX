@@ -3943,8 +3943,7 @@ fieldset:disabled .btn {
   color: var(--bs-dropdown-color);
   text-align: left;
   list-style: none;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(50px);
+  background: rgba(248, 248, 248);
   background-clip: padding-box;
   border: var(--bs-dropdown-border-width) solid var(--bs-dropdown-border-color);
   border-radius: var(--bs-dropdown-border-radius);
