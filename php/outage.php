@@ -137,9 +137,9 @@ try {
                 <nav class="navbar-nav">
                     <ul class="nav flex-column text-center">
                         <li><a href="../" class="nav-link px-3 link-body-emphasis">Home</a></li>
-                        <li><a href="./dashboard.php" class="nav-link px-3 link-secondary">Dashboard</a></li>
+                        <li><a href="./dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
                         <li><a href="./pay.php" class="nav-link px-3 link-body-emphasis">Pay Bill</a></li>
-                        <li><a href="./outage.php" class="nav-link px-3 link-body-emphasis">Outage Area</a></li>
+                        <li><a href="./outage.php" class="nav-link px-3 link-secondary">Outage Area</a></li>
                     </ul>
                 </nav>
             </div>

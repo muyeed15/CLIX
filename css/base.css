@@ -59,6 +59,10 @@ body {
 }
 
 @media (max-width: 768px) {
+    body {
+        margin-top: 8vw;
+    }
+
     #header-logo {
         width: 11vw;
     }
@@ -88,6 +92,10 @@ body {
 }
 
 @media (max-width: 576px) {
+    body {
+        margin-top: 13vw;
+    }
+
     #header-logo {
         width: 17vw;
     }
