@@ -1,0 +1,61 @@
+.vision-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+
+.vision-card:hover {
+    transform: translateY(-5px);
+}
+
+.vision-icon {
+    font-size: 2.5rem;
+    color: #63ba5d;
+    margin-bottom: 1rem;
+}
+
+.about-section {
+    padding: 4rem 0;
+}
+
+.section-title {
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+}
+
+.feature-list li {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.feature-list li::before {
+    content: "•";
+    color: #63ba5d;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.stats-card {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    margin: 1rem 0;
+}
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #63ba5d;
+}
