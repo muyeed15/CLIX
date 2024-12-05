@@ -1,47 +1,81 @@
 <?php
 session_start();
-require_once 'db-connection.php';
+require_once './db-connection.php';
 
-if (!isset($_SESSION['nid'])) {
+if (!isset($_SESSION['_user_id_'])) {
     header("Location: login.php");
     exit;
 }
 
-$nid = $_SESSION['nid'];
+$user_id = $_SESSION['_user_id_'];
 
 try {
     // Notification
-    $notificationQuery = "SELECT * 
-                        FROM (
-                            SELECT * 
-                            FROM notification_t 
-                            WHERE (_nid_ = ? OR _nid_ IS NULL)
-                            ORDER BY _date_ DESC, _time_ DESC 
-                            LIMIT 10
-                        ) AS _notifications_";
+    $notificationQuery = "SELECT * FROM notification_table
+                        WHERE _user_id_ = ? OR _user_id_ IS NULL
+                        ORDER BY _notification_time_ DESC";
 
     $stmt = mysqli_prepare($conn, $notificationQuery);
-    mysqli_stmt_bind_param($stmt, "s", $nid);
+    mysqli_stmt_bind_param($stmt, "s", $user_id);
     mysqli_stmt_execute($stmt);
     $notifications = mysqli_stmt_get_result($stmt);
 
     // User Picture
-    $pictureQuery = "SELECT _picture_
-                    FROM user_t
-                    WHERE _nid_ = ?";
+    $pictureQuery = "SELECT _profile_picture_ FROM user_table
+                    WHERE _user_id_ = ?";
 
     $stmt = mysqli_prepare($conn, $pictureQuery);
-    mysqli_stmt_bind_param($stmt, "i", $nid);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
     mysqli_stmt_execute($stmt);
     $picture = mysqli_stmt_get_result($stmt);
 
-    if (($row = mysqli_fetch_assoc($picture)) && (!empty($row['_picture_']) && $row['_picture_'] !== NULL)) {
-        $pictureData = $row['_picture_'];
+    if (($row = mysqli_fetch_assoc($picture)) && (!empty($row['_profile_picture_']) && $row['_profile_picture_'] !== NULL)) {
+        $pictureData = $row['_profile_picture_'];
         $base64Image = base64_encode($pictureData);
         $imageSrc = 'data:image/jpeg;base64,' . $base64Image;
     } else {
-        $imageSrc = "../img/user-rounded-svgrepo-com.jpg";
+        $imageSrc = "./img/user-rounded-svgrepo-com.jpg";
     }
+
+    // Outage
+    $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $itemsPerPage = 10;
+    $offset = ($page - 1) * $itemsPerPage;
+
+    $totalQuery = "SELECT COUNT(*) as total FROM outage_table o";
+    if (!empty($search)) {
+        $totalQuery .= " WHERE o._affected_area_ LIKE ?";
+    }
+
+    $stmt = mysqli_prepare($conn, $totalQuery);
+    if (!empty($search)) {
+        $searchParam = "%$search%";
+        mysqli_stmt_bind_param($stmt, "s", $searchParam);
+    }
+    mysqli_stmt_execute($stmt);
+    $totalResult = mysqli_stmt_get_result($stmt);
+    $totalRow = mysqli_fetch_assoc($totalResult);
+    $totalOutages = $totalRow['total'];
+    $totalPages = ceil($totalOutages / $itemsPerPage);
+
+    $query = "SELECT o.*, u._utility_id_ 
+            FROM outage_table o 
+            JOIN utility_table u ON o._utility_id_ = u._utility_id_";
+    if (!empty($search)) {
+        $query .= " WHERE o._affected_area_ LIKE ?";
+    }
+    $query .= " ORDER BY o._start_time_ DESC LIMIT ? OFFSET ?";
+
+    $stmt = mysqli_prepare($conn, $query);
+    if (!empty($search)) {
+        $searchParam = "%$search%";
+        mysqli_stmt_bind_param($stmt, "sii", $searchParam, $itemsPerPage, $offset);
+    } else {
+        mysqli_stmt_bind_param($stmt, "ii", $itemsPerPage, $offset);
+    }
+    mysqli_stmt_execute($stmt);
+    $outages = mysqli_stmt_get_result($stmt);
 
     mysqli_stmt_close($stmt);
     
@@ -67,6 +101,7 @@ try {
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/leaflet.css">
     <link rel="stylesheet" href="../css/outage.css">
+    <link rel="stylesheet" href="../css/animation.css">
 </head>
 
 <!-- body -->
@@ -86,8 +121,8 @@ try {
                     <ul class="nav">
                         <li><a href="../" class="nav-link px-3 link-body-emphasis">Home</a></li>
                         <li><a href="./dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
-                        <li><a href="./pay.php" class="nav-link px-3 link-body-emphasis">Pay Bill</a></li>
-                        <li><a href="./outage.php" class="nav-link px-3 link-secondary">Outage Area</a></li>
+                        <li><a href="./history.php" class="nav-link px-3 link-body-emphasis">History</a></li>
+                        <li><a href="./outage.php" class="nav-link px-3 link-secondary">Outage</a></li>
                     </ul>
                 </nav>
 
@@ -111,7 +146,7 @@ try {
                         </a>
                         <ul class="dropdown-menu">
                             <?php while ($row = mysqli_fetch_assoc($notifications)) : ?>
-                                <li><a class="dropdown-item small" href="#"><?= htmlspecialchars($row['_message_']); ?></a></li>
+                                <li><a class="dropdown-item small" href="#"><?= htmlspecialchars($row['_notification_message_']); ?></a></li>
                             <?php endwhile; ?>
                         </ul>
                     </div>
@@ -129,7 +164,6 @@ try {
                         </ul>
                     </div>
                 </div>
-
             </div>
 
             <!-- Collapsible Mobile Menu -->
@@ -138,8 +172,8 @@ try {
                     <ul class="nav flex-column text-center">
                         <li><a href="../" class="nav-link px-3 link-body-emphasis">Home</a></li>
                         <li><a href="./dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
-                        <li><a href="./pay.php" class="nav-link px-3 link-body-emphasis">Pay Bill</a></li>
-                        <li><a href="./outage.php" class="nav-link px-3 link-secondary">Outage Area</a></li>
+                        <li><a href="./history.php" class="nav-link px-3 link-body-emphasis">History</a></li>
+                        <li><a href="./outage.php" class="nav-link px-3 link-secondary">Outage</a></li>
                     </ul>
                 </nav>
             </div>
@@ -165,12 +199,15 @@ try {
             <p>Latitude: <span id="latitude">N/A</span></p>
             <p>Longitude: <span id="longitude">N/A</span></p>
         </div>
-
         <div id="table-section">
             <div>
                 <h2 id="sub-div-header">Outage List</h2>
                 <div class="py-1">
-                    <input class="form-control" id="client-search" type="search" placeholder="🔍 Search area" aria-label="Search" style="width: 300px;">
+                    <form id="searchForm" method="GET" action="">
+                        <input class="form-control" id="client-search" name="search" type="search" 
+                            placeholder="🔍 Search area" aria-label="Search" style="width: 300px;"
+                            value="<?php echo htmlspecialchars($search ?? ''); ?>">
+                    </form>
                 </div>
             </div>
             <table class="table table-borderless">
@@ -183,91 +220,71 @@ try {
                         <th scope="col">End</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/gas-costs-svgrepo-com.svg"></td>
-                        <td>Dhanmondi, Dhaka</td>
-                        <td>Gas Outage</td>
-                        <td>10:00am (12-Nov-2024)</td>
-                        <td>07:00pm (12-Nov-2024)</td>
-                    </tr>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/hydropower-coal-svgrepo-com.svg"></td>
-                        <td>Banani, Dhaka</td>
-                        <td>Electricity Outage</td>
-                        <td>11:00am (11-Nov-2024)</td>
-                        <td>07:00am (12-Nov-2024)</td>
-                    </tr>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/water-fee-svgrepo-com.svg"></td>
-                        <td>Gulshan, Dhaka</td>
-                        <td>Water Outage</td>
-                        <td>03:00pm (16-Nov-2024)</td>
-                        <td>05:00pm (17-Nov-2024)</td>
-                    </tr>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/gas-costs-svgrepo-com.svg"></td>
-                        <td>Mohammadpur, Dhaka</td>
-                        <td>Gas Outage</td>
-                        <td>02:00pm (12-Nov-2024)</td>
-                        <td>08:00pm (12-Nov-2024)</td>
-                    </tr>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/hydropower-coal-svgrepo-com.svg"></td>
-                        <td>Mirpur, Dhaka</td>
-                        <td>Electricity Outage</td>
-                        <td>09:00am (10-Nov-2024)</td>
-                        <td>03:00pm (10-Nov-2024)</td>
-                    </tr>
-                    <tr>
-                       <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/water-fee-svgrepo-com.svg"></td>
-                        <td>Uttara, Dhaka</td>
-                        <td>Water Outage</td>
-                        <td>01:00pm (13-Nov-2024)</td>
-                        <td>09:00am (14-Nov-2024)</td>
-                    </tr>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/gas-costs-svgrepo-com.svg"></td>
-                        <td>Bashundhara, Dhaka</td>
-                        <td>Gas Outage</td>
-                        <td>10:00am (11-Nov-2024)</td>
-                        <td>04:00pm (11-Nov-2024)</td>
-                    </tr>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/hydropower-coal-svgrepo-com.svg"></td>
-                        <td>Tejgaon, Dhaka</td>
-                        <td>Electricity Outage</td>
-                        <td>05:00pm (15-Nov-2024)</td>
-                        <td>10:00pm (15-Nov-2024)</td>
-                    </tr>
-                    <tr>
-                        <td class="d-flex justify-content-center"><img class="utility-svg" src="../img/water-fee-svgrepo-com.svg"></td>
-                        <td>Rampura, Dhaka</td>
-                        <td>Water Outage</td>
-                        <td>09:00am (14-Nov-2024)</td>
-                        <td>06:00pm (14-Nov-2024)</td>
-                    </tr>
+                <tbody id="outageTableBody">
+                    <?php while ($row = mysqli_fetch_assoc($outages)): ?>
+                        <tr>
+                            <td class="d-flex justify-content-center">
+                                <?php
+                                $utilityIcon = '';
+                                $outageType = '';
+                                if (isset($row['_utility_id_'])) {
+                                    switch($row['_utility_id_']) {
+                                        case 1:
+                                            $utilityIcon = '../img/gas-costs-svgrepo-com.svg';
+                                            $outageType = 'Gas Outage';
+                                            break;
+                                        case 2:
+                                            $utilityIcon = '../img/water-fee-svgrepo-com.svg';
+                                            $outageType = 'Water Outage';
+                                            break;
+                                        case 3:
+                                            $utilityIcon = '../img/hydropower-coal-svgrepo-com.svg';
+                                            $outageType = 'Electricity Outage';
+                                            break;
+                                    }
+                                }
+                                ?>
+                                <img class="utility-svg" src="<?php echo $utilityIcon; ?>">
+                            </td>
+                            <td><?php echo htmlspecialchars($row['_affected_area_']); ?></td>
+                            <td><?php echo $outageType; ?></td>
+                            <td><?php echo date('h:ia (d-M-Y)', strtotime($row['_start_time_'])); ?></td>
+                            <td><?php echo date('h:ia (d-M-Y)', strtotime($row['_end_time_'])); ?></td>
+                        </tr>
+                    <?php endwhile; ?>
                 </tbody>
             </table>
-            <div class="d-flex justify-content-center" id="pagination-section">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination no-border">
-                        <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        <li class="page-item"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+            <?php if ($totalPages > 0): ?>
+                <div class="d-flex justify-content-center" id="pagination-section" <?php echo ($totalPages <= 1) ? 'style="display: none !important;"' : ''; ?>>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination no-border">
+                            <?php if ($page > 1): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?php echo ($page - 1); ?>&search=<?php echo urlencode($search); ?>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                            
+                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
+                                    <a class="page-link" href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>">
+                                        <?php echo $i; ?>
+                                    </a>
+                                </li>
+                            <?php endfor; ?>
+                            
+                            <?php if ($page < $totalPages): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?php echo ($page + 1); ?>&search=<?php echo urlencode($search); ?>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
+                </div>
+            <?php endif; ?>
         </div>
     </main>
 
