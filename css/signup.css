@@ -1,0 +1,153 @@
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5;
+    position: relative;
+}
+
+#background-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+#header-logo-container {
+    position: absolute;
+    top: 10px;
+    left: 20px;
+}
+
+.form-signin {
+    width: 100%;
+    max-width: 500px;
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    border-radius: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.form-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-row {
+    display: flex;
+    gap: 0rem 0.3rem;
+    padding: 0.3rem 0rem;
+}
+
+.form-row .form-floating {
+    flex: 1;
+}
+
+.profile-upload-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+}
+
+.profile-preview {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #f8f9fa;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    padding: 2px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profile-upload-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid white;
+    transition: all 0.2s ease;
+    background-color: #63ba5d;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-upload-icon:hover {
+    background-color: #50954b;
+    transform: scale(1.05);
+}
+
+.profile-upload-icon svg {
+    width: 18px;
+    height: 18px;
+    color: white;
+}
+
+#profilePicture {
+    display: none;
+}
+
+.form-control {
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    padding: 1rem 0.75rem;
+    height: calc(3.5rem + 2px);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    box-shadow: 0 0 0 0.25rem rgba(99, 186, 93, 0.25);
+    border-color: #63ba5d;
+}
+
+.form-floating>label {
+    padding: 1rem 0.75rem;
+    color: #666;
+}
+
+.btn-primary {
+    background-color: #63ba5d;
+    border-color: #63ba5d;
+    border-radius: 12px;
+    padding: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #50954b;
+    border-color: #50954b;
+    box-shadow: 0 4px 15px rgba(99, 186, 93, 0.3);
+}
+
+#sign-h1 {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.sign-up {
+    color: rgb(104, 104, 104);
+    font-size: small;
+    text-decoration: underline;
+    transition: all 0.3s ease;
+}
