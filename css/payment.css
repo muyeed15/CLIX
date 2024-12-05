@@ -1,0 +1,48 @@
+.mobile-payments {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    padding: 2rem 0;
+}
+
+.payment-option {
+    text-align: center;
+    padding: 1.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    background: #fff;
+}
+
+.payment-option:hover {
+    border-color: #63ba5d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.payment-option img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+}
+
+.payment-option span {
+    display: block;
+    font-size: 0.9rem;
+    color: #495057;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .mobile-payments {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        padding: 1.5rem 0;
+    }
+
+    .payment-option {
+        padding: 1rem;
+    }
+}
