@@ -1,42 +1,36 @@
 <?php
 session_start();
-require_once 'db-connection.php';
+require_once './db-connection.php';
 
-if (!isset($_SESSION['nid'])) {
+if (!isset($_SESSION['_user_id_'])) {
     header("Location: login.php");
     exit;
 }
 
-$nid = $_SESSION['nid'];
+$user_id = $_SESSION['_user_id_'];
 
 try {
     // Notification
-    $notificationQuery = "SELECT * 
-                        FROM (
-                            SELECT * 
-                            FROM notification_t 
-                            WHERE (_nid_ = ? OR _nid_ IS NULL)
-                            ORDER BY _date_ DESC, _time_ DESC 
-                            LIMIT 10
-                        ) AS _notifications_";
+    $notificationQuery = "SELECT * FROM notification_table
+                        WHERE _user_id_ = ? OR _user_id_ IS NULL
+                        ORDER BY _notification_time_ DESC";
 
     $stmt = mysqli_prepare($conn, $notificationQuery);
-    mysqli_stmt_bind_param($stmt, "s", $nid);
+    mysqli_stmt_bind_param($stmt, "s", $user_id);
     mysqli_stmt_execute($stmt);
     $notifications = mysqli_stmt_get_result($stmt);
 
     // User Picture
-    $pictureQuery = "SELECT _picture_
-                    FROM user_t
-                    WHERE _nid_ = ?";
+    $pictureQuery = "SELECT _profile_picture_ FROM user_table
+                    WHERE _user_id_ = ?";
 
     $stmt = mysqli_prepare($conn, $pictureQuery);
-    mysqli_stmt_bind_param($stmt, "i", $nid);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
     mysqli_stmt_execute($stmt);
     $picture = mysqli_stmt_get_result($stmt);
 
-    if (($row = mysqli_fetch_assoc($picture)) && (!empty($row['_picture_']) && $row['_picture_'] !== NULL)) {
-        $pictureData = $row['_picture_'];
+    if (($row = mysqli_fetch_assoc($picture)) && (!empty($row['_profile_picture_']) && $row['_profile_picture_'] !== NULL)) {
+        $pictureData = $row['_profile_picture_'];
         $base64Image = base64_encode($pictureData);
         $imageSrc = 'data:image/jpeg;base64,' . $base64Image;
     } else {
@@ -47,35 +41,64 @@ try {
 
     // IoT Usage
     $usageQuery = "SELECT 
-            iot._iot_id_, 
-            iot._label_, 
-            iot._type_, 
-            SUM(u._usage_amount_) AS _total_usage_,
-            (
-                SELECT u2._usage_amount_ 
-                FROM usage_t u2 
-                WHERE u2._iot_id_ = iot._iot_id_ AND u2._nid_ = ?
-                ORDER BY u2._date_ DESC, u2._time_ DESC 
-                LIMIT 1
-            ) AS _last_usage_,
-            (
-                SELECT b._balance_ 
-                FROM balance_t b 
-                WHERE b._iot_id_ = iot._iot_id_ AND b._nid_ = ?
-                LIMIT 1
-            ) AS _balance_,
-            iot._status_ AS _status_
-        FROM 
-            usage_t u
-        INNER JOIN iot_utility_t iot ON u._iot_id_ = iot._iot_id_
-        WHERE u._nid_ = ?
-        GROUP BY iot._iot_id_
-    ";
+                CASE 
+                    WHEN g._gas_id_ IS NOT NULL THEN 'Gas'
+                    WHEN e._electricity_id_ IS NOT NULL THEN 'Electricity'
+                    WHEN w._water_id_ IS NOT NULL THEN 'Water'
+                END AS _type_,
+                i._iot_id_,
+                i._iot_label_ AS _label_,
+                COALESCE(u_current._usage_amount_, 0) AS _last_usage_,
+                COALESCE(SUM(u_total._usage_amount_), 0) AS _total_usage_,
+                COALESCE(b._current_balance_, 0) AS _balance_,
+                CASE 
+                    WHEN b._current_balance_ <= 0 OR u._unpaid_iot_id_ IS NOT NULL THEN 'Unpaid'
+                    WHEN b._current_balance_ > 0 AND a._active_iot_id_ IS NOT NULL THEN 'Active'
+                    WHEN b._current_balance_ > 0 AND ia._inactive_iot_id_ IS NOT NULL THEN 'Inactive'
+                    ELSE 'Unknown'
+                END AS _status_
+            FROM 
+                iot_table i
+                LEFT JOIN utility_table ut ON i._utility_id_ = ut._utility_id_
+                LEFT JOIN gas_table g ON ut._utility_id_ = g._gas_id_
+                LEFT JOIN electricity_table e ON ut._utility_id_ = e._electricity_id_
+                LEFT JOIN water_table w ON ut._utility_id_ = w._water_id_
+                LEFT JOIN (
+                    SELECT _iot_id_, _usage_amount_
+                    FROM usage_table
+                    WHERE (_iot_id_, _usage_time_) IN (
+                        SELECT _iot_id_, MAX(_usage_time_) 
+                        FROM usage_table 
+                        GROUP BY _iot_id_
+                    )
+                ) u_current ON i._iot_id_ = u_current._iot_id_
+                LEFT JOIN usage_table u_total ON i._iot_id_ = u_total._iot_id_
+                LEFT JOIN balance_table b ON i._iot_id_ = b._iot_id_
+                LEFT JOIN active_iot_table a ON i._iot_id_ = a._active_iot_id_
+                LEFT JOIN inactive_iot_table ia ON i._iot_id_ = ia._inactive_iot_id_
+                LEFT JOIN unpaid_iot_table u ON i._iot_id_ = u._unpaid_iot_id_
+                INNER JOIN balance_table user_iot ON i._iot_id_ = user_iot._iot_id_
+            WHERE 
+                user_iot._user_id_ = ?
+            GROUP BY 
+                _type_, 
+                i._iot_id_, 
+                i._iot_label_,
+                u_current._usage_amount_,
+                b._current_balance_,
+                a._active_iot_id_,
+                ia._inactive_iot_id_,
+                u._unpaid_iot_id_
+            ORDER BY 
+                _type_, 
+                i._iot_id_;";
 
     $stmt = mysqli_prepare($conn, $usageQuery);
-    mysqli_stmt_bind_param($stmt, "sss", $nid, $nid, $nid);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
     mysqli_stmt_execute($stmt);
     $usageSummary = mysqli_stmt_get_result($stmt);
+
+    mysqli_stmt_close($stmt);
     
 } catch (Exception $e) {
     echo "Error fetching data: " . $e->getMessage();
@@ -98,6 +121,7 @@ try {
     <link rel="stylesheet" href="../css/bootstrap.css">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/animation.css">
 </head>
 
 <!-- body -->
@@ -117,8 +141,8 @@ try {
                     <ul class="nav">
                         <li><a href="../" class="nav-link px-3 link-body-emphasis">Home</a></li>
                         <li><a href="./dashboard.php" class="nav-link px-3 link-secondary">Dashboard</a></li>
-                        <li><a href="./pay.php" class="nav-link px-3 link-body-emphasis">Pay Bill</a></li>
-                        <li><a href="./outage.php" class="nav-link px-3 link-body-emphasis">Outage Area</a></li>
+                        <li><a href="./history.php" class="nav-link px-3 link-body-emphasis">History</a></li>
+                        <li><a href="./outage.php" class="nav-link px-3 link-body-emphasis">Outage</a></li>
                     </ul>
                 </nav>
 
@@ -142,7 +166,7 @@ try {
                         </a>
                         <ul class="dropdown-menu">
                             <?php while ($row = mysqli_fetch_assoc($notifications)) : ?>
-                                <li><a class="dropdown-item small" href="#"><?= htmlspecialchars($row['_message_']); ?></a></li>
+                                <li><a class="dropdown-item small" href="#"><?= htmlspecialchars($row['_notification_message_']); ?></a></li>
                             <?php endwhile; ?>
                         </ul>
                     </div>
@@ -169,7 +193,7 @@ try {
                     <ul class="nav flex-column text-center">
                         <li><a href="../" class="nav-link px-3 link-body-emphasis">Home</a></li>
                         <li><a href="./dashboard.php" class="nav-link px-3 link-secondary">Dashboard</a></li>
-                        <li><a href="./pay.php" class="nav-link px-3 link-body-emphasis">Pay Bill</a></li>
+                        <li><a href="./history.php" class="nav-link px-3 link-body-emphasis">Pay Bill</a></li>
                         <li><a href="./outage.php" class="nav-link px-3 link-body-emphasis">Outage Area</a></li>
                     </ul>
                 </nav>
@@ -215,12 +239,35 @@ try {
                         <th>Total Usage</th>
                         <th>Balance</th>
                         <th>Status</th>
+                        <th>Pay</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php while ($row = mysqli_fetch_assoc($usageSummary)) : ?>
                         <tr>
-                            <td><?= htmlspecialchars($row['_type_']); ?></td>
+                            <td>
+                                <?php
+                                $utilityIcon = '';
+                                $outageType = '';
+                                if (isset($row['_type_'])) {
+                                    switch($row['_type_']) {
+                                        case 'Gas':
+                                            $utilityIcon = '../img/gas-costs-svgrepo-com.svg';
+                                            $outageType = 'Gas';
+                                            break;
+                                        case 'Water':
+                                            $utilityIcon = '../img/water-fee-svgrepo-com.svg';
+                                            $outageType = 'Water';
+                                            break;
+                                        case 'Electricity':
+                                            $utilityIcon = '../img/hydropower-coal-svgrepo-com.svg';
+                                            $outageType = 'Electricity';
+                                            break;
+                                    }
+                                }
+                                ?>
+                                <img class="utility-svg" src="<?php echo $utilityIcon; ?>" alt="<?php echo $outageType; ?>">
+                            </td>
                             <td><?= htmlspecialchars($row['_iot_id_']); ?></td>
                             <td><?= htmlspecialchars($row['_label_']); ?></td>
                             <td>
@@ -253,15 +300,20 @@ try {
                             <td 
                                 <?php 
                                     if ($row['_status_'] === 'Inactive') {
-                                        echo 'style="background-color: #a3a3a3;"';
+                                        echo 'style="color: #a3a3a3;"';
                                     } elseif ($row['_status_'] === 'Unpaid') {
-                                        echo 'style="background-color: #fc6565;"';
+                                        echo 'style="color: #f05959;"';
                                     } elseif ($row['_status_'] === 'Active') {
-                                        echo 'style="background-color: #75f08d;"';
+                                        echo 'style="color: #53cf6b;"';
                                     }
                                 ?>
                                     >
                                 <?= htmlspecialchars($row['_status_']); ?>
+                            </td>
+                            <td>
+                                <a href="./payment.php?iot_id=<?= htmlspecialchars($row['_iot_id_']); ?>" class="d-flex px-3">
+                                    <img class="utility-svg-pay" src="../img/creadit-card-debit-svgrepo-green.svg">
+                                </a>
                             </td>
                         </tr>
                     <?php endwhile; ?>
