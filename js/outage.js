@@ -61,13 +61,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 let circleColor;
                 switch (_type_) {
                     case 'Gas':
-                        circleColor = 'red';
+                        circleColor = '#e44d4d';
                         break;
                     case 'Water':
-                        circleColor = 'blue';
+                        circleColor = '#3d81ff';
                         break;
                     case 'Electricity':
-                        circleColor = 'green';
+                        circleColor = '#2ea38a';
                         break;
                     default:
                         circleColor = 'gray';
@@ -89,7 +89,6 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Error fetching outage data:", error);
         }
     }
-
 
     fetchOutages();
 
@@ -146,5 +145,38 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     } else {
         alert("Geolocation is not supported by this browser.");
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('client-search');
+    const searchForm = document.getElementById('searchForm');
+
+    if (searchInput && searchForm) {
+        searchInput.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                searchForm.submit();
+            }
+        });
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const searchParam = urlParams.get('search');
+    if (searchParam && searchInput) {
+        searchInput.value = decodeURIComponent(searchParam);
+    }
+
+    if (urlParams.has('search') || urlParams.has('page')) {
+        const tableSection = document.getElementById('table-section');
+        if (tableSection) {
+            const tablePosition = tableSection.getBoundingClientRect().top + window.pageYOffset;
+
+            window.scrollTo({
+                top: tablePosition - 100,
+                behavior: 'smooth'
+            });
+        }
     }
 });
