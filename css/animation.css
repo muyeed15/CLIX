@@ -1,0 +1,177 @@
+:root {
+    --premium-timing: cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+body {
+    opacity: 0;
+    animation: pageLoad 0.7s var(--premium-timing) forwards;
+}
+
+#header-logo-container {
+    opacity: 0;
+    transform-origin: left center;
+    animation: smoothSlide 0.7s var(--premium-timing) forwards;
+}
+
+.form-signin,
+.container,
+main,
+section {
+    opacity: 0;
+    transform-origin: center;
+    animation: smoothScale 0.7s var(--premium-timing) 0.1s forwards;
+    will-change: transform, opacity;
+}
+
+form>*,
+.container>*,
+main>*,
+section>* {
+    opacity: 0;
+    animation: smoothFade 0.6s var(--premium-timing) forwards;
+    will-change: transform, opacity;
+}
+
+form> :nth-child(1) {
+    animation-delay: 0.15s;
+}
+
+form> :nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+form> :nth-child(3) {
+    animation-delay: 0.25s;
+}
+
+form> :nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+form> :nth-child(5) {
+    animation-delay: 0.35s;
+}
+
+@keyframes pageLoad {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes smoothFade {
+    0% {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes smoothSlide {
+    0% {
+        opacity: 0;
+        transform: translateX(-12px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes smoothScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+a,
+button,
+input,
+select,
+textarea {
+    transition: all 0.4s var(--premium-timing);
+    will-change: transform;
+}
+
+#background-video,
+.background-image {
+    opacity: 0;
+    animation: pageLoad 0.9s var(--premium-timing) forwards;
+}
+
+button:hover,
+a:hover {
+    transform: translateY(-2px) scale(1.01);
+    transition: all 0.4s var(--premium-timing);
+}
+
+button:active,
+a:active {
+    transform: translateY(1px) scale(0.99);
+    transition: all 0.2s var(--premium-timing);
+}
+
+.page-exit {
+    opacity: 0;
+    transform: scale(0.98);
+    transition: all 0.4s var(--premium-timing);
+}
+
+@media (max-width: 768px) {
+    body {
+        animation-duration: 0.6s;
+    }
+
+    .form-signin,
+    .container,
+    main,
+    section {
+        animation-duration: 0.6s;
+    }
+
+    form>*,
+    .container>*,
+    main>*,
+    section>* {
+        animation-duration: 0.5s;
+    }
+
+    form> :nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    form> :nth-child(2) {
+        animation-delay: 0.15s;
+    }
+
+    form> :nth-child(3) {
+        animation-delay: 0.2s;
+    }
+
+    form> :nth-child(4) {
+        animation-delay: 0.25s;
+    }
+
+    form> :nth-child(5) {
+        animation-delay: 0.3s;
+    }
+
+    button:hover,
+    a:hover {
+        transform: translateY(-1px) scale(1.005);
+    }
+}
