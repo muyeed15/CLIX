@@ -1,24 +1,40 @@
+#video-background {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -1;
+    object-fit: cover;
+}
+
 .contact-section {
     max-width: 800px;
     margin: 0 auto;
     padding: 2rem;
+    position: relative;
+    z-index: 1;
 }
 
 .contact-info {
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(224, 224, 224, 0.3);
     border-radius: 15px;
     padding: 2rem;
     margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .contact-form {
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(224, 224, 224, 0.3);
     border-radius: 15px;
     padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .contact-icon {
@@ -35,6 +51,7 @@
     padding: 1rem;
     border-radius: 10px;
     transition: transform 0.3s ease;
+    background: rgba(255, 255, 255, 0.7);
 }
 
 .contact-item:hover {
@@ -53,4 +70,15 @@
     font-size: 2.5rem;
     font-weight: 600;
     text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    #video-background {
+        display: none;
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
 }
