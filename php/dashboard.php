@@ -193,8 +193,8 @@ try {
                     <ul class="nav flex-column text-center">
                         <li><a href="../" class="nav-link px-3 link-body-emphasis">Home</a></li>
                         <li><a href="./dashboard.php" class="nav-link px-3 link-secondary">Dashboard</a></li>
-                        <li><a href="./history.php" class="nav-link px-3 link-body-emphasis">Pay Bill</a></li>
-                        <li><a href="./outage.php" class="nav-link px-3 link-body-emphasis">Outage Area</a></li>
+                        <li><a href="./history.php" class="nav-link px-3 link-body-emphasis">History</a></li>
+                        <li><a href="./outage.php" class="nav-link px-3 link-body-emphasis">Outage</a></li>
                     </ul>
                 </nav>
             </div>
