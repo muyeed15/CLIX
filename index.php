@@ -146,11 +146,12 @@ if ($isLoggedIn) {
                 <nav class="navbar-nav">
                     <ul class="nav flex-column text-center">
                         <li><a href="./" class="nav-link px-3 link-secondary">Home</a></li>
-                        <li><a href="./about.php" class="nav-link px-3 link-body-emphasis">About Us</a></li>
-                        <li><a href="./contact.php" class="nav-link px-3 link-body-emphasis">Contact Us</a></li>
-                        <?php if ($isLoggedIn): ?>
+                        <?php if (!$isLoggedIn): ?>
+                            <li><a href="./about.php" class="nav-link px-3 link-body-emphasis">About Us</a></li>
+                            <li><a href="./contact.php" class="nav-link px-3 link-body-emphasis">Contact Us</a></li>
+                        <?php else: ?>
                             <li><a href="./php/dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
-                            <li><a href="./php/history.php" class="nav-link px-3 link-body-emphasis">Pay Bill</a></li>
+                            <li><a href="./php/history.php" class="nav-link px-3 link-body-emphasis">History</a></li>
                             <li><a href="./php/outage.php" class="nav-link px-3 link-body-emphasis">Outage</a></li>
                         <?php endif; ?>
                     </ul>
@@ -165,7 +166,7 @@ if ($isLoggedIn) {
             <!-- hero section -->
             <section class="hero-section">
                 <video class="hero-video" autoplay muted loop>
-                    <source src="./vid/3052161-hd_1920_1080_24fps.mp4" type="video/mp4">
+                    <source src="./vid/20003753-hd_1920_1080_60fps.mp4" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
                 <img class="hero-logo" src="./img/CLIX-white.svg" alt="Logo">
@@ -384,11 +385,11 @@ if ($isLoggedIn) {
             <div class="col-3">
                 <h5>Links</h5>
                 <ul class=" list-unstyled">
-                    <li><a class="link-secondary text-decoration-none small" href="./about.php">About Us</a></li>
-                    <li><a class="link-secondary text-decoration-none small" href="./contact.php">Contact Us</a></li>
-                    <li><a class="link-secondary text-decoration-none small" href="./privacy.php">Privacy Policy</a></li>
-                    <li><a class="link-secondary text-decoration-none small" href="./term.php">Terms & Conditions</a></li>
-                    <li><a class="link-secondary text-decoration-none small" href="./faq.php">FAQ & Help</a></li>
+                    <li><a class="link-secondary text-decoration-none small" href="./php/about.php">About Us</a></li>
+                    <li><a class="link-secondary text-decoration-none small" href="./php/contact.php">Contact Us</a></li>
+                    <li><a class="link-secondary text-decoration-none small" href="./php/privacy.php">Privacy Policy</a></li>
+                    <li><a class="link-secondary text-decoration-none small" href="./php/term.php">Terms & Conditions</a></li>
+                    <li><a class="link-secondary text-decoration-none small" href="./php/faq.php">FAQ & Help</a></li>
                 </ul>
             </div>
             <div class="col-3">
