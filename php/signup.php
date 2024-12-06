@@ -168,7 +168,7 @@ if (!empty($error)) {
 
 <body>
     <video autoplay muted loop id="background-video">
-        <source src="../vid/10996977-uhd_3840_2160_30fps.mp4" type="video/mp4">
+        <source src="../vid/10996977-hd_1920_1080_60fps.mp4" type="video/mp4">
     </video>
 
     <div id="header-logo-container">
