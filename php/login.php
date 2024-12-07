@@ -14,6 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             throw new Exception("All fields must be filled out");
         }
 
+        // Check user credentials
         $query = "SELECT * FROM user_table WHERE _email_ = ?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("s", $email);
@@ -23,22 +24,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($result && $result->num_rows > 0) {
             $user = $result->fetch_assoc();
 
-            $client_check = $conn->prepare("SELECT * FROM client_table WHERE _client_id_ = ?");
-            $client_check->bind_param("i", $user['_user_id_']);
-            $client_check->execute();
-            $client_result = $client_check->get_result();
-
-            if ($client_result->num_rows === 0) {
-                throw new Exception("Invalid email or password");
-            }
-
             if (hash('sha256', $password) === $user['_password_']) {
                 $_SESSION['_user_id_'] = $user['_user_id_'];
 
+                // Check if user is an admin
+                $admin_check = $conn->prepare("SELECT * FROM admin_table WHERE _admin_id_ = ?");
+                $admin_check->bind_param("i", $user['_user_id_']);
+                $admin_check->execute();
+                $admin_result = $admin_check->get_result();
+
+                // Check if user is a client
+                $client_check = $conn->prepare("SELECT * FROM client_table WHERE _client_id_ = ?");
+                $client_check->bind_param("i", $user['_user_id_']);
+                $client_check->execute();
+                $client_result = $client_check->get_result();
+
+                // Log the login attempt
                 $ip_address = $_SERVER['REMOTE_ADDR'];
                 $device_name = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown Device';
                 
-                // logs
                 $log_stmt = $conn->prepare("INSERT INTO user_login_log_table (
                     _user_id_, 
                     _log_time_, 
@@ -57,8 +61,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 );
                 $log_stmt->execute();
 
-                header("Location: ../index.php");
-                exit();
+                // Redirect based on user type
+                if ($admin_result->num_rows > 0) {
+                    header("Location: ../admin-dashboard.php");
+                    exit();
+                } elseif ($client_result->num_rows > 0) {
+                    header("Location: ../index.php");
+                    exit();
+                } else {
+                    throw new Exception("Invalid account type");
+                }
             }
         }
         
