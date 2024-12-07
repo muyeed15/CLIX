@@ -9,6 +9,49 @@ if (!isset($_SESSION['_user_id_'])) {
 
 $user_id = $_SESSION['_user_id_'];
 
+// Process feedback form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['feedback_submit'])) {  // Check for specific form submission
+    // Get form data and sanitize inputs
+    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $subject = mysqli_real_escape_string($conn, $_POST['subject']);
+    $message = mysqli_real_escape_string($conn, $_POST['message']);
+    
+    try {
+        // Prepare the SQL statement
+        $sql = "INSERT INTO feedback_table (_user_id_, _feedback_time_, _feedback_name_, _feedback_subject_, _feedback_message_) 
+                VALUES (?, NOW(), ?, ?, ?)";
+        
+        $stmt = mysqli_prepare($conn, $sql);
+        
+        // Bind parameters
+        mysqli_stmt_bind_param($stmt, "isss", $user_id, $name, $subject, $message);
+        
+        // Execute the statement
+        if (mysqli_stmt_execute($stmt)) {
+            echo "<script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var successModal = new bootstrap.Modal(document.getElementById('feedbackSuccessModal'));
+                    successModal.show();
+                });
+            </script>";
+        } else {
+            throw new Exception("Error submitting feedback: " . mysqli_error($conn));
+        }
+        
+        mysqli_stmt_close($stmt);
+        
+    } catch (Exception $e) {
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var errorModal = new bootstrap.Modal(document.getElementById('feedbackErrorModal'));
+                document.getElementById('errorMessage').textContent = '" . addslashes($e->getMessage()) . "';
+                errorModal.show();
+            });
+        </script>";
+    }
+}
+
 try {
     // Notification
     $notificationQuery = "SELECT * FROM notification_table
@@ -202,7 +245,7 @@ try {
                         <label for="message" class="form-label">Message</label>
                         <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Send Message</button>
+                     <button type="submit" name="feedback_submit" class="btn w-100" style="background-color: #63ba5d; color: white; border: none;">Send Message</button>
                 </form>
             </div>
         </section>
@@ -241,7 +284,62 @@ try {
         </div>
     </footer>
 
+    <!-- Success Modal -->
+    <div class="modal fade" id="feedbackSuccessModal" tabindex="-1" aria-labelledby="feedbackSuccessModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #63ba5d; color: white;">
+                    <h5 class="modal-title" id="feedbackSuccessModalLabel">Success!</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="#63ba5d" class="bi bi-check-circle-fill mb-4" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                    </svg>
+                    <h4>Thank you for your feedback!</h4>
+                    <p class="text-muted mb-0">We appreciate you taking the time to share your thoughts with us.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn px-4" style="background-color: #63ba5d; color: white;" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="modal fade" id="feedbackErrorModal" tabindex="-1" aria-labelledby="feedbackErrorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="feedbackErrorModalLabel">Error</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-exclamation-circle-fill text-danger mb-4" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+                    </svg>
+                    <h4>Oops! Something went wrong</h4>
+                    <p class="text-muted mb-0" id="errorMessage"></p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-danger px-4" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function() {
+            const successModal = document.getElementById('feedbackSuccessModal');
+            successModal.addEventListener('hidden.bs.modal', function() {
+                form.reset();
+            });
+        });
+    });
+    </script>
     <script src="../js/bootstrap.bundle.js"></script>
 </body>
 
