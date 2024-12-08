@@ -160,7 +160,6 @@ if (!empty($error)) {
 
     <link rel="stylesheet" href="../css/bootstrap.css">
     <link rel="stylesheet" href="../css/base.css">
-    <link rel="stylesheet" href="../css/login.css">
     <link rel="stylesheet" href="../css/animation.css">
     <link rel="stylesheet" href="../css/signup.css">
 

@@ -151,3 +151,35 @@ body {
     text-decoration: underline;
     transition: all 0.3s ease;
 }
+
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+        padding-top: 4rem;
+    }
+
+    .form-signin {
+        margin: 0;
+        padding: 1.5rem;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 0.5rem;
+        padding-top: 3.5rem;
+    }
+
+    .form-signin {
+        padding: 1rem;
+    }
+
+    .form-row {
+        gap: 0.2rem;
+    }
+}
