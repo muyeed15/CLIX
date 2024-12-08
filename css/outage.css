@@ -1,44 +1,157 @@
 #map {
-    height: 500px;
+    height: clamp(300px, 50vw, 500px);
     width: 100%;
-    margin: 0vw 0vw 1vw 0vw;
-    border-radius: 10px
+    margin: 0 0 clamp(10px, 1vw, 20px) 0;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 #map-section {
-    padding: 1vw 0vw;
+    padding: clamp(10px, 1vw, 20px) 0;
 }
 
 #map-gas {
     color: #e44d4d;
+    font-size: clamp(14px, 1vw, 16px);
 }
 
 #map-water {
     color: #3d81ff;
-
+    font-size: clamp(14px, 1vw, 16px);
 }
 
 #map-electricity {
     color: #2ea38a;
+    font-size: clamp(14px, 1vw, 16px);
 }
 
 #table-section {
-    font-size: small;
+    font-size: clamp(12px, 0.875rem, 14px);
+    margin-top: clamp(20px, 2vw, 40px);
+}
+
+.utility-svg {
+    height: clamp(20px, 2vw, 32px);
+    width: auto;
+}
+
+#client-search {
+    max-width: 100%;
+    width: clamp(250px, 50vw, 300px);
+    font-size: clamp(14px, 1vw, 16px);
+    padding: 0.5rem;
+}
+
+#pagination-section {
+    margin: clamp(20px, 2vw, 40px) 0;
 }
 
 #pagination-section nav ul li a {
-    font-size: small
+    font-size: clamp(12px, 0.875rem, 14px);
+    padding: clamp(6px, 0.5vw, 10px) clamp(10px, 0.8vw, 15px);
 }
 
 .pagination.no-border {
     border: none;
     box-shadow: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem;
 }
 
 .pagination.no-border .page-item .page-link {
     border: none;
+    min-width: 2.5rem;
+    text-align: center;
 }
 
-.utility-svg {
-    height: 2vw;
+@media (max-width: 1200px) {
+    #map {
+        height: clamp(280px, 45vw, 450px);
+    }
+}
+
+@media (max-width: 992px) {
+    #map {
+        height: clamp(250px, 40vw, 400px);
+    }
+
+    .utility-svg {
+        height: clamp(18px, 2.5vw, 28px);
+    }
+}
+
+@media (max-width: 768px) {
+    #map {
+        height: clamp(220px, 35vw, 350px);
+    }
+
+    #table-section {
+        font-size: clamp(11px, 0.8rem, 13px);
+    }
+
+    .utility-svg {
+        height: clamp(16px, 3vw, 24px);
+    }
+
+    .pagination.no-border .page-item .page-link {
+        min-width: 2rem;
+        padding: clamp(4px, 0.4vw, 8px) clamp(8px, 0.6vw, 12px);
+    }
+}
+
+@media (max-width: 576px) {
+    #map {
+        height: clamp(200px, 30vw, 300px);
+        margin-bottom: 15px;
+    }
+
+    #table-section {
+        font-size: clamp(10px, 0.75rem, 12px);
+    }
+
+    .utility-svg {
+        height: clamp(14px, 3.5vw, 20px);
+    }
+
+    #map-gas,
+    #map-water,
+    #map-electricity {
+        font-size: clamp(12px, 0.9vw, 14px);
+        padding: 0 0.5rem !important;
+    }
+
+    .pagination.no-border .page-item .page-link {
+        min-width: 1.8rem;
+        padding: 4px 6px;
+    }
+
+    #client-search {
+        width: 100%;
+    }
+}
+
+@media (hover: none) {
+    .pagination.no-border .page-item .page-link {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #client-search {
+        min-height: 44px;
+    }
+}
+
+.leaflet-control-zoom {
+    margin: clamp(10px, 1vw, 20px) !important;
+}
+
+.leaflet-control-zoom a {
+    width: clamp(30px, 2.5vw, 40px) !important;
+    height: clamp(30px, 2.5vw, 40px) !important;
+    line-height: clamp(28px, 2.4vw, 38px) !important;
+    font-size: clamp(16px, 1.2vw, 20px) !important;
 }
