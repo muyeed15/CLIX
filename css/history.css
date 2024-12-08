@@ -1,0 +1,149 @@
+/* Utility Icon Styles */
+.utility-svg {
+    height: 2vw;
+    min-height: 20px;
+    max-height: 32px;
+    width: auto;
+}
+
+/* Table Styles */
+#iot-table {
+    width: 100%;
+    font-size: small;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+#iot-table thead th {
+    white-space: nowrap;
+    padding: 0.75rem;
+}
+
+#iot-table tbody td {
+    padding: 0.75rem;
+    vertical-align: middle;
+}
+
+/* Pagination Styles */
+#pagination-section {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.pagination.no-border {
+    border: none;
+    box-shadow: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.pagination.no-border .page-item .page-link {
+    border: none;
+    padding: 0.5rem 0.75rem;
+    font-size: small;
+    min-width: 2.5rem;
+    text-align: center;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1200px) {
+    #iot-table {
+        font-size: 0.9rem;
+    }
+
+    .utility-svg {
+        height: 2.5vw;
+    }
+}
+
+@media (max-width: 992px) {
+    #iot-table {
+        font-size: 0.85rem;
+    }
+
+    .utility-svg {
+        height: 3vw;
+    }
+
+    #iot-table thead th,
+    #iot-table tbody td {
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    #iot-table {
+        font-size: 0.8rem;
+    }
+
+    .utility-svg {
+        height: 3.5vw;
+    }
+
+    .pagination.no-border .page-item .page-link {
+        padding: 0.4rem 0.6rem;
+        min-width: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    #iot-table {
+        font-size: 0.75rem;
+        display: block;
+        white-space: nowrap;
+    }
+
+    .utility-svg {
+        height: 4vw;
+        min-height: 16px;
+    }
+
+    #iot-table thead th,
+    #iot-table tbody td {
+        padding: 0.4rem;
+    }
+
+    .pagination.no-border .page-item .page-link {
+        padding: 0.3rem 0.5rem;
+        min-width: 1.8rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Ensure table remains usable on very small screens */
+@media (max-width: 480px) {
+    #iot-table {
+        font-size: 0.7rem;
+    }
+
+    #iot-table thead th,
+    #iot-table tbody td {
+        padding: 0.3rem;
+    }
+
+    .utility-svg {
+        height: 5vw;
+    }
+
+    .pagination.no-border {
+        gap: 0.15rem;
+    }
+
+    .pagination.no-border .page-item .page-link {
+        padding: 0.25rem 0.4rem;
+        min-width: 1.6rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) {
+    .pagination.no-border .page-item .page-link {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
