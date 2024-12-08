@@ -238,7 +238,6 @@ if ($isLoggedIn) {
                 <div class="about-label-container">
                     <p class="about-section-2-label">
                         We help you to<br>make living easy ->
-                        <br><br>Let's<br>.make<br>..it<br>...easy!
                     </p>
                 </div>
                 <div class="about-box-container">
