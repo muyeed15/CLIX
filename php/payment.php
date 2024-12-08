@@ -44,6 +44,17 @@ try {
             (isset($_SESSION['last_payment_time']) && time() - $_SESSION['last_payment_time'] > 5)) {
             
             $amount = floatval($_POST['amount']);
+            
+            if ($amount < 500) {
+                header("Location: payment.php?iot_id=" . $iot_id . "&status=error&message=" . urlencode("Transaction amount must be at least 500 taka"));
+                exit;
+            }
+            
+            if ($amount > 20000) {
+                header("Location: payment.php?iot_id=" . $iot_id . "&status=error&message=" . urlencode("Transaction amount cannot exceed 20,000 taka"));
+                exit;
+            }
+            
             $currentDateTime = date('Y-m-d H:i:s');
             
             mysqli_begin_transaction($conn);
@@ -252,7 +263,19 @@ try {
                     </div>
                     <div class="col-md-6">
                         <h4 class="mb-3">Amount</h4>
-                        <input type="number" class="form-control" name="amount" min="0" step="0.01" required>
+                        <input 
+                            type="number" 
+                            class="form-control" 
+                            name="amount" 
+                            min="500" 
+                            max="20000" 
+                            step="0.01" 
+                            placeholder="Enter amount (৳500 - ৳20,000)" 
+                            required
+                        >
+                        <div class="invalid-feedback">
+                            Amount must be between ৳500 and ৳20,000
+                        </div>
                     </div>
                 </div>
             
@@ -299,23 +322,23 @@ try {
                             <div class="row gy-3">
                                 <div class="col-md-6">
                                     <label for="cc-name" class="form-label">Name on card</label>
-                                    <input type="text" class="form-control" id="cc-name" required>
+                                    <input type="text" class="form-control" id="cc-name" placeholder="Enter full name as on card" required>
                                     <small class="text-body-secondary">Full name as displayed on card</small>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="cc-number" class="form-label">Card number</label>
-                                    <input type="text" class="form-control" id="cc-number" required>
+                                    <input type="text" class="form-control" id="cc-number" placeholder="XXXX XXXX XXXX XXXX" maxlength="19" required>
                                 </div>
 
                                 <div class="col-md-3">
                                     <label for="cc-expiration" class="form-label">Expiration</label>
-                                    <input type="text" class="form-control" id="cc-expiration" required>
+                                    <input type="text" class="form-control" id="cc-expiration" placeholder="MM/YY" maxlength="5" required>
                                 </div>
 
                                 <div class="col-md-3">
                                     <label for="cc-cvv" class="form-label">CVV</label>
-                                    <input type="text" class="form-control" id="cc-cvv" required>
+                                    <input type="text" class="form-control" id="cc-cvv" placeholder="3 or 4-digit code" maxlength="4" required>
                                 </div>
                             </div>
                         </div>
@@ -344,8 +367,8 @@ try {
             <div class="col-3">
                 <h5>Links</h5>
                 <ul class=" list-unstyled">
-                    <li><a class="link-secondary text-decoration-none small" href="#">About Us</a></li>
-                    <li><a class="link-secondary text-decoration-none small" href="#">Contact Us</a></li>
+                    <li><a class="link-secondary text-decoration-none small" href="./about.php">About Us</a></li>
+                    <li><a class="link-secondary text-decoration-none small" href="./contact.php">Contact Us</a></li>
                     <li><a class="link-secondary text-decoration-none small" href="#">Privacy Policy</a></li>
                     <li><a class="link-secondary text-decoration-none small" href="#">Terms & Conditions</a></li>
                     <li><a class="link-secondary text-decoration-none small" href="#">FAQ & Help</a></li>
@@ -461,7 +484,6 @@ try {
                 if (paymentStatus === 'success') {
                     const successModal = new bootstrap.Modal(document.getElementById('paymentSuccessModal'));
                     
-                    // Add event listener for when modal is hidden
                     document.getElementById('paymentSuccessModal').addEventListener('hidden.bs.modal', () => {
                         window.location.href = 'dashboard.php';
                     });
@@ -471,7 +493,6 @@ try {
                     const errorModal = new bootstrap.Modal(document.getElementById('paymentErrorModal'));
                     document.getElementById('errorMessage').textContent = errorMessage || "An unexpected error occurred.";
                     
-                    // Add event listener for when modal is hidden
                     document.getElementById('paymentErrorModal').addEventListener('hidden.bs.modal', () => {
                         window.location.href = 'dashboard.php';
                     });
