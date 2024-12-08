@@ -1,11 +1,12 @@
 body {
     margin-top: 5vw;
     background-color: #ffffff;
+    min-height: 100vh;
 }
 
 #header-section {
-    padding: 0vw 2.2vw;
-    font-size: 1vw;
+    padding: 0 2.2vw;
+    font-size: clamp(14px, 1vw, 18px);
     background: rgba(248, 248, 248, 0.6);
     backdrop-filter: blur(10px);
     position: fixed;
@@ -13,26 +14,42 @@ body {
     left: 0;
     width: 100%;
     z-index: 1000;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
 }
 
 #header-logo {
     width: 6.5vw;
-    padding: 0.9vw 0vw;
+    min-width: 80px;
+    max-width: 120px;
+    padding: 0.9vw 0;
 }
 
 #notification-icon {
     z-index: 10001;
-    padding: 0.5vw 1vw 0vw 0vw;
+    padding: 0.5vw 1vw 0 0;
 }
 
 #user-picture {
     z-index: 10000;
 }
 
+#main-section {
+    padding: 0 3vw;
+    min-height: calc(100vh - 200px);
+}
+
+#sub-div-header {
+    padding: 1vw 0;
+    font-size: clamp(20px, 1.8vw, 32px);
+    color: #282828;
+}
+
 #footer-section {
-    padding: 3vw;
+    padding: clamp(20px, 3vw, 40px);
     color: #202020;
-    font-size: 1.35vw;
+    font-size: clamp(14px, 1.35vw, 20px);
     background-color: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -40,88 +57,11 @@ body {
 }
 
 #footer-section div div h5 {
-    font-size: 1.5vw;
-}
-
-#main-section {
-    padding: 0vw 3vw;
-}
-
-#sub-div-header {
-    padding: 1vw 0vw 1vw 0vw;
-    font-size: 1.8vw;
-    color: #282828;
+    font-size: clamp(16px, 1.5vw, 24px);
 }
 
 .footer-logo {
-    width: 4vw;
-}
-
-@media (max-width: 768px) {
-    body {
-        margin-top: 8vw;
-    }
-
-    #header-logo {
-        width: 11vw;
-    }
-
-    #header-section {
-        padding: 0vw 1.5vw;
-        font-size: 2.2vw;
-    }
-
-    #sub-div-header {
-        padding: 1.5vw 0vw 0vw 0vw;
-        font-size: 3vw;
-        color: #282828;
-    }
-
-    #footer-section {
-        font-size: 2vw;
-    }
-
-    #footer-section div div h5 {
-        font-size: 2.25vw;
-    }
-
-    .footer-logo {
-        width: 5.9vw;
-    }
-}
-
-@media (max-width: 576px) {
-    body {
-        margin-top: 13vw;
-    }
-
-    #header-logo {
-        width: 17vw;
-    }
-
-    #header-section {
-        padding: 0vw 1vw;
-        font-size: 2.3vw;
-    }
-
-    #sub-div-header {
-        padding: 1.5vw 0vw 0vw 0vw;
-        font-size: 3.5vw;
-        color: #282828;
-    }
-
-    #footer-section {
-        font-size: 2.5vw;
-    }
-
-    #footer-section div div h5 {
-        font-size: 2.75vw;
-    }
-
-    .footer-logo {
-        width: 8vw;
-    }
-
+    width: clamp(40px, 4vw, 60px);
 }
 
 table {
@@ -131,7 +71,7 @@ table {
     background: #ffffff;
     border-radius: 12px;
     padding: 1px;
-    margin: 1.5vw 0;
+    margin: clamp(15px, 1.5vw, 30px) 0;
     border: 1px solid rgba(199, 199, 199, 0.8);
 }
 
@@ -142,38 +82,30 @@ thead {
 
 th {
     text-align: left;
-    padding: 1.2vw 1.4vw;
+    padding: clamp(12px, 1.2vw, 20px) clamp(14px, 1.4vw, 24px);
     color: #374151;
     font-weight: 600;
     border-bottom: 2px solid rgba(224, 224, 224, 0.8);
     position: relative;
     background: rgba(249, 250, 251, 0.9);
-    font-size: 0.95vw;
-}
-
-th:first-child {
-    border-top-left-radius: 12px;
-}
-
-th:last-child {
-    border-top-right-radius: 12px;
+    font-size: clamp(12px, 0.95vw, 16px);
 }
 
 td {
-    padding: 1.2vw 1.4vw;
+    padding: clamp(12px, 1.2vw, 20px) clamp(14px, 1.4vw, 24px);
     border-bottom: 1px solid rgba(224, 224, 224, 0.4);
     transition: all 0.2s ease-in-out;
     background: #ffffff;
     vertical-align: middle;
 }
 
-th:not(:last-child),
-td:not(:last-child) {
-    border-right: 1px solid rgba(224, 224, 224, 0.4);
+/* Table Border Radius */
+th:first-child {
+    border-top-left-radius: 12px;
 }
 
-tr:last-child td {
-    border-bottom: none;
+th:last-child {
+    border-top-right-radius: 12px;
 }
 
 tr:last-child td:first-child {
@@ -184,25 +116,18 @@ tr:last-child td:last-child {
     border-bottom-right-radius: 12px;
 }
 
+/* Table Borders */
+th:not(:last-child),
+td:not(:last-child) {
+    border-right: 1px solid rgba(224, 224, 224, 0.4);
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
 tr:nth-child(even) {
     background: rgba(249, 250, 251, 0.5);
-}
-
-/* Responsive Table */
-@media (max-width: 768px) {
-
-    th,
-    td {
-        padding: 2vw 2.2vw;
-    }
-}
-
-@media (max-width: 576px) {
-
-    th,
-    td {
-        padding: 3vw 3.2vw;
-    }
 }
 
 td .d-flex {
@@ -210,4 +135,107 @@ td .d-flex {
     align-items: center;
     justify-content: flex-start;
     padding: 0 !important;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1200px) {
+    body {
+        margin-top: 70px;
+    }
+}
+
+@media (max-width: 992px) {
+    body {
+        margin-top: 65px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        margin-top: 8vw;
+    }
+
+    #header-logo {
+        width: clamp(90px, 11vw, 120px);
+    }
+
+    #header-section {
+        padding: 0 1.5vw;
+        font-size: clamp(14px, 1.8vw, 18px);
+    }
+
+    #sub-div-header {
+        padding: 1.5vw 0 0 0;
+        font-size: clamp(20px, 2.5vw, 28px);
+    }
+
+    #footer-section {
+        font-size: clamp(14px, 1.6vw, 18px);
+    }
+
+    #footer-section div div h5 {
+        font-size: clamp(16px, 1.8vw, 20px);
+    }
+
+    .footer-logo {
+        width: clamp(45px, 5.9vw, 65px);
+    }
+
+    th,
+    td {
+        padding: clamp(12px, 2vw, 18px) clamp(14px, 2.2vw, 20px);
+        font-size: clamp(12px, 1.4vw, 16px);
+    }
+}
+
+@media (max-width: 576px) {
+    body {
+        margin-top: 13vw;
+    }
+
+    #header-logo {
+        width: clamp(100px, 17vw, 130px);
+    }
+
+    #header-section {
+        padding: 0 1vw;
+        font-size: clamp(14px, 2vw, 16px);
+    }
+
+    #sub-div-header {
+        padding: 1.5vw 0 0 0;
+        font-size: clamp(18px, 2.8vw, 24px);
+    }
+
+    #footer-section {
+        font-size: clamp(14px, 2vw, 16px);
+        padding: 20px;
+    }
+
+    #footer-section div div h5 {
+        font-size: clamp(16px, 2.2vw, 18px);
+    }
+
+    .footer-logo {
+        width: clamp(50px, 8vw, 70px);
+    }
+
+    th,
+    td {
+        padding: clamp(10px, 3vw, 16px) clamp(12px, 3.2vw, 18px);
+        font-size: clamp(12px, 1.6vw, 14px);
+    }
+}
+
+@media (hover: none) {
+
+    td,
+    th {
+        min-height: 44px;
+    }
+
+    #notification-icon,
+    #user-picture {
+        padding: 8px;
+    }
 }
