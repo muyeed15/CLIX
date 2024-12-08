@@ -60,6 +60,7 @@ try {
     <link rel="stylesheet" href="../css/bootstrap.css">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/animation.css">
+    <link rel="stylesheet" href="../css/iot.css">
 </head>
 
 <!-- body -->
