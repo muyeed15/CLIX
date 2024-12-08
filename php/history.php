@@ -102,7 +102,7 @@ try {
     <link rel="stylesheet" href="../css/bootstrap.css">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/animation.css">
-    <link rel="stylesheet" href="../css/pay.css">
+    <link rel="stylesheet" href="../css/history.css">
 </head>
 
 <!-- body -->
