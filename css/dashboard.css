@@ -4,6 +4,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-bottom: 1rem;
 }
 
 .card-body {
@@ -17,10 +18,20 @@
 
 .utility-svg-pay {
     height: 1.5vw;
+    min-height: 16px;
+    max-height: 24px;
 }
 
 .utility-svg {
     height: 2vw;
+    min-height: 20px;
+    max-height: 32px;
+}
+
+#iot-table {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 #iot-table thead {
@@ -31,7 +42,39 @@
     font-size: 0.9rem;
 }
 
+@media (max-width: 1200px) {
+    .card {
+        height: 40vw;
+    }
+
+    #iot-table thead {
+        font-size: 0.9rem;
+    }
+
+    #iot-table tbody {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .card {
+        height: 45vw;
+    }
+
+    #iot-table thead {
+        font-size: 0.8rem;
+    }
+
+    #iot-table tbody {
+        font-size: 0.7rem;
+    }
+}
+
 @media (max-width: 768px) {
+    .card {
+        height: 50vw;
+    }
+
     #iot-table thead {
         font-size: 0.7rem;
     }
@@ -39,14 +82,61 @@
     #iot-table tbody {
         font-size: 0.6rem;
     }
+
+    .utility-svg-pay {
+        height: 2vw;
+    }
+
+    .utility-svg {
+        height: 2.5vw;
+    }
 }
 
 @media (max-width: 576px) {
+    .card {
+        height: 60vw;
+    }
+
+    #iot-table {
+        display: block;
+        white-space: nowrap;
+    }
+
     #iot-table thead {
-        font-size: 0.5rem;
+        font-size: 0.6rem;
     }
 
     #iot-table tbody {
-        font-size: 0.4rem;
+        font-size: 0.5rem;
+    }
+
+    .utility-svg-pay {
+        height: 3vw;
+    }
+
+    .utility-svg {
+        height: 3.5vw;
+    }
+}
+
+@media (max-width: 992px) {
+
+    [style*="flex: 0 0 66.666%"],
+    [style*="flex: 0 0 33.333%"] {
+        flex: 0 0 100% !important;
+    }
+}
+
+td,
+th {
+    padding: 0.5rem !important;
+    min-height: 44px;
+}
+
+@media (max-width: 480px) {
+
+    #iot-table td,
+    #iot-table th {
+        padding: 0.25rem !important;
     }
 }
