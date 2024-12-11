@@ -9,7 +9,7 @@ if (!isset($_SESSION['_user_id_'])) {
 
 $nid = $_SESSION['_user_id_'];
 
-// Fetch consumption data for the last 7 days
+// Chart 1 (Last 7 Days)
 $consumptionQuery = "SELECT 
                 DATE(u._usage_time_) as date,
                 SUM(CASE 
@@ -35,8 +35,6 @@ $consumptionQuery = "SELECT
             ORDER BY date;
 ";
 
-// u._date_ >= CURDATE() - INTERVAL 7 DAY AND 
-
 $consumptionStmt = $conn->prepare($consumptionQuery);
 $consumptionStmt->bind_param("i", $nid);
 $consumptionStmt->execute();
@@ -56,7 +54,7 @@ while ($row = $consumptionResult->fetch_assoc()) {
     $consumptionData['electricity'][] = (float)$row['electricity_consumption'];
 }
 
-// Fetch total usage data
+// Chart 2 (All time)
 $totalUsageQuery = "SELECT 
                 SUM(CASE 
                     WHEN g._gas_id_ IS NOT NULL THEN u._usage_amount_ 
@@ -85,14 +83,13 @@ $totalUsageStmt->execute();
 $totalUsageResult = $totalUsageStmt->get_result();
 $totalUsageData = $totalUsageResult->fetch_assoc();
 
-// Prepare total usage data
 $totalUsage = [
     'gas' => (int)$totalUsageData['total_gas_usage'],
     'water' => (int)$totalUsageData['total_water_usage'],
     'electricity' => (int)$totalUsageData['total_electricity_usage']
 ];
 
-// Combined response
+// Combined response (Chart 1 + Chart 2)
 $response = [
     'consumptionData' => $consumptionData,
     'totalUsageData' => $totalUsage
@@ -102,4 +99,3 @@ header('Content-Type: application/json');
 echo json_encode($response);
 
 $conn->close();
-
