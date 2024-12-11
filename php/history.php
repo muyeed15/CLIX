@@ -13,7 +13,8 @@ try {
     // Notification
     $notificationQuery = "SELECT * FROM notification_table
                         WHERE _user_id_ = ? OR _user_id_ IS NULL
-                        ORDER BY _notification_time_ DESC";
+                        ORDER BY _notification_time_ DESC
+                        LIMIT 10";
 
     $stmt = mysqli_prepare($conn, $notificationQuery);
     mysqli_stmt_bind_param($stmt, "s", $user_id);
@@ -37,12 +38,11 @@ try {
         $imageSrc = "./img/user-rounded-svgrepo-com.jpg";
     }
 
-    // Pagination setup
+    // Pagination
     $items_per_page = 10;
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $offset = ($page - 1) * $items_per_page;
 
-    // Get total number of recharges for pagination
     $count_query = "SELECT COUNT(*) as total FROM recharge_table WHERE _user_id_ = ?";
     $stmt = mysqli_prepare($conn, $count_query);
     mysqli_stmt_bind_param($stmt, "i", $user_id);
@@ -52,7 +52,7 @@ try {
     $total_recharges = $total_row['total'];
     $total_pages = ceil($total_recharges / $items_per_page);
 
-    // Get recharge history with utility type information
+    // History
     $query = "SELECT r.*, i._iot_label_, i._iot_id_, 
             CASE 
                 WHEN g._gas_id_ IS NOT NULL THEN 'Gas'
@@ -282,6 +282,7 @@ try {
 
     <!-- script -->
     <script src="../js/bootstrap.bundle.js"></script>
+    
 </body>
 
 </html>
