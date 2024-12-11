@@ -3,6 +3,7 @@ session_start();
 require_once './db-connection.php';
 $error = '';
 
+// login
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
         $email = strtolower(trim(filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL)));
@@ -14,7 +15,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             throw new Exception("All fields must be filled out");
         }
 
-        // Check user credentials
         $query = "SELECT * FROM user_table WHERE _email_ = ?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("s", $email);
@@ -27,19 +27,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (hash('sha256', $password) === $user['_password_']) {
                 $_SESSION['_user_id_'] = $user['_user_id_'];
 
-                // Check if user is an admin
                 $admin_check = $conn->prepare("SELECT * FROM admin_table WHERE _admin_id_ = ?");
                 $admin_check->bind_param("i", $user['_user_id_']);
                 $admin_check->execute();
                 $admin_result = $admin_check->get_result();
 
-                // Check if user is a client
                 $client_check = $conn->prepare("SELECT * FROM client_table WHERE _client_id_ = ?");
                 $client_check->bind_param("i", $user['_user_id_']);
                 $client_check->execute();
                 $client_result = $client_check->get_result();
 
-                // Log the login attempt
                 $ip_address = $_SERVER['REMOTE_ADDR'];
                 $device_name = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown Device';
                 
@@ -61,7 +58,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 );
                 $log_stmt->execute();
 
-                // Redirect based on user type
                 if ($admin_result->num_rows > 0) {
                     header("Location: ../admin-dashboard.php");
                     exit();
@@ -134,39 +130,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <button type="submit" class="btn btn-primary w-100 mt-3 mb-4">Sign in</button>
         </form>
     </main>
-
-    <script>
-        function getLocation() {
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    document.getElementById('latitude').value = position.coords.latitude;
-                    document.getElementById('longitude').value = position.coords.longitude;
-                }, function(error) {
-                    document.getElementById('latitude').value = 23.8103;
-                    document.getElementById('longitude').value = 90.4125;
-                });
-            } else {
-                document.getElementById('latitude').value = 23.8103;
-                document.getElementById('longitude').value = 90.4125;
-            }
-        }
-
-        getLocation();
-
-        (function () {
-            'use strict';
-            var forms = document.querySelectorAll('.needs-validation');
-            Array.prototype.slice.call(forms)
-                .forEach(function (form) {
-                    form.addEventListener('submit', function (event) {
-                        if (!form.checkValidity()) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                        }
-                        form.classList.add('was-validated');
-                    }, false);
-                });
-        })();
-    </script>
+    
+    <!-- script -->
+    <script src="../js/login.js"></script>
+    
 </body>
 </html>
