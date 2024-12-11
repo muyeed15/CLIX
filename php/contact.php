@@ -2,32 +2,64 @@
 session_start();
 require_once './db-connection.php';
 
-if (!isset($_SESSION['_user_id_'])) {
-    header("Location: login.php");
-    exit;
+$isLoggedIn = isset($_SESSION['_user_id_']);
+$notifications = [];
+$imageSrc = "";
+
+if ($isLoggedIn) {
+    $user_id = $_SESSION['_user_id_'];
+    
+    try {
+        // Notification
+        $notificationQuery = "SELECT * FROM notification_table
+                            WHERE _user_id_ = ? OR _user_id_ IS NULL
+                            ORDER BY _notification_time_ DESC
+                            LIMIT 10";
+
+        $stmt = mysqli_prepare($conn, $notificationQuery);
+        mysqli_stmt_bind_param($stmt, "s", $user_id);
+        mysqli_stmt_execute($stmt);
+        $notifications = mysqli_stmt_get_result($stmt);
+
+        // User Picture
+        $pictureQuery = "SELECT _profile_picture_ FROM user_table
+                        WHERE _user_id_ = ?";
+
+        $stmt = mysqli_prepare($conn, $pictureQuery);
+        mysqli_stmt_bind_param($stmt, "i", $user_id);
+        mysqli_stmt_execute($stmt);
+        $picture = mysqli_stmt_get_result($stmt);
+
+        if (($row = mysqli_fetch_assoc($picture)) && (!empty($row['_profile_picture_']) && $row['_profile_picture_'] !== NULL)) {
+            $pictureData = $row['_profile_picture_'];
+            $base64Image = base64_encode($pictureData);
+            $imageSrc = 'data:image/jpeg;base64,' . $base64Image;
+        } else {
+            $imageSrc = "./img/user-rounded-svgrepo-com.jpg";
+        }
+
+        mysqli_stmt_close($stmt);
+        
+    } catch (Exception $e) {
+        echo "Error fetching data: " . $e->getMessage();
+    }
 }
 
-$user_id = $_SESSION['_user_id_'];
-
-// Process feedback form submission
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['feedback_submit'])) {  // Check for specific form submission
-    // Get form data and sanitize inputs
+// POST feedback
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['feedback_submit'])) {
     $name = mysqli_real_escape_string($conn, $_POST['name']);
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $subject = mysqli_real_escape_string($conn, $_POST['subject']);
     $message = mysqli_real_escape_string($conn, $_POST['message']);
     
     try {
-        // Prepare the SQL statement
         $sql = "INSERT INTO feedback_table (_user_id_, _feedback_time_, _feedback_name_, _feedback_subject_, _feedback_message_) 
                 VALUES (?, NOW(), ?, ?, ?)";
         
         $stmt = mysqli_prepare($conn, $sql);
         
-        // Bind parameters
         mysqli_stmt_bind_param($stmt, "isss", $user_id, $name, $subject, $message);
         
-        // Execute the statement
         if (mysqli_stmt_execute($stmt)) {
             echo "<script>
                 document.addEventListener('DOMContentLoaded', function() {
@@ -52,39 +84,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['feedback_submit'])) { 
     }
 }
 
-try {
-    // Notification
-    $notificationQuery = "SELECT * FROM notification_table
-                        WHERE _user_id_ = ? OR _user_id_ IS NULL
-                        ORDER BY _notification_time_ DESC";
-
-    $stmt = mysqli_prepare($conn, $notificationQuery);
-    mysqli_stmt_bind_param($stmt, "s", $user_id);
-    mysqli_stmt_execute($stmt);
-    $notifications = mysqli_stmt_get_result($stmt);
-
-    // User Picture
-    $pictureQuery = "SELECT _profile_picture_ FROM user_table
-                    WHERE _user_id_ = ?";
-
-    $stmt = mysqli_prepare($conn, $pictureQuery);
-    mysqli_stmt_bind_param($stmt, "i", $user_id);
-    mysqli_stmt_execute($stmt);
-    $picture = mysqli_stmt_get_result($stmt);
-
-    if (($row = mysqli_fetch_assoc($picture)) && (!empty($row['_profile_picture_']) && $row['_profile_picture_'] !== NULL)) {
-        $pictureData = $row['_profile_picture_'];
-        $base64Image = base64_encode($pictureData);
-        $imageSrc = 'data:image/jpeg;base64,' . $base64Image;
-    } else {
-        $imageSrc = "./img/user-rounded-svgrepo-com.jpg";
-    }
-
-    mysqli_stmt_close($stmt);
-    
-} catch (Exception $e) {
-    echo "Error fetching data: " . $e->getMessage();
-}
 ?>
 
 <!doctype html>
@@ -97,18 +96,21 @@ try {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CLIX: About Us</title>
+    <title>CLIX: Convenient Living & Integrated Experience</title>
 
     <!-- css -->
     <link rel="stylesheet" href="../css/bootstrap.css">
     <link rel="stylesheet" href="../css/base.css">
-    <link rel="stylesheet" href="../css/animation.css">
+    <link rel="stylesheet" href="../css/index.css">
     <link rel="stylesheet" href="../css/contact.css">
-
+    <link rel="stylesheet" href="../css/slick.min.css">
+    <link rel="stylesheet" href="../css/slick-theme.min.css">
+    <link rel="stylesheet" href="../css/animation.css">
 </head>
 
+<!-- body -->
+
 <body>
-    <body>
     <video autoplay muted loop id="video-background">
         <source src="../vid/12742302_1920_1080_30fps.mp4" type="video/mp4">
     </video>
@@ -126,9 +128,14 @@ try {
                 <nav class="d-none d-lg-flex flex-grow-1 justify-content-center">
                     <ul class="nav">
                         <li><a href="../" class="nav-link px-3 link-body-emphasis">Home</a></li>
-                        <li><a href="./dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
-                        <li><a href="./history.php" class="nav-link px-3 link-body-emphasis">History</a></li>
-                        <li><a href="./outage.php" class="nav-link px-3 link-body-emphasis">Outage</a></li>
+                        <?php if (!$isLoggedIn): ?>
+                            <li><a href="./about.php" class="nav-link px-3 link-body-emphasis">About Us</a></li>
+                            <li><a href="./contact.php" class="nav-link px-3 link-secondary">Contact Us</a></li>
+                        <?php else: ?>
+                            <li><a href="./dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
+                            <li><a href="./history.php" class="nav-link px-3 link-body-emphasis">History</a></li>
+                            <li><a href="./outage.php" class="nav-link px-3 link-body-emphasis">Outage</a></li>
+                        <?php endif; ?>
                     </ul>
                 </nav>
 
@@ -143,34 +150,41 @@ try {
                         </span>
                     </button>
 
-                    <!-- Notifications -->
-                    <div class="dropdown text-end me-2" id="notification-icon">
-                        <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="17px" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
-                                <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6" />
-                            </svg>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <?php while ($row = mysqli_fetch_assoc($notifications)) : ?>
-                                <li><a class="dropdown-item small" href="#"><?= htmlspecialchars($row['_notification_message_']); ?></a></li>
-                            <?php endwhile; ?>
-                        </ul>
-                    </div>
+                    <?php if ($isLoggedIn): ?>
+                        <!-- Notifications -->
+                        <div class="dropdown text-end me-2" id="notification-icon">
+                            <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17px" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
+                                    <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6" />
+                                </svg>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <?php while ($row = mysqli_fetch_assoc($notifications)) : ?>
+                                    <li><a class="dropdown-item small" href="#"><?= htmlspecialchars($row['_notification_message_']); ?></a></li>
+                                <?php endwhile; ?>
+                            </ul>
+                        </div>
 
-                    <!-- User Picture -->
-                    <div class="dropdown text-end" id="user-picture">
-                        <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
-                            <img src="<?php echo $imageSrc; ?>" alt="User" class="rounded-circle" style="width: 36px; height: 36px;">
-                        </a>
-                        <ul class="dropdown-menu text-small">
-                            <li><a class="dropdown-item small" href="./profile.php">Profile</a></li>
-                            <li><a class="dropdown-item small" href="./settings.php">Settings</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item small" href="./logout.php">Sign out</a></li>
-                        </ul>
-                    </div>
+                        <!-- User Picture -->
+                        <div class="dropdown text-end" id="user-picture">
+                            <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+                                <img src="<?php echo $imageSrc; ?>" alt="User" class="rounded-circle" style="width: 36px; height: 36px;">
+                            </a>
+                            <ul class="dropdown-menu text-small">
+                                <li><a class="dropdown-item small" href="./profile.php">Profile</a></li>
+                                <li><a class="dropdown-item small" href="./settings.php">Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item small" href="./logout.php">Sign out</a></li>
+                            </ul>
+                        </div>
+                    <?php else: ?>
+                        <!-- Login and Signup Buttons -->
+                        <div class="d-flex gap-2">
+                            <a href="./login.php" class="btn btn-outline-primary">Login</a>
+                            <a href="./signup.php" class="btn btn-primary">Sign Up</a>
+                        </div>
+                    <?php endif; ?>
                 </div>
-
             </div>
 
             <!-- Collapsible Mobile Menu -->
@@ -178,9 +192,14 @@ try {
                 <nav class="navbar-nav">
                     <ul class="nav flex-column text-center">
                         <li><a href="../" class="nav-link px-3 link-body-emphasis">Home</a></li>
-                        <li><a href="./dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
-                        <li><a href="./history.php" class="nav-link px-3 link-body-emphasis">History</a></li>
-                        <li><a href="./outage.php" class="nav-link px-3 link-body-emphasis">Outage</a></li>
+                        <?php if (!$isLoggedIn): ?>
+                            <li><a href="./about.php" class="nav-link px-3 link-body-emphasis">About Us</a></li>
+                            <li><a href="./contact.php" class="nav-link px-3 link-secondary">Contact Us</a></li>
+                        <?php else: ?>
+                            <li><a href="./dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
+                            <li><a href="./history.php" class="nav-link px-3 link-body-emphasis">History</a></li>
+                            <li><a href="./outage.php" class="nav-link px-3 link-body-emphasis">Outage</a></li>
+                        <?php endif; ?>
                     </ul>
                 </nav>
             </div>
@@ -330,17 +349,10 @@ try {
 
     <!-- script -->
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('form');
-        form.addEventListener('submit', function() {
-            const successModal = document.getElementById('feedbackSuccessModal');
-            successModal.addEventListener('hidden.bs.modal', function() {
-                form.reset();
-            });
-        });
-    });
+
     </script>
     <script src="../js/bootstrap.bundle.js"></script>
+
 </body>
 
 </html>
