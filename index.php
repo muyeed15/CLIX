@@ -13,7 +13,8 @@ if ($isLoggedIn) {
         // Notification
         $notificationQuery = "SELECT * FROM notification_table
                             WHERE _user_id_ = ? OR _user_id_ IS NULL
-                            ORDER BY _notification_time_ DESC";
+                            ORDER BY _notification_time_ DESC
+                            LIMIT 10";
 
         $stmt = mysqli_prepare($conn, $notificationQuery);
         mysqli_stmt_bind_param($stmt, "s", $user_id);
@@ -83,8 +84,8 @@ if ($isLoggedIn) {
                     <ul class="nav">
                         <li><a href="./" class="nav-link px-3 link-secondary">Home</a></li>
                         <?php if (!$isLoggedIn): ?>
-                            <li><a href="./about.php" class="nav-link px-3 link-body-emphasis">About Us</a></li>
-                            <li><a href="./contact.php" class="nav-link px-3 link-body-emphasis">Contact Us</a></li>
+                            <li><a href="./php/about.php" class="nav-link px-3 link-body-emphasis">About Us</a></li>
+                            <li><a href="./php/contact.php" class="nav-link px-3 link-body-emphasis">Contact Us</a></li>
                         <?php else: ?>
                             <li><a href="./php/dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
                             <li><a href="./php/history.php" class="nav-link px-3 link-body-emphasis">History</a></li>
@@ -147,8 +148,8 @@ if ($isLoggedIn) {
                     <ul class="nav flex-column text-center">
                         <li><a href="./" class="nav-link px-3 link-secondary">Home</a></li>
                         <?php if (!$isLoggedIn): ?>
-                            <li><a href="./about.php" class="nav-link px-3 link-body-emphasis">About Us</a></li>
-                            <li><a href="./contact.php" class="nav-link px-3 link-body-emphasis">Contact Us</a></li>
+                            <li><a href="./php/about.php" class="nav-link px-3 link-body-emphasis">About Us</a></li>
+                            <li><a href="./php/contact.php" class="nav-link px-3 link-body-emphasis">Contact Us</a></li>
                         <?php else: ?>
                             <li><a href="./php/dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
                             <li><a href="./php/history.php" class="nav-link px-3 link-body-emphasis">History</a></li>
