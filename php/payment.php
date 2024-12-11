@@ -2,6 +2,10 @@
 session_start();
 require_once './db-connection.php';
 
+// time zone
+$dateTime = new DateTime('now', new DateTimeZone('Asia/Dhaka'));
+$currentDateTime = $dateTime->format('Y-m-d H:i:s');
+
 if (!isset($_SESSION['_user_id_'])) {
     header("Location: login.php");
     exit;
@@ -16,7 +20,35 @@ if (!$iot_id) {
 }
 
 try {
-    // Get device details
+    // Notification
+    $notificationQuery = "SELECT * FROM notification_table
+                        WHERE _user_id_ = ? OR _user_id_ IS NULL
+                        ORDER BY _notification_time_ DESC
+                        LIMIT 10";
+
+    $stmt = mysqli_prepare($conn, $notificationQuery);
+    mysqli_stmt_bind_param($stmt, "s", $user_id);
+    mysqli_stmt_execute($stmt);
+    $notifications = mysqli_stmt_get_result($stmt);
+
+    // User Picture
+    $pictureQuery = "SELECT _profile_picture_ FROM user_table
+                    WHERE _user_id_ = ?";
+
+    $stmt = mysqli_prepare($conn, $pictureQuery);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+    mysqli_stmt_execute($stmt);
+    $picture = mysqli_stmt_get_result($stmt);
+
+    if (($row = mysqli_fetch_assoc($picture)) && (!empty($row['_profile_picture_']) && $row['_profile_picture_'] !== NULL)) {
+        $pictureData = $row['_profile_picture_'];
+        $base64Image = base64_encode($pictureData);
+        $imageSrc = 'data:image/jpeg;base64,' . $base64Image;
+    } else {
+        $imageSrc = "./img/user-rounded-svgrepo-com.jpg";
+    }
+
+    // GET Payemnt Details
     $deviceQuery = "SELECT 
         i._iot_label_,
         i._iot_id_,
@@ -55,10 +87,11 @@ try {
                 exit;
             }
             
-            $currentDateTime = date('Y-m-d H:i:s');
+            
             
             mysqli_begin_transaction($conn);
-            
+
+            // POST Payemnt Details
             try {
                 $rechargeQuery = "INSERT INTO recharge_table (_user_id_, _iot_id_, _recharge_time_, _recharge_amount_) 
                                 VALUES (?, ?, ?, ?)";
@@ -122,30 +155,6 @@ try {
             var errorMessage = '" . htmlspecialchars($errorMessage) . "';
             var redirectUrl = 'dashboard.php';
         </script>";
-    }
-
-    // Get notifications for header
-    $notificationQuery = "SELECT * FROM notification_table
-                         WHERE _user_id_ = ? OR _user_id_ IS NULL
-                         ORDER BY _notification_time_ DESC";
-    $stmt = mysqli_prepare($conn, $notificationQuery);
-    mysqli_stmt_bind_param($stmt, "s", $user_id);
-    mysqli_stmt_execute($stmt);
-    $notifications = mysqli_stmt_get_result($stmt);
-
-    // Get user picture for header
-    $pictureQuery = "SELECT _profile_picture_ FROM user_table WHERE _user_id_ = ?";
-    $stmt = mysqli_prepare($conn, $pictureQuery);
-    mysqli_stmt_bind_param($stmt, "i", $user_id);
-    mysqli_stmt_execute($stmt);
-    $picture = mysqli_stmt_get_result($stmt);
-
-    if (($row = mysqli_fetch_assoc($picture)) && (!empty($row['_profile_picture_']) && $row['_profile_picture_'] !== NULL)) {
-        $pictureData = $row['_profile_picture_'];
-        $base64Image = base64_encode($pictureData);
-        $imageSrc = 'data:image/jpeg;base64,' . $base64Image;
-    } else {
-        $imageSrc = "../img/user-rounded-svgrepo-com.jpg";
     }
 
 } catch (Exception $e) {
@@ -431,77 +440,7 @@ try {
 
     <!-- script -->
     <script src="../js/bootstrap.bundle.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const paymentOptions = document.querySelectorAll('.payment-option');
-            const cardPaymentSection = document.getElementById('card-payment-section');
-            const cardInputs = cardPaymentSection.querySelectorAll('input');
-            let selectedMobilePayment = null;
-
-            function resetMobilePayments() {
-                paymentOptions.forEach(option => {
-                    option.classList.remove('selected');
-                });
-            }
-
-            function toggleCardPaymentSection(disable) {
-                if (disable) {
-                    cardPaymentSection.classList.add('disabled');
-                    cardInputs.forEach(input => {
-                        input.disabled = true;
-                    });
-                } else {
-                    cardPaymentSection.classList.remove('disabled');
-                    cardInputs.forEach(input => {
-                        input.disabled = false;
-                    });
-                }
-            }
-
-            paymentOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    const method = this.getAttribute('data-method');
-                    
-                    if (selectedMobilePayment === method) {
-                        // Deselect current mobile payment
-                        resetMobilePayments();
-                        toggleCardPaymentSection(false);
-                        selectedMobilePayment = null;
-                    } else {
-                        // Select new mobile payment
-                        resetMobilePayments();
-                        this.classList.add('selected');
-                        toggleCardPaymentSection(true);
-                        selectedMobilePayment = method;
-                    }
-                });
-            });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof paymentStatus !== 'undefined') {
-                if (paymentStatus === 'success') {
-                    const successModal = new bootstrap.Modal(document.getElementById('paymentSuccessModal'));
-                    
-                    document.getElementById('paymentSuccessModal').addEventListener('hidden.bs.modal', () => {
-                        window.location.href = 'dashboard.php';
-                    });
-                    
-                    successModal.show();
-                } else if (paymentStatus === 'error') {
-                    const errorModal = new bootstrap.Modal(document.getElementById('paymentErrorModal'));
-                    document.getElementById('errorMessage').textContent = errorMessage || "An unexpected error occurred.";
-                    
-                    document.getElementById('paymentErrorModal').addEventListener('hidden.bs.modal', () => {
-                        window.location.href = 'dashboard.php';
-                    });
-                    
-                    errorModal.show();
-                }
-            }
-        });
-    </script>
+    <script src="../js/payment.js"></script>
 
 </body>
 
