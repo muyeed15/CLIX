@@ -3,6 +3,7 @@ session_start();
 require_once './db-connection.php';
 $error = '';
 
+// signup
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
         $first_name = htmlspecialchars(trim($_POST['first_name'] ?? ''), ENT_QUOTES, 'UTF-8');
@@ -248,34 +249,9 @@ if (!empty($error)) {
             </form>
         </div>
     </main>
+    
+    <!-- script -->
+    <script src="../js/signup.js"></script>
 
-    <script>
-        (function () {
-            'use strict';
-            var forms = document.querySelectorAll('.needs-validation');
-            Array.prototype.slice.call(forms)
-                .forEach(function (form) {
-                    form.addEventListener('submit', function (event) {
-                        if (!form.checkValidity()) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                        }
-                        form.classList.add('was-validated');
-                    }, false);
-                });
-        })();
-
-        document.getElementById('profilePicture').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const preview = document.getElementById('profilePreview');
-                    preview.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    </script>
 </body>
 </html>
