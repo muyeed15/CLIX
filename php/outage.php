@@ -13,7 +13,8 @@ try {
     // Notification
     $notificationQuery = "SELECT * FROM notification_table
                         WHERE _user_id_ = ? OR _user_id_ IS NULL
-                        ORDER BY _notification_time_ DESC";
+                        ORDER BY _notification_time_ DESC
+                        LIMIT 10";
 
     $stmt = mysqli_prepare($conn, $notificationQuery);
     mysqli_stmt_bind_param($stmt, "s", $user_id);
@@ -325,6 +326,7 @@ try {
     <script src="../js/bootstrap.bundle.js"></script>
     <script src="../js/leaflet.js"></script>
     <script src="../js/outage.js"></script>
+    
 </body>
 
 </html>
