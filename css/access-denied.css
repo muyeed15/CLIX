@@ -1,0 +1,33 @@
+.warning-icon {
+    color: #dc3545;
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.warning-title {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.warning-box {
+    border: 2px solid #dc3545;
+    border-radius: 8px;
+    padding: 2rem;
+    background-color: #fff5f5;
+}
+
+.warning-message {
+    color: #dc3545;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.return-btn {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.return-btn:hover {
+    background-color: #bb2d3b;
+    border-color: #b02a37;
+}
