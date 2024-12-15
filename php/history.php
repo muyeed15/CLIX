@@ -9,7 +9,21 @@ if (!isset($_SESSION['_user_id_'])) {
 
 $user_id = $_SESSION['_user_id_'];
 
+$clientCheckQuery = "SELECT c._client_id_ 
+                    FROM client_table c 
+                    WHERE c._client_id_ = ?";
+
 try {
+    $stmt = mysqli_prepare($conn, $clientCheckQuery);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    
+    if (mysqli_num_rows($result) === 0) {
+        header("Location: access-denied.php");
+        exit;
+    }
+
     // Notification
     $notificationQuery = "SELECT * FROM notification_table
                         WHERE _user_id_ = ? OR _user_id_ IS NULL
@@ -220,21 +234,47 @@ try {
             <div class="d-flex justify-content-center" id="pagination-section">
                 <nav aria-label="Page navigation">
                     <ul class="pagination no-border">
-                        <?php if ($page > 1): ?>
+                        <?php
+                        if ($page > 1): ?>
                             <li class="page-item">
                                 <a class="page-link" href="?page=<?php echo ($page - 1); ?>" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
-                        <?php endif; ?>
+                        <?php endif;
 
-                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                        $start_page = max(1, min($page - 2, $total_pages - 4));
+                        $end_page = min($total_pages, $start_page + 4);
+                        
+                        if ($start_page > 1): ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1">1</a>
+                            </li>
+                            <?php if ($start_page > 2): ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            <?php endif;
+                        endif;
+
+                        for ($i = $start_page; $i <= $end_page; $i++): ?>
                             <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
                                 <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
                             </li>
-                        <?php endfor; ?>
+                        <?php endfor;
 
-                        <?php if ($page < $total_pages): ?>
+                        if ($end_page < $total_pages): ?>
+                            <?php if ($end_page < $total_pages - 1): ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            <?php endif; ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<?php echo $total_pages; ?>"><?php echo $total_pages; ?></a>
+                            </li>
+                        <?php endif;
+
+                        if ($page < $total_pages): ?>
                             <li class="page-item">
                                 <a class="page-link" href="?page=<?php echo ($page + 1); ?>" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
