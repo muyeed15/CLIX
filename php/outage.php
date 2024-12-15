@@ -9,7 +9,21 @@ if (!isset($_SESSION['_user_id_'])) {
 
 $user_id = $_SESSION['_user_id_'];
 
+$clientCheckQuery = "SELECT c._client_id_ 
+                    FROM client_table c 
+                    WHERE c._client_id_ = ?";
+
 try {
+    $stmt = mysqli_prepare($conn, $clientCheckQuery);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    
+    if (mysqli_num_rows($result) === 0) {
+        header("Location: access-denied.php");
+        exit;
+    }
+
     // Notification
     $notificationQuery = "SELECT * FROM notification_table
                         WHERE _user_id_ = ? OR _user_id_ IS NULL
@@ -259,23 +273,47 @@ try {
                 <div class="d-flex justify-content-center" id="pagination-section" <?php echo ($totalPages <= 1) ? 'style="display: none !important;"' : ''; ?>>
                     <nav aria-label="Page navigation">
                         <ul class="pagination no-border">
-                            <?php if ($page > 1): ?>
+                            <?php
+                            if ($page > 1): ?>
                                 <li class="page-item">
                                     <a class="page-link" href="?page=<?php echo ($page - 1); ?>&search=<?php echo urlencode($search); ?>" aria-label="Previous">
                                         <span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
-                            <?php endif; ?>
+                            <?php endif;
+
+                            $start_page = max(1, min($page - 2, $totalPages - 4));
+                            $end_page = min($totalPages, $start_page + 4);
                             
-                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
-                                    <a class="page-link" href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>">
-                                        <?php echo $i; ?>
-                                    </a>
+                            if ($start_page > 1): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1&search=<?php echo urlencode($search); ?>">1</a>
                                 </li>
-                            <?php endfor; ?>
-                            
-                            <?php if ($page < $totalPages): ?>
+                                <?php if ($start_page > 2): ?>
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                <?php endif;
+                            endif;
+
+                            for ($i = $start_page; $i <= $end_page; $i++): ?>
+                                <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
+                                    <a class="page-link" href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>"><?php echo $i; ?></a>
+                                </li>
+                            <?php endfor;
+
+                            if ($end_page < $totalPages): ?>
+                                <?php if ($end_page < $totalPages - 1): ?>
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                <?php endif; ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?php echo $totalPages; ?>&search=<?php echo urlencode($search); ?>"><?php echo $totalPages; ?></a>
+                                </li>
+                            <?php endif;
+
+                            if ($page < $totalPages): ?>
                                 <li class="page-item">
                                     <a class="page-link" href="?page=<?php echo ($page + 1); ?>&search=<?php echo urlencode($search); ?>" aria-label="Next">
                                         <span aria-hidden="true">&raquo;</span>
