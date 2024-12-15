@@ -156,7 +156,7 @@
 
     <!-- script -->
     <script src="../js/bootstrap.bundle.js"></script>
-    <script src="../js/chart.js"></script>
+    <script src="../js/chart-dummy.js"></script>
     <script src="../js/chart.script.js"></script>
 </body>
 
