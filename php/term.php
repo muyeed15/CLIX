@@ -9,7 +9,21 @@ if (!isset($_SESSION['_user_id_'])) {
 
 $user_id = $_SESSION['_user_id_'];
 
+$clientCheckQuery = "SELECT c._client_id_ 
+                    FROM client_table c 
+                    WHERE c._client_id_ = ?";
+
 try {
+    $stmt = mysqli_prepare($conn, $clientCheckQuery);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    
+    if (mysqli_num_rows($result) === 0) {
+        header("Location: access-denied.php");
+        exit;
+    }
+
     // Notification
     $notificationQuery = "SELECT * FROM notification_table
                         WHERE _user_id_ = ? OR _user_id_ IS NULL
