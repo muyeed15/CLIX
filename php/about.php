@@ -6,8 +6,22 @@ $isLoggedIn = isset($_SESSION['_user_id_']);
 $notifications = [];
 $imageSrc = "";
 
+$clientCheckQuery = "SELECT c._client_id_ 
+                    FROM client_table c 
+                    WHERE c._client_id_ = ?";
+
 if ($isLoggedIn) {
     $user_id = $_SESSION['_user_id_'];
+
+    $stmt = mysqli_prepare($conn, $clientCheckQuery);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    
+    if (mysqli_num_rows($result) === 0) {
+        header("Location: access-denied.php");
+        exit;
+    }
     
     try {
         // Notification
