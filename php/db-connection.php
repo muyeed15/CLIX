@@ -1,7 +1,7 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "12345678";
+$servername = "localhost:3306";
+$username = "clix_user";
+$password = "F9sqtmJx9kqj9FP";
 $dbname = "clix_database";
 
 $conn = mysqli_connect($servername, $username, $password, $dbname);
