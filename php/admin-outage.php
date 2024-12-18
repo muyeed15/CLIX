@@ -21,10 +21,38 @@ try {
         header("Location: access-denied.php");
         exit;
     }
+    // Notification
+    $notificationQuery = "SELECT * FROM notification_table
+                        WHERE _user_id_ = ? OR _user_id_ IS NULL
+                        ORDER BY _notification_time_ DESC
+                        LIMIT 10";
+
+    $stmt = mysqli_prepare($conn, $notificationQuery);
+    mysqli_stmt_bind_param($stmt, "s", $user_id);
+    mysqli_stmt_execute($stmt);
+    $notifications = mysqli_stmt_get_result($stmt);
+
+    // User Picture
+    $pictureQuery = "SELECT _profile_picture_ FROM user_table
+                    WHERE _user_id_ = ?";
+
+    $stmt = mysqli_prepare($conn, $pictureQuery);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+    mysqli_stmt_execute($stmt);
+    $picture = mysqli_stmt_get_result($stmt);
+
+    if (($row = mysqli_fetch_assoc($picture)) && (!empty($row['_profile_picture_']) && $row['_profile_picture_'] !== NULL)) {
+        $pictureData = $row['_profile_picture_'];
+        $base64Image = base64_encode($pictureData);
+        $imageSrc = 'data:image/jpeg;base64,' . $base64Image;
+    } else {
+        $imageSrc = "../img/user-rounded-svgrepo-com.jpg";
+    }
+
+    mysqli_stmt_close($stmt);
 
     // Handle outage form submission
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addOutage'])) {
-        // Start transaction
         mysqli_begin_transaction($conn);
         
         try {
@@ -42,15 +70,9 @@ try {
             }
             
             $utility_id = mysqli_fetch_assoc($utility_result)['_utility_id_'];
-
-            // Prepare datetime strings
             $start_datetime = date('Y-m-d H:i:s', strtotime($_POST['startDate'] . ' ' . $_POST['startTime']));
             $end_datetime = date('Y-m-d H:i:s', strtotime($_POST['endDate'] . ' ' . $_POST['endTime']));
-            
-            // Convert radius to kilometers
             $radius_km = $_POST['radiusInput'] / 1000;
-            
-            // Get other form values
             $area_name = $_POST['areaName'];
             $latitude = $_POST['latitude'];
             $longitude = $_POST['longitude'];
@@ -93,7 +115,7 @@ try {
                 AND ST_Distance_Sphere(
                     point(i._iot_longitude_, i._iot_latitude_),
                     point(?, ?)
-                ) <= ? * 1000";  // Convert km to meters for calculation
+                ) <= ? * 1000";
 
             $stmt = mysqli_prepare($conn, $affected_iot_query);
             mysqli_stmt_bind_param($stmt, "iddd", 
@@ -102,13 +124,11 @@ try {
                 $latitude,
                 $radius_km
             );
-            
+
             mysqli_stmt_execute($stmt);
             $affected_iots = mysqli_stmt_get_result($stmt);
 
-            // Insert outage mappings and impact level
             while ($iot = mysqli_fetch_assoc($affected_iots)) {
-                // Insert into outage_mapping_table
                 $stmt = mysqli_prepare($conn, 
                     "INSERT INTO outage_mapping_table (_outage_id_, _iot_id_)
                     VALUES (?, ?)");
@@ -119,16 +139,24 @@ try {
                 }
 
                 $mapping_id = mysqli_insert_id($conn);
+                $impact_type = strtolower($_POST['impactType']);
+                $impact_table = $impact_type . '_impact_table';
+                $impact_column = '_' . $impact_type . '_impact_id_';
 
-                // Insert into impact level table
-                $impact_table = strtolower($_POST['impactType']) . '_impact_table';
                 $stmt = mysqli_prepare($conn, 
-                    "INSERT INTO $impact_table (_" . strtolower($_POST['impactType']) . "_impact_id_)
+                    "INSERT INTO " . $impact_table . " (" . $impact_column . ") 
                     VALUES (?)");
-                mysqli_stmt_bind_param($stmt, "i", $mapping_id);
-                
+
+                if (!$stmt) {
+                    throw new Exception("Failed to prepare impact statement");
+                }
+
+                if (!mysqli_stmt_bind_param($stmt, "i", $mapping_id)) {
+                    throw new Exception("Failed to bind impact parameters");
+                }
+
                 if (!mysqli_stmt_execute($stmt)) {
-                    throw new Exception("Failed to set impact level");
+                    throw new Exception("Failed to insert impact level: " . mysqli_error($conn));
                 }
             }
 
@@ -183,23 +211,109 @@ try {
         }
     }
 
-    // Fetch notifications
-    $stmt = mysqli_prepare($conn, "SELECT * FROM notification_table WHERE _user_id_ = ? OR _user_id_ IS NULL ORDER BY _notification_time_ DESC LIMIT 10");
-    mysqli_stmt_bind_param($stmt, "s", $user_id);
-    mysqli_stmt_execute($stmt);
-    $notifications = mysqli_stmt_get_result($stmt);
+    // Handle status updates
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updateStatus'])) {
+        $outage_id = intval($_POST['outage_id']);
+        $new_status = $_POST['status'];
+        
+        mysqli_begin_transaction($conn);
+        
+        try {
+            if ($new_status === 'Resolved') {
+                $stmt = mysqli_prepare($conn, "DELETE FROM active_outage_table WHERE _active_outage_id_ = ?");
+                mysqli_stmt_bind_param($stmt, "i", $outage_id);
+                mysqli_stmt_execute($stmt);
 
-    // Get user profile picture
-    $stmt = mysqli_prepare($conn, "SELECT _profile_picture_ FROM user_table WHERE _user_id_ = ?");
-    mysqli_stmt_bind_param($stmt, "i", $user_id);
-    mysqli_stmt_execute($stmt);
-    $picture = mysqli_stmt_get_result($stmt);
+                $stmt = mysqli_prepare($conn, "INSERT INTO resolved_outage_table (_resolved_outage_id_) VALUES (?)");
+                mysqli_stmt_bind_param($stmt, "i", $outage_id);
+                mysqli_stmt_execute($stmt);
 
-    // Process profile picture
-    if (($row = mysqli_fetch_assoc($picture)) && !empty($row['_profile_picture_'])) {
-        $imageSrc = 'data:image/jpeg;base64,' . base64_encode($row['_profile_picture_']);
-    } else {
-        $imageSrc = "./img/user-rounded-svgrepo-com.jpg";
+                $stmt = mysqli_prepare($conn, 
+                    "INSERT INTO notification_table 
+                    (_notification_time_, _notification_title_, _notification_message_)
+                    VALUES (NOW(), 'Outage Resolved', 'Utility service has been restored')");
+                mysqli_stmt_execute($stmt);
+
+                $notification_id = mysqli_insert_id($conn);
+
+                $stmt = mysqli_prepare($conn, 
+                    "INSERT INTO alert_notifiaction_table (_alt_not_id_)
+                    VALUES (?)");
+                mysqli_stmt_bind_param($stmt, "i", $notification_id);
+                mysqli_stmt_execute($stmt);
+
+            } elseif ($new_status === 'Active') {
+                $stmt = mysqli_prepare($conn, "DELETE FROM resolved_outage_table WHERE _resolved_outage_id_ = ?");
+                mysqli_stmt_bind_param($stmt, "i", $outage_id);
+                mysqli_stmt_execute($stmt);
+
+                $stmt = mysqli_prepare($conn, "INSERT INTO active_outage_table (_active_outage_id_) VALUES (?)");
+                mysqli_stmt_bind_param($stmt, "i", $outage_id);
+                mysqli_stmt_execute($stmt);
+            }
+
+            mysqli_commit($conn);
+            $_SESSION['success_message'] = "Outage status updated successfully";
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit;
+
+        } catch (Exception $e) {
+            mysqli_rollback($conn);
+            $_SESSION['error_message'] = "Failed to update outage status: " . $e->getMessage();
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit;
+        }
+    }
+
+    // Handle outage deletion
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deleteOutage'])) {
+        $outage_id = intval($_POST['outage_id']);
+
+        mysqli_begin_transaction($conn);
+        
+        try {
+            $stmt = mysqli_prepare($conn, "DELETE FROM outage_alert_notification_table WHERE _outage_id_ = ?");
+            mysqli_stmt_bind_param($stmt, "i", $outage_id);
+            mysqli_stmt_execute($stmt);
+
+            $stmt = mysqli_prepare($conn, "
+                DELETE l, m, h 
+                FROM outage_mapping_table om
+                LEFT JOIN low_impact_table l ON om._outage_map_id_ = l._low_impact_id_
+                LEFT JOIN medium_impact_table m ON om._outage_map_id_ = m._medium_impact_id_
+                LEFT JOIN high_impact_table h ON om._outage_map_id_ = h._high_impact_id_
+                WHERE om._outage_id_ = ?
+            ");
+            mysqli_stmt_bind_param($stmt, "i", $outage_id);
+            mysqli_stmt_execute($stmt);
+
+            $stmt = mysqli_prepare($conn, "DELETE FROM outage_mapping_table WHERE _outage_id_ = ?");
+            mysqli_stmt_bind_param($stmt, "i", $outage_id);
+            mysqli_stmt_execute($stmt);
+
+            $stmt = mysqli_prepare($conn, "DELETE FROM active_outage_table WHERE _active_outage_id_ = ?");
+            mysqli_stmt_bind_param($stmt, "i", $outage_id);
+            mysqli_stmt_execute($stmt);
+
+            $stmt = mysqli_prepare($conn, "DELETE FROM resolved_outage_table WHERE _resolved_outage_id_ = ?");
+            mysqli_stmt_bind_param($stmt, "i", $outage_id);
+            mysqli_stmt_execute($stmt);
+
+            $stmt = mysqli_prepare($conn, "DELETE FROM outage_table WHERE _outage_id_ = ?");
+            mysqli_stmt_bind_param($stmt, "i", $outage_id);
+            mysqli_stmt_execute($stmt);
+
+            mysqli_commit($conn);
+            $_SESSION['success_message'] = "Outage deleted successfully";
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit;
+
+        } catch (Exception $e) {
+            mysqli_rollback($conn);
+            $_SESSION['error_message'] = "Failed to delete outage: " . $e->getMessage();
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit;
+        }
     }
 
     // Pagination setup
@@ -259,6 +373,7 @@ try {
     <link rel="stylesheet" href="../css/leaflet.css">
     <link rel="stylesheet" href="../css/admin-base.css">
     <link rel="stylesheet" href="../css/admin-outage.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
 <body>
     <!-- Header -->
@@ -503,12 +618,68 @@ try {
                                     <td><?php echo htmlspecialchars($row['utility_type']); ?></td>
                                     <td><?php echo date('Y-m-d H:i', strtotime($row['_start_time_'])); ?></td>
                                     <td><?php echo date('Y-m-d H:i', strtotime($row['_end_time_'])); ?></td>
-                                    <td><?php echo htmlspecialchars($row['status']); ?></td>
                                     <td>
-                                        <button class="btn btn-sm btn-danger delete-outage" 
-                                                data-id="<?php echo $row['_outage_id_']; ?>">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                    <?php 
+                                    $statusClass = '';
+                                    $statusIcon = '';
+                                    
+                                    switch($row['status']) {
+                                        case 'Active':
+                                            $statusClass = 'text-bg-warning';
+                                            $statusIcon = 'bi bi-exclamation-circle';
+                                            break;
+                                        case 'Resolved':
+                                            $statusClass = 'text-bg-success';
+                                            $statusIcon = 'bi bi-check-circle';
+                                            break;
+                                        case 'Pending':
+                                            $statusClass = 'text-bg-secondary';
+                                            $statusIcon = 'bi bi-clock';
+                                            break;
+                                        default:
+                                            $statusClass = 'text-bg-secondary';
+                                            $statusIcon = 'bi bi-question-circle';
+                                    }
+                                    ?>
+                                    <span class="badge rounded-pill <?php echo $statusClass; ?>">
+                                        <i class="<?php echo $statusIcon; ?> me-1"></i>
+                                        <?php echo htmlspecialchars($row['status']); ?>
+                                    </span>
+                                </td>
+                                    <td>
+                                        <?php if ($row['status'] === 'Active'): ?>
+                                            <form method="POST" style="display: inline;" class="me-1">
+                                                <input type="hidden" name="updateStatus" value="1">
+                                                <input type="hidden" name="outage_id" value="<?php echo $row['_outage_id_']; ?>">
+                                                <input type="hidden" name="status" value="Resolved">
+                                                <button type="submit" class="btn btn-sm btn-success" 
+                                                        onclick="return confirm('Mark this outage as resolved?')" 
+                                                        title="Mark Resolved">
+                                                    <i class="bi bi-check-circle"></i>
+                                                </button>
+                                            </form>
+                                        <?php elseif ($row['status'] === 'Resolved'): ?>
+                                            <form method="POST" style="display: inline;" class="me-1">
+                                                <input type="hidden" name="updateStatus" value="1">
+                                                <input type="hidden" name="outage_id" value="<?php echo $row['_outage_id_']; ?>">
+                                                <input type="hidden" name="status" value="Active">
+                                                <button type="submit" class="btn btn-sm btn-warning" 
+                                                        onclick="return confirm('Reactivate this outage?')"
+                                                        title="Reactivate">
+                                                    <i class="bi bi-arrow-clockwise"></i>
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                        
+                                        <form method="POST" style="display: inline;">
+                                            <input type="hidden" name="deleteOutage" value="1">
+                                            <input type="hidden" name="outage_id" value="<?php echo $row['_outage_id_']; ?>">
+                                            <button type="submit" class="btn btn-sm btn-danger" 
+                                                    onclick="return confirm('Are you sure you want to delete this outage?')"
+                                                    title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                                 <?php endwhile; ?>

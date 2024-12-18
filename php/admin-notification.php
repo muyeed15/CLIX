@@ -87,7 +87,7 @@ try {
         exit;
     }
 
-    // Notification for header dropdown
+    // Notification
     $notificationQuery = "SELECT * FROM notification_table
                         WHERE _user_id_ = ? OR _user_id_ IS NULL
                         ORDER BY _notification_time_ DESC
@@ -98,8 +98,10 @@ try {
     mysqli_stmt_execute($stmt);
     $notifications = mysqli_stmt_get_result($stmt);
 
-    // User Profile Picture
-    $pictureQuery = "SELECT _profile_picture_ FROM user_table WHERE _user_id_ = ?";
+    // User Picture
+    $pictureQuery = "SELECT _profile_picture_ FROM user_table
+                    WHERE _user_id_ = ?";
+
     $stmt = mysqli_prepare($conn, $pictureQuery);
     mysqli_stmt_bind_param($stmt, "i", $user_id);
     mysqli_stmt_execute($stmt);
@@ -110,8 +112,10 @@ try {
         $base64Image = base64_encode($pictureData);
         $imageSrc = 'data:image/jpeg;base64,' . $base64Image;
     } else {
-        $imageSrc = "./img/user-rounded-svgrepo-com.jpg";
+        $imageSrc = "../img/user-rounded-svgrepo-com.jpg";
     }
+
+    mysqli_stmt_close($stmt);
 
     // Pagination setup
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -262,6 +266,10 @@ try {
                             <option value="Alert">Alert</option>
                             <option value="Reminder">Reminder</option>
                         </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notification-recipient" class="form-label">Recipient Email</label>
+                        <input type="email" class="form-control" id="notification-recipient" name="user_email" placeholder="Enter email (leave empty for all users)">
                     </div>
                     <div class="mb-3">
                         <label for="notification-header" class="form-label">Header</label>
