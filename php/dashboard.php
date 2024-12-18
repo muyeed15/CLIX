@@ -374,6 +374,7 @@ try {
     <script src="../js/bootstrap.bundle.js"></script>
     <script src="../js/chart.js"></script>
     <script src="../js/chart.script.js"></script>
+    <script src="../js/usage-simulation.js"></script>
 
 </body>
 </html>
