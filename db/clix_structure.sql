@@ -46,6 +46,21 @@ CREATE TABLE `active_outage_table` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `active_request_table`
+--
+
+DROP TABLE IF EXISTS `active_request_table`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `active_request_table` (
+  `_active_request_id_` bigint NOT NULL,
+  PRIMARY KEY (`_active_request_id_`),
+  UNIQUE KEY `_active_id__UNIQUE` (`_active_request_id_`),
+  CONSTRAINT `active_request_fk1` FOREIGN KEY (`_active_request_id_`) REFERENCES `request_table` (`_request_id_`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `admin_log_table`
 --
 
@@ -132,6 +147,21 @@ CREATE TABLE `client_table` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `declined_request_table`
+--
+
+DROP TABLE IF EXISTS `declined_request_table`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `declined_request_table` (
+  `_declined_request_id_` bigint NOT NULL,
+  PRIMARY KEY (`_declined_request_id_`),
+  UNIQUE KEY `_declined_request_id__UNIQUE` (`_declined_request_id_`),
+  CONSTRAINT `declined_request_fk1` FOREIGN KEY (`_declined_request_id_`) REFERENCES `request_table` (`_request_id_`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `electricity_admin_table`
 --
 
@@ -159,6 +189,27 @@ CREATE TABLE `electricity_table` (
   UNIQUE KEY `_electricity_id__UNIQUE` (`_electricity_id_`),
   CONSTRAINT `electricity_utility_fk1` FOREIGN KEY (`_electricity_id_`) REFERENCES `utility_table` (`_utility_id_`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `feedback_table`
+--
+
+DROP TABLE IF EXISTS `feedback_table`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `feedback_table` (
+  `_feedback_id_` bigint NOT NULL AUTO_INCREMENT,
+  `_user_id_` bigint DEFAULT NULL,
+  `_feedback_time_` datetime NOT NULL,
+  `_feedback_name_` varchar(255) NOT NULL,
+  `_feedback_subject_` varchar(255) NOT NULL,
+  `_feedback_message_` text NOT NULL,
+  PRIMARY KEY (`_feedback_id_`),
+  UNIQUE KEY `idfeedback_table_UNIQUE` (`_feedback_id_`),
+  KEY `feedback_user_fk1_idx` (`_user_id_`),
+  CONSTRAINT `feedback_user_fk1` FOREIGN KEY (`_user_id_`) REFERENCES `user_table` (`_user_id_`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -302,7 +353,7 @@ CREATE TABLE `notification_table` (
   `_notification_message_` text NOT NULL,
   PRIMARY KEY (`_notification_id_`),
   UNIQUE KEY `_notification_id__UNIQUE` (`_notification_id_`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -378,7 +429,22 @@ CREATE TABLE `outage_table` (
   UNIQUE KEY `_outage_id__UNIQUE` (`_outage_id_`),
   KEY `outage_utility_fk1_idx` (`_utility_id_`),
   CONSTRAINT `outage_utility_fk1` FOREIGN KEY (`_utility_id_`) REFERENCES `utility_table` (`_utility_id_`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `pending_request_table`
+--
+
+DROP TABLE IF EXISTS `pending_request_table`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `pending_request_table` (
+  `_pending_request_id_` bigint NOT NULL,
+  PRIMARY KEY (`_pending_request_id_`),
+  UNIQUE KEY `_pending_id__UNIQUE` (`_pending_request_id_`),
+  CONSTRAINT `pending_request_fk1` FOREIGN KEY (`_pending_request_id_`) REFERENCES `request_table` (`_request_id_`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -400,7 +466,7 @@ CREATE TABLE `recharge_table` (
   KEY `recharge_iot_fk1_idx` (`_iot_id_`),
   CONSTRAINT `recharge_iot_fk1` FOREIGN KEY (`_iot_id_`) REFERENCES `iot_table` (`_iot_id_`),
   CONSTRAINT `recharge_user_fk1` FOREIGN KEY (`_user_id_`) REFERENCES `user_table` (`_user_id_`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -415,6 +481,28 @@ CREATE TABLE `reminder_notification_table` (
   PRIMARY KEY (`_rem_not_id_`),
   UNIQUE KEY `_rem_not_id__UNIQUE` (`_rem_not_id_`),
   CONSTRAINT `rem_not_fk1` FOREIGN KEY (`_rem_not_id_`) REFERENCES `notification_table` (`_notification_id_`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `request_table`
+--
+
+DROP TABLE IF EXISTS `request_table`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `request_table` (
+  `_request_id_` bigint NOT NULL AUTO_INCREMENT,
+  `_user_id_` bigint NOT NULL,
+  `_iot_id_` bigint NOT NULL,
+  `_request_time_` varchar(255) NOT NULL,
+  `_request_status_` varchar(255) NOT NULL,
+  PRIMARY KEY (`_request_id_`),
+  UNIQUE KEY `_request_id__UNIQUE` (`_request_id_`),
+  KEY `request_user_fk1_idx` (`_user_id_`),
+  KEY `request_iot_fk1_idx` (`_iot_id_`),
+  CONSTRAINT `request_iot_fk1` FOREIGN KEY (`_iot_id_`) REFERENCES `iot_table` (`_iot_id_`),
+  CONSTRAINT `request_user_fk1` FOREIGN KEY (`_user_id_`) REFERENCES `user_table` (`_user_id_`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -504,7 +592,7 @@ CREATE TABLE `user_login_log_table` (
   UNIQUE KEY `_user_log_id__UNIQUE` (`_user_log_id_`),
   KEY `login_log_user_fk1_idx` (`_user_id_`),
   CONSTRAINT `login_log_user_fk1` FOREIGN KEY (`_user_id_`) REFERENCES `user_table` (`_user_id_`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -530,7 +618,7 @@ CREATE TABLE `user_table` (
   UNIQUE KEY `_email__UNIQUE` (`_email_`),
   UNIQUE KEY `_phone__UNIQUE` (`_phone_`),
   UNIQUE KEY `_nid__UNIQUE` (`_nid_`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -602,4 +690,4 @@ CREATE TABLE `water_table` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-06  2:11:06
+-- Dump completed on 2024-12-18 21:26:19
