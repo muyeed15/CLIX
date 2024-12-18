@@ -1,5 +1,5 @@
 <?php
-$servername = "localhost:3306";
+$servername = "118.139.179.92:3306";
 $username = "clix_user";
 $password = "F9sqtmJx9kqj9FP";
 $dbname = "clix_database";
