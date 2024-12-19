@@ -394,6 +394,7 @@ try {
                         <li><a href="./admin-notification.php" class="nav-link px-3 link-body-emphasis">Notification</a></li>
                         <li><a href="./admin-login-seasion.php" class="nav-link px-3 link-body-emphasis">Seasion</a></li>
                         <li><a href="./admin-user-control" class="nav-link px-3 link-body-emphasis">Client</a></li>
+                        <li><a href="./admin-feedback.php" class="nav-link px-3 link-body-emphasis">Feedback</a></li>
                     </ul>
                 </nav>
 
@@ -448,6 +449,7 @@ try {
                         <li><a href="./admin-notification.php" class="nav-link px-3 link-body-emphasis">Notification</a></li>
                         <li><a href="./admin-login-seasion.php" class="nav-link px-3 link-body-emphasis">Seasion</a></li>
                         <li><a href="./admin-user-control" class="nav-link px-3 link-body-emphasis">Client</a></li>
+                        <li><a href="./admin-feedback.php" class="nav-link px-3 link-body-emphasis">Feedback</a></li>
                     </ul>
                 </nav>
             </div>
