@@ -1,4 +1,3 @@
-/* Admin Theme Colors */
 :root {
     --admin-primary: #63ba5d;
     --admin-primary-dark: #4e9549;
@@ -14,7 +13,6 @@ body {
     color: #2d2d2d;
 }
 
-/* Header Styling */
 #header-section {
     padding: 0 2.2vw;
     font-size: clamp(14px, 1vw, 18px);
@@ -24,7 +22,7 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 1000;
+    z-index: 10000;
     min-height: 60px;
     display: flex;
     align-items: center;
@@ -53,7 +51,6 @@ body {
     padding: 0.9vw 0;
 }
 
-/* Notification and User Picture */
 #notification-icon {
     z-index: 10001;
     padding: 0.5vw 1vw 0 0;
@@ -84,7 +81,6 @@ body {
     font-weight: 500;
 }
 
-/* Table Styling */
 table {
     width: 100%;
     border-collapse: separate;
@@ -122,7 +118,6 @@ td {
     color: #495057;
 }
 
-/* Search Input Styling */
 .form-control {
     border: 1px solid var(--admin-border);
     border-radius: 8px;
@@ -142,7 +137,6 @@ td {
     font-weight: 500;
 }
 
-/* Card Styling */
 .card {
     background-color: white;
     border: 1px solid var(--admin-border);
@@ -150,7 +144,6 @@ td {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-/* Table Border Radius */
 th:first-child {
     border-top-left-radius: 12px;
 }
@@ -167,7 +160,6 @@ tr:last-child td:last-child {
     border-bottom-right-radius: 12px;
 }
 
-/* Table Borders */
 th:not(:last-child),
 td:not(:last-child) {
     border-right: 1px solid var(--admin-border);
@@ -185,7 +177,6 @@ tr:hover td {
     background: rgba(99, 186, 93, 0.04);
 }
 
-/* Dropdown Styling */
 .dropdown-menu {
     background-color: rgb(51, 51, 51);
     border: 1px solid var(--admin-border);
@@ -206,7 +197,6 @@ tr:hover td {
     border-top: 1px solid var(--admin-border);
 }
 
-/* Footer Styling */
 #footer-section {
     padding: 1rem;
     color: #6c757d;
@@ -216,7 +206,6 @@ tr:hover td {
     text-align: center;
 }
 
-/* Responsive Breakpoints - Preserved from original */
 @media (max-width: 1200px) {
     body {
         margin-top: 70px;
