@@ -59,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $log_stmt->execute();
 
                 if ($admin_result->num_rows > 0) {
-                    header("Location: ./admin-outage.php");
+                    header("Location: ./admin-dashboard.php");
                     exit();
                 } elseif ($client_result->num_rows > 0) {
                     header("Location: ../index.php");
