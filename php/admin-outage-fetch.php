@@ -1,4 +1,5 @@
 <?php
+global $conn;
 include 'db-connection.php';
 
 header('Content-Type: application/json');
@@ -44,4 +45,3 @@ if ($result && mysqli_num_rows($result) > 0) {
 }
 
 echo json_encode($outages);
-?>

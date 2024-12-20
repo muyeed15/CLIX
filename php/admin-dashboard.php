@@ -4,7 +4,7 @@ require_once './db-connection.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['_user_id_'])) {
-    header("Location: login.php");
+    header("Location: access-denied.php");
     exit;
 }
 

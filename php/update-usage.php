@@ -1,11 +1,12 @@
 <?php
+global $conn;
 session_start();
 require_once './db-connection.php';
 
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['_user_id_'])) {
-    echo json_encode(['error' => 'Not authenticated']);
+    header("Location: access-denied.php");
     exit;
 }
 
@@ -90,7 +91,7 @@ try {
                  LEFT JOIN unpaid_iot_table up ON b._iot_id_ = up._unpaid_iot_id_
                  WHERE b._user_id_ = ? AND b._iot_id_ = ?
                  GROUP BY b._iot_id_";
-    
+
     $stmt = mysqli_prepare($conn, $dataQuery);
     mysqli_stmt_bind_param($stmt, "ii", $user_id, $iot_id);
     mysqli_stmt_execute($stmt);
@@ -113,4 +114,3 @@ try {
 }
 
 mysqli_close($conn);
-?>

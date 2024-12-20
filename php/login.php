@@ -1,4 +1,5 @@
 <?php
+global $conn;
 session_start();
 require_once './db-connection.php';
 $error = '';
@@ -39,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 $ip_address = $_SERVER['REMOTE_ADDR'];
                 $device_name = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown Device';
-                
+
                 $log_stmt = $conn->prepare("INSERT INTO user_login_log_table (
                     _user_id_, 
                     _log_time_, 
@@ -48,9 +49,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     _device_longitude_, 
                     _device_name_
                 ) VALUES (?, NOW(), ?, ?, ?, ?)");
-                
-                $log_stmt->bind_param("isdds", 
-                    $user['_user_id_'], 
+
+                $log_stmt->bind_param("isdds",
+                    $user['_user_id_'],
                     $ip_address,
                     $latitude,
                     $longitude,
@@ -69,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
         }
-        
+
         throw new Exception("Invalid email or password");
 
     } catch (Exception $e) {
@@ -90,49 +91,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="../css/animation.css">
 </head>
 <body>
-    <video autoplay muted loop id="background-video">
-        <source src="../vid/10996977-hd_1920_1080_60fps.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+<video autoplay muted loop id="background-video">
+    <source src="../vid/10996977-hd_1920_1080_60fps.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
 
-    <div id="header-logo-container">
-        <a href="../index.php">
-            <img class="py-2" src="../img/CLIX.svg" id="header-logo" alt="Logo">
-        </a>
-    </div>
+<div id="header-logo-container">
+    <a href="../index.php">
+        <img class="py-2" src="../img/CLIX.svg" id="header-logo" alt="Logo">
+    </a>
+</div>
 
-    <main class="form-signin w-100 m-auto">
-        <form method="POST" action="" class="needs-validation" novalidate id="loginForm">
-            <h1 class="h3 mt-4 mb-4 fw-normal text-center" id="sign-h1">Sign In</h1>
-            
-            <?php if (!empty($error)): ?>
-                <div class="alert alert-danger text-center">
-                    <?= htmlspecialchars($error); ?>
-                </div>
-            <?php endif; ?>
-            
-            <div class="form-floating">
-                <input name="email" type="email" class="form-control" id="floatingInput" placeholder="name@example.com" required>
-                <label for="floatingInput" id="floatingInputText">Email</label>
-            </div>
-            <div class="form-floating mt-3">
-                <input name="password" type="password" class="form-control" id="floatingPassword" placeholder="Password" required>
-                <label for="floatingPassword" id="floatingPasswordText">Password</label>
-            </div>
+<main class="form-signin w-100 m-auto">
+    <form method="POST" action="" class="needs-validation" novalidate id="loginForm">
+        <h1 class="h3 mt-4 mb-4 fw-normal text-center" id="sign-h1">Sign In</h1>
 
-            <input type="hidden" name="latitude" id="latitude">
-            <input type="hidden" name="longitude" id="longitude">
-            
-            <div class="my-3 d-flex justify-content-between align-items-center">
-                <a href="forgot-password.php" class="sign-up">Forgot Password?</a>
-                <a href="./signup.php" class="sign-up">New Here? Sign Up</a>
+        <?php if (!empty($error)): ?>
+            <div class="alert alert-danger text-center">
+                <?= htmlspecialchars($error); ?>
             </div>
-            <button type="submit" class="btn btn-primary w-100 mt-3 mb-4">Sign in</button>
-        </form>
-    </main>
-    
-    <!-- script -->
-    <script src="../js/login.js"></script>
-    
+        <?php endif; ?>
+
+        <div class="form-floating">
+            <input name="email" type="email" class="form-control" id="floatingInput" placeholder="name@example.com"
+                   required>
+            <label for="floatingInput" id="floatingInputText">Email</label>
+        </div>
+        <div class="form-floating mt-3">
+            <input name="password" type="password" class="form-control" id="floatingPassword" placeholder="Password"
+                   required>
+            <label for="floatingPassword" id="floatingPasswordText">Password</label>
+        </div>
+
+        <input type="hidden" name="latitude" id="latitude">
+        <input type="hidden" name="longitude" id="longitude">
+
+        <div class="my-3 d-flex justify-content-between align-items-center">
+            <a href="forgot-password.php" class="sign-up">Forgot Password?</a>
+            <a href="./signup.php" class="sign-up">New Here? Sign Up</a>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 mt-3 mb-4">Sign in</button>
+    </form>
+</main>
+
+<!-- script -->
+<script src="../js/login.js"></script>
+
 </body>
 </html>

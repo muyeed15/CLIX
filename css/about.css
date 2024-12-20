@@ -1,61 +1,254 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #2c3e50;
+    background-color: #f8f9fa;
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(135deg, #63ba5d 0%, #2c3e50 100%);
+    color: white;
+    padding: 8rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    animation: fadeInUp 1s ease;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    animation: fadeInUp 1s ease 0.2s;
+    animation-fill-mode: both;
+}
+
+/* Vision Cards */
+.vision-section {
+    padding: 6rem 2rem;
+    background: white;
+}
+
+.vision-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+}
+
 .vision-card {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    background: white;
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.vision-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: #63ba5d;
+    transform: scaleX(0);
+    transform-origin: left;
     transition: transform 0.3s ease;
-    height: 100%;
 }
 
 .vision-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-10px);
+}
+
+.vision-card:hover::before {
+    transform: scaleX(1);
 }
 
 .vision-icon {
-    font-size: 2.5rem;
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
     color: #63ba5d;
+    transition: transform 0.3s ease;
+}
+
+.vision-card:hover .vision-icon {
+    transform: scale(1.1);
+}
+
+.vision-card h3 {
+    font-size: 1.5rem;
     margin-bottom: 1rem;
-}
-
-.about-section {
-    padding: 4rem 0;
-}
-
-.section-title {
     color: #2c3e50;
-    margin-bottom: 2rem;
-    font-weight: 600;
+}
+
+/* Features Section */
+.features-section {
+    background: #f8f9fa;
+    padding: 6rem 2rem;
+}
+
+.features-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
 }
 
 .feature-list {
     list-style: none;
-    padding: 0;
 }
 
-.feature-list li {
-    margin-bottom: 1rem;
+.feature-item {
     display: flex;
     align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
 }
 
-.feature-list li::before {
-    content: "•";
-    color: #63ba5d;
-    font-weight: bold;
-    margin-right: 0.5rem;
+.feature-item:hover {
+    transform: translateX(10px);
+}
+
+.feature-icon {
+    background: #63ba5d;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+/* Stats Section */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
 }
 
 .stats-card {
-    text-align: center;
+    background: white;
     padding: 2rem;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
-    margin: 1rem 0;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: scale(1.05);
 }
 
 .stats-number {
-    font-size: 2.5rem;
+    font-size: 3rem;
     font-weight: bold;
     color: #63ba5d;
+    margin-bottom: 0.5rem;
+}
+
+.stats-label {
+    color: #2c3e50;
+    font-size: 1.1rem;
+}
+
+/* Goal Section */
+.goal-section {
+    padding: 6rem 2rem;
+    background: white;
+    text-align: center;
+}
+
+.goal-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    position: relative;
+    display: inline-block;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: #63ba5d;
+    border-radius: 2px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .features-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .vision-container {
+        grid-template-columns: 1fr;
+    }
 }
