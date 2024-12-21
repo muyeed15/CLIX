@@ -229,8 +229,9 @@ require_once './footer.php';
 <!-- script -->
 <script src="../js/bootstrap.bundle.js"></script>
 <script src="../js/chart.js"></script>
-<script src="../js/chart.script.js"></script>
-<script src="../js/usage-simulation.js"></script>
-
+<?php
+require_once './chart.php';
+require_once './live.php';
+?>
 </body>
 </html>
