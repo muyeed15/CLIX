@@ -1,0 +1,36 @@
+.invoice-box {
+    max-width: 800px;
+    margin: auto;
+    padding: 30px;
+    border: 1px solid #eee;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    font-size: 16px;
+    line-height: 24px;
+    background-color: white;
+}
+
+.invoice-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.invoice-details {
+    margin-bottom: 40px;
+}
+
+@media print {
+    .no-print {
+        display: none;
+    }
+
+    body {
+        padding: 0;
+        background: white;
+    }
+
+    .invoice-box {
+        box-shadow: none;
+        border: none;
+    }
+}

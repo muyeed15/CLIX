@@ -1,6 +1,6 @@
 <?php
 global $conn;
-include 'db-connection.php';
+require_once 'db-connection.php';
 
 header('Content-Type: application/json');
 
@@ -34,7 +34,13 @@ $sql = "SELECT
         LEFT JOIN outage_mapping_table om ON o._outage_id_ = om._outage_id_
         LEFT JOIN high_impact_table hi ON om._outage_map_id_ = hi._high_impact_id_
         LEFT JOIN medium_impact_table mi ON om._outage_map_id_ = mi._medium_impact_id_
-        LEFT JOIN low_impact_table li ON om._outage_map_id_ = li._low_impact_id_;";
+        LEFT JOIN low_impact_table li ON om._outage_map_id_ = li._low_impact_id_
+        WHERE NOT EXISTS (
+            SELECT 1 
+            FROM resolved_outage_table r 
+            WHERE r._resolved_outage_id_ = o._outage_id_
+        );";
+
 $result = mysqli_query($conn, $sql);
 
 $outages = [];

@@ -22,6 +22,7 @@ require_once './db-connection.php';
     <link rel="stylesheet" href="../css/leaflet.css">
     <link rel="stylesheet" href="../css/outage.css">
     <link rel="stylesheet" href="../css/animation.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
 
 <!-- body -->
@@ -58,9 +59,16 @@ try {
     $total_pages = ceil($total_outages / $items_per_page);
 
     // Search
-    $query = "SELECT o.*, u._utility_id_ 
-              FROM outage_table o 
-              JOIN utility_table u ON o._utility_id_ = u._utility_id_";
+    $query = "SELECT o.*, u._utility_id_,
+          CASE 
+              WHEN ao._active_outage_id_ IS NOT NULL THEN 'Active'
+              WHEN ro._resolved_outage_id_ IS NOT NULL THEN 'Resolved'
+              ELSE 'Pending'
+          END as status
+          FROM outage_table o 
+          JOIN utility_table u ON o._utility_id_ = u._utility_id_
+          LEFT JOIN active_outage_table ao ON o._outage_id_ = ao._active_outage_id_
+          LEFT JOIN resolved_outage_table ro ON o._outage_id_ = ro._resolved_outage_id_";
 
     if (!empty($search)) {
         $query .= " WHERE o._affected_area_ LIKE ?";
@@ -119,6 +127,8 @@ try {
                 <th scope="col">Outage</th>
                 <th scope="col">Start</th>
                 <th scope="col">End</th>
+                <th scope="col">Status</th>
+                <th scope="col">Range</th>
             </tr>
             </thead>
             <tbody id="outageTableBody">
@@ -151,6 +161,35 @@ try {
                     <td><?php echo $outageType; ?></td>
                     <td><?php echo date('h:ia (d-M-Y)', strtotime($row['_start_time_'])); ?></td>
                     <td><?php echo date('h:ia (d-M-Y)', strtotime($row['_end_time_'])); ?></td>
+                    <td>
+                        <?php
+                        $statusClass = '';
+                        $statusIcon = '';
+
+                        switch ($row['status']) {
+                            case 'Active':
+                                $statusClass = 'text-bg-warning';
+                                $statusIcon = 'bi bi-clock';
+                                break;
+                            case 'Resolved':
+                                $statusClass = 'text-bg-success';
+                                $statusIcon = 'bi bi-check-circle';
+                                break;
+                            case 'Closed':
+                                $statusClass = 'text-bg-secondary';
+                                $statusIcon = 'bi bi-x-circle';
+                                break;
+                            default:
+                                $statusClass = 'text-bg-secondary';
+                                $statusIcon = 'bi bi-dash-circle';
+                        }
+                        ?>
+                        <span class="badge rounded-pill <?php echo $statusClass; ?>">
+                            <i class="<?php echo $statusIcon; ?> me-1"></i>
+                            <?php echo htmlspecialchars($row['status'] ?? 'Unknown'); ?>
+                        </span>
+                    </td>
+                    <td><?php echo number_format($row['_range_km_'], 1); ?>km</td>
                 </tr>
             <?php endwhile; ?>
             </tbody>

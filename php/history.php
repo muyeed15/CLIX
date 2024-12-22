@@ -5,12 +5,7 @@ require_once './db-connection.php';
 ?>
 
 <!doctype html>
-
-<!-- html -->
 <html lang="en">
-
-<!-- head -->
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -27,13 +22,10 @@ require_once './db-connection.php';
 
 <body>
 <!-- header -->
-<?php
-require_once './header.php';
-?>
+<?php require_once './header.php'; ?>
 
 <!-- main -->
 <?php
-
 try {
     // Pagination
     $items_per_page = 10;
@@ -77,7 +69,6 @@ try {
     $recharges = mysqli_stmt_get_result($stmt);
 
     mysqli_stmt_close($stmt);
-
 } catch (Exception $e) {
     echo "Error fetching data: " . $e->getMessage();
 }
@@ -96,6 +87,7 @@ try {
                 <th scope="col">Amount</th>
                 <th scope="col">Time</th>
                 <th scope="col">Date</th>
+                <th scope="col">Invoice</th>
             </tr>
             </thead>
             <tbody>
@@ -111,6 +103,13 @@ try {
                     <td><?php echo number_format($row['_recharge_amount_'], 2) . 'tk'; ?></td>
                     <td><?php echo date('h:ia', strtotime($row['_recharge_time_'])); ?></td>
                     <td><?php echo date('d/m/Y', strtotime($row['_recharge_time_'])); ?></td>
+                    <td>
+                        <a href="invoice.php?recharge_id=<?php echo htmlspecialchars($row['_recharge_id_']); ?>"
+                           class="btn btn-sm btn-primary"
+                           target="_blank">
+                            View Invoice
+                        </a>
+                    </td>
                 </tr>
             <?php endwhile; ?>
             </tbody>
@@ -118,19 +117,14 @@ try {
     </div>
 
     <!-- pagination -->
-    <?php
-    require_once './pagination.php';
-    ?>
+    <?php require_once './pagination.php'; ?>
 </main>
 
 <!-- footer -->
-<?php
-require_once './footer.php';
-?>
+<?php require_once './footer.php'; ?>
 
 <!-- script -->
 <script src="../js/bootstrap.bundle.js"></script>
 
 </body>
-
 </html>
