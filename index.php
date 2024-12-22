@@ -62,6 +62,6 @@ if ($isLoggedIn) {
         exit;
     }
 } else {
-    header("Location: ./php/login.php");
+    header("Location: ./php/home.php");
     exit;
 }
