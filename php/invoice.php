@@ -1,9 +1,30 @@
 <?php
-global $conn;
+global $conn, $recharge_id;
 session_start();
 require_once './db-connection.php';
+?>
 
-// Check if recharge_id is provided
+<!doctype html>
+
+<!-- html -->
+<html lang="en">
+
+<!-- head -->
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Invoice #<?php echo $recharge_id; ?></title>
+
+    <!-- css -->
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <link rel="stylesheet" href="../css/invoice.css">
+
+</head>
+
+<!-- body -->
+
+<?php
 if (!isset($_GET['recharge_id'])) {
     die('Recharge ID not provided');
 }
@@ -11,7 +32,6 @@ if (!isset($_GET['recharge_id'])) {
 $recharge_id = (int)$_GET['recharge_id'];
 
 try {
-    // Get recharge details with user and IoT information
     $query = "SELECT r.*, i._iot_label_, i._iot_id_, u._first_name_, u._last_name_, u._email_, u._phone_,
               u._current_address_, ut._cost_per_unit_,
               CASE 
@@ -44,90 +64,72 @@ try {
 }
 ?>
 
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice #<?php echo $recharge_id; ?></title>
+<body>
+<div class="action-buttons">
+    <button onclick="window.print()" class="btn btn-primary">Print Invoice</button>
+    <button onclick="window.close()" class="btn btn-secondary ms-2">Close</button>
+</div>
 
-    <!-- css -->
-    <link rel="stylesheet" href="../css/bootstrap.css">
-    <link rel="stylesheet" href="../css/invoice.css">
+<div class="invoice-container">
+    <div class="invoice-header">
+        <div class="company-info">
+            <img src="../img/CLIX.svg" alt="CLIX">
+            <p>Convenient Living & Integrated Experience</p>
+        </div>
+        <div class="invoice-title">
+            <h1>INVOICE</h1>
+            <p>
+                Invoice #: <?php echo $recharge_id; ?><br>
+                Date: <?php echo date('d/m/Y', strtotime($invoice_data['_recharge_time_'])); ?><br>
+                Time: <?php echo date('h:ia', strtotime($invoice_data['_recharge_time_'])); ?>
+            </p>
+        </div>
+    </div>
 
-</head>
-
-<!-- body -->
-
-<body class="bg-light">
-<div class="container my-5">
-    <div class="invoice-box">
-        <div class="invoice-header">
-            <div class="row">
-                <div class="col-6">
-                    <h2>CLIX</h2>
-                    <p>Convenient Living & Integrated Experience</p>
-                </div>
-                <div class="col-6 text-end">
-                    <h3>INVOICE</h3>
-                    <p>Invoice #: <?php echo $recharge_id; ?><br>
-                        Date: <?php echo date('d/m/Y', strtotime($invoice_data['_recharge_time_'])); ?><br>
-                        Time: <?php echo date('h:ia', strtotime($invoice_data['_recharge_time_'])); ?></p>
-                </div>
+    <div class="invoice-details">
+        <div class="row">
+            <div class="col">
+                <h3>Bill To:</h3>
+                <p>
+                    <?php echo htmlspecialchars($invoice_data['_first_name_'] . ' ' . $invoice_data['_last_name_']); ?>
+                    <br>
+                    <?php echo htmlspecialchars($invoice_data['_email_']); ?><br>
+                    <?php echo htmlspecialchars($invoice_data['_phone_']); ?><br>
+                    <?php echo htmlspecialchars($invoice_data['_current_address_']); ?>
+                </p>
+            </div>
+            <div class="col">
+                <h3>Device Details:</h3>
+                <p>
+                    ID: <?php echo htmlspecialchars($invoice_data['_iot_id_']); ?><br>
+                    Label: <?php echo htmlspecialchars($invoice_data['_iot_label_']); ?><br>
+                    Type: <?php echo htmlspecialchars($invoice_data['utility_type']); ?>
+                </p>
             </div>
         </div>
+    </div>
 
-        <div class="invoice-details">
-            <div class="row">
-                <div class="col-6">
-                    <h5>Bill To:</h5>
-                    <p>
-                        <?php echo htmlspecialchars($invoice_data['_first_name_'] . ' ' . $invoice_data['_last_name_']); ?><br>
-                        <?php echo htmlspecialchars($invoice_data['_email_']); ?><br>
-                        <?php echo htmlspecialchars($invoice_data['_phone_']); ?><br>
-                        <?php echo htmlspecialchars($invoice_data['_current_address_']); ?>
-                    </p>
-                </div>
-                <div class="col-6">
-                    <h5>Device Details:</h5>
-                    <p>
-                        ID: <?php echo htmlspecialchars($invoice_data['_iot_id_']); ?><br>
-                        Label: <?php echo htmlspecialchars($invoice_data['_iot_label_']); ?><br>
-                        Type: <?php echo htmlspecialchars($invoice_data['utility_type']); ?>
-                    </p>
-                </div>
-            </div>
-        </div>
+    <table>
+        <thead>
+        <tr>
+            <th>Description</th>
+            <th class="text-end">Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><?php echo htmlspecialchars($invoice_data['utility_type']); ?> Recharge</td>
+            <td class="text-end"><?php echo number_format($invoice_data['_recharge_amount_'], 2); ?> tk</td>
+        </tr>
+        <tr class="total-row">
+            <td class="text-end">Total Amount</td>
+            <td class="text-end"><?php echo number_format($invoice_data['_recharge_amount_'], 2); ?> tk</td>
+        </tr>
+        </tbody>
+    </table>
 
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Description</th>
-                <th class="text-end">Rate</th>
-                <th class="text-end">Amount</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td><?php echo htmlspecialchars($invoice_data['utility_type']); ?> Recharge</td>
-                <td class="text-end"><?php echo number_format($invoice_data['_cost_per_unit_'], 2); ?> tk/unit</td>
-                <td class="text-end"><?php echo number_format($invoice_data['_recharge_amount_'], 2); ?> tk</td>
-            </tr>
-            <tr>
-                <td colspan="2" class="text-end"><strong>Total Amount</strong></td>
-                <td class="text-end"><strong><?php echo number_format($invoice_data['_recharge_amount_'], 2); ?> tk</strong></td>
-            </tr>
-            </tbody>
-        </table>
-
-        <div class="mt-4 text-center">
-            <p><small>Thank you for using CLIX services!</small></p>
-        </div>
-
-        <div class="mt-4 text-center no-print">
-            <button onclick="window.print()" class="btn btn-primary">Print Invoice</button>
-            <button onclick="window.close()" class="btn btn-secondary ms-2">Close</button>
-        </div>
+    <div class="footer">
+        <p>Thank you for using CLIX services</p>
     </div>
 </div>
 
