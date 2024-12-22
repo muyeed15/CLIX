@@ -1,6 +1,8 @@
 <?php
+$currentPage = basename($_SERVER['PHP_SELF']);
+$isHomePage = ($currentPage === 'home.php');
 
-if (!isset($_SESSION) || !isset($_SESSION['_user_id_'])) {
+if (!$isHomePage && (!isset($_SESSION) || !isset($_SESSION['_user_id_']))) {
     header("Location: access-denied.php");
     exit();
 }
@@ -10,7 +12,6 @@ global $conn;
 $isLoggedIn = isset($_SESSION['_user_id_']);
 $notifications = [];
 $imageSrc = "";
-$currentPage = basename($_SERVER['PHP_SELF']);
 
 $clientCheckQuery = "SELECT c._client_id_ 
                     FROM client_table c 
@@ -65,7 +66,6 @@ if ($isLoggedIn) {
     }
 }
 
-// Function to check if a nav link should be active
 function isActiveLink($pageName): string
 {
     global $currentPage;
