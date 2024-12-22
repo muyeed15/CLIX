@@ -350,54 +350,59 @@ try {
 
     // Pagination setup
     $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-    $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
+    $search = isset($_GET['search']) ? trim($_GET['search']) : '';
     $itemsPerPage = 10;
     $offset = ($page - 1) * $itemsPerPage;
 
+    // Get total count for pagination with search condition
+    $countQuery = "SELECT COUNT(*) as total FROM outage_table WHERE _affected_area_ LIKE ?";
+    $stmt = mysqli_prepare($conn, $countQuery);
+    $searchParam = "%$search%";
+    mysqli_stmt_bind_param($stmt, "s", $searchParam);
+    mysqli_stmt_execute($stmt);
+    $totalResult = mysqli_stmt_get_result($stmt);
+    $totalRow = mysqli_fetch_assoc($totalResult);
+    $total_pages = ceil($totalRow['total'] / $itemsPerPage);
+    mysqli_stmt_close($stmt);
+
     // Fetch outages with utility type
     $outageQuery = "SELECT o.*, 
-                        CASE 
-                            WHEN e._electricity_id_ IS NOT NULL THEN 'Electricity'
-                            WHEN g._gas_id_ IS NOT NULL THEN 'Gas'
-                            WHEN w._water_id_ IS NOT NULL THEN 'Water'
-                        END as utility_type,
-                        CASE
-                            WHEN ao._active_outage_id_ IS NOT NULL THEN 'Active'
-                            WHEN ro._resolved_outage_id_ IS NOT NULL THEN 'Resolved'
-                            ELSE 'Pending'
-                        END as status,
-                        CASE
-                            WHEN l._low_impact_id_ IS NOT NULL THEN 'Low'
-                            WHEN m._medium_impact_id_ IS NOT NULL THEN 'Medium'
-                            WHEN h._high_impact_id_ IS NOT NULL THEN 'High'
-                        END as impact_level,
-                        (_range_km_ * 1000) as range_meters
-                    FROM outage_table o
-                    LEFT JOIN electricity_table e ON o._utility_id_ = e._electricity_id_
-                    LEFT JOIN gas_table g ON o._utility_id_ = g._gas_id_
-                    LEFT JOIN water_table w ON o._utility_id_ = w._water_id_
-                    LEFT JOIN active_outage_table ao ON o._outage_id_ = ao._active_outage_id_
-                    LEFT JOIN resolved_outage_table ro ON o._outage_id_ = ro._resolved_outage_id_
-                    LEFT JOIN outage_mapping_table om ON o._outage_id_ = om._outage_id_
-                    LEFT JOIN low_impact_table l ON om._outage_map_id_ = l._low_impact_id_
-                    LEFT JOIN medium_impact_table m ON om._outage_map_id_ = m._medium_impact_id_
-                    LEFT JOIN high_impact_table h ON om._outage_map_id_ = h._high_impact_id_
-                    WHERE o._affected_area_ LIKE ?
-                    ORDER BY o._start_time_ DESC
-                    LIMIT ? OFFSET ?";
+        CASE 
+            WHEN e._electricity_id_ IS NOT NULL THEN 'Electricity'
+            WHEN g._gas_id_ IS NOT NULL THEN 'Gas'
+            WHEN w._water_id_ IS NOT NULL THEN 'Water'
+        END as utility_type,
+        CASE
+            WHEN ao._active_outage_id_ IS NOT NULL THEN 'Active'
+            WHEN ro._resolved_outage_id_ IS NOT NULL THEN 'Resolved'
+            ELSE 'Pending'
+        END as status,
+        CASE
+            WHEN l._low_impact_id_ IS NOT NULL THEN 'Low'
+            WHEN m._medium_impact_id_ IS NOT NULL THEN 'Medium'
+            WHEN h._high_impact_id_ IS NOT NULL THEN 'High'
+        END as impact_level,
+        (_range_km_ * 1000) as range_meters
+    FROM outage_table o
+    LEFT JOIN electricity_table e ON o._utility_id_ = e._electricity_id_
+    LEFT JOIN gas_table g ON o._utility_id_ = g._gas_id_
+    LEFT JOIN water_table w ON o._utility_id_ = w._water_id_
+    LEFT JOIN active_outage_table ao ON o._outage_id_ = ao._active_outage_id_
+    LEFT JOIN resolved_outage_table ro ON o._outage_id_ = ro._resolved_outage_id_
+    LEFT JOIN outage_mapping_table om ON o._outage_id_ = om._outage_id_
+    LEFT JOIN low_impact_table l ON om._outage_map_id_ = l._low_impact_id_
+    LEFT JOIN medium_impact_table m ON om._outage_map_id_ = m._medium_impact_id_
+    LEFT JOIN high_impact_table h ON om._outage_map_id_ = h._high_impact_id_
+    WHERE o._affected_area_ LIKE ?
+    ORDER BY o._start_time_ DESC
+    LIMIT ? OFFSET ?";
 
     $stmt = mysqli_prepare($conn, $outageQuery);
     $searchParam = "%$search%";
     mysqli_stmt_bind_param($stmt, "sii", $searchParam, $itemsPerPage, $offset);
     mysqli_stmt_execute($stmt);
     $outages = mysqli_stmt_get_result($stmt);
-
-    // Get total count for pagination
-    $stmt = mysqli_prepare($conn, "SELECT COUNT(*) as total FROM outage_table WHERE _affected_area_ LIKE ?");
-    mysqli_stmt_bind_param($stmt, "s", $searchParam);
-    mysqli_stmt_execute($stmt);
-    $totalCount = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt))['total'];
-    $totalPages = ceil($totalCount / $itemsPerPage);
+    mysqli_stmt_close($stmt);
 
 } catch (Exception $e) {
     error_log("Error in admin-outage.php: " . $e->getMessage());
@@ -656,42 +661,10 @@ try {
                     </table>
                 </div>
 
-                <!-- Pagination -->
-                <?php if ($totalPages > 1): ?>
-                    <nav aria-label="Page navigation" class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            <!-- Previous page -->
-                            <?php if ($page > 1): ?>
-                                <li class="page-item">
-                                    <a class="page-link"
-                                       href="?page=<?php echo($page - 1); ?>&search=<?php echo urlencode($search); ?>">
-                                        Previous
-                                    </a>
-                                </li>
-                            <?php endif; ?>
-
-                            <!-- Page numbers -->
-                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
-                                    <a class="page-link"
-                                       href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>">
-                                        <?php echo $i; ?>
-                                    </a>
-                                </li>
-                            <?php endfor; ?>
-
-                            <!-- Next page -->
-                            <?php if ($page < $totalPages): ?>
-                                <li class="page-item">
-                                    <a class="page-link"
-                                       href="?page=<?php echo($page + 1); ?>&search=<?php echo urlencode($search); ?>">
-                                        Next
-                                    </a>
-                                </li>
-                            <?php endif; ?>
-                        </ul>
-                    </nav>
-                <?php endif; ?>
+                <!-- pagination -->
+                <?php
+                require_once './pagination.php';
+                ?>
             </div>
         </div>
     </div>
