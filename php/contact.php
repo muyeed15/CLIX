@@ -19,10 +19,7 @@ require_once './db-connection.php';
     <!-- css -->
     <link rel="stylesheet" href="../css/bootstrap.css">
     <link rel="stylesheet" href="../css/base.css">
-    <link rel="stylesheet" href="../css/index.css">
     <link rel="stylesheet" href="../css/contact.css">
-    <link rel="stylesheet" href="../css/slick.min.css">
-    <link rel="stylesheet" href="../css/slick-theme.min.css">
     <link rel="stylesheet" href="../css/animation.css">
 </head>
 

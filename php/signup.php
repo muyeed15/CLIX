@@ -2,6 +2,42 @@
 global $conn;
 session_start();
 require_once './db-connection.php';
+?>
+
+<!doctype html>
+
+<!-- html -->
+<html lang="en">
+
+<!-- head -->
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CLIX: Sign Up</title>
+
+    <!-- css -->
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/animation.css">
+    <link rel="stylesheet" href="../css/signup.css">
+
+</head>
+
+<!-- body -->
+
+<body>
+<video autoplay muted loop id="background-video">
+    <source src="../vid/10996977-hd_1920_1080_60fps.mp4" type="video/mp4">
+</video>
+
+<div id="header-logo-container">
+    <a href="../index.php">
+        <img class="py-2" src="../img/CLIX.svg" id="header-logo" alt="Logo">
+    </a>
+</div>
+
+<?php
 $error = '';
 
 // signup
@@ -153,31 +189,7 @@ if (!empty($error)) {
 }
 ?>
 
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CLIX: Sign Up</title>
-
-    <link rel="stylesheet" href="../css/bootstrap.css">
-    <link rel="stylesheet" href="../css/base.css">
-    <link rel="stylesheet" href="../css/animation.css">
-    <link rel="stylesheet" href="../css/signup.css">
-
-</head>
-
-<body>
-<video autoplay muted loop id="background-video">
-    <source src="../vid/10996977-hd_1920_1080_60fps.mp4" type="video/mp4">
-</video>
-
-<div id="header-logo-container">
-    <a href="../index.php">
-        <img class="py-2" src="../img/CLIX.svg" id="header-logo" alt="Logo">
-    </a>
-</div>
-
+<!-- main -->
 <main class="form-signin">
     <div class="form-content">
         <form method="POST" action="" class="needs-validation" enctype="multipart/form-data" novalidate>

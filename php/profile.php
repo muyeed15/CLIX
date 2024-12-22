@@ -1,11 +1,16 @@
 <?php
-global $conn;
+global $conn, $user_id;
 session_start();
 require_once './db-connection.php';
 ?>
 
-<!DOCTYPE html>
+<!doctype html>
+
+<!-- html -->
 <html lang="en">
+
+<!-- head -->
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,6 +22,8 @@ require_once './db-connection.php';
     <link rel="stylesheet" href="../css/profile.css">
 
 </head>
+
+<!-- body -->
 
 <body>
 <!-- header -->

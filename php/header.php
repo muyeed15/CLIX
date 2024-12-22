@@ -79,7 +79,7 @@ function isActiveLink($pageName): string
             <!-- Navbar -->
             <nav class="d-none d-lg-flex flex-grow-1 justify-content-center">
                 <ul class="nav">
-                    <li><a href="../" class="nav-link px-3 <?php echo isActiveLink('index.php'); ?>">Home</a></li>
+                    <li><a href="./home.php" class="nav-link px-3 <?php echo isActiveLink('home.php'); ?>">Home</a></li>
                     <?php if (!$isLoggedIn): ?>
                         <li><a href="./about.php" class="nav-link px-3 <?php echo isActiveLink('about.php'); ?>">About
                                 Us</a></li>
@@ -161,7 +161,7 @@ function isActiveLink($pageName): string
         <div class="collapse" id="mobileNav">
             <nav class="navbar-nav">
                 <ul class="nav flex-column text-center">
-                    <li><a href="../" class="nav-link px-3 <?php echo isActiveLink('index.php'); ?>">Home</a></li>
+                    <li><a href="./home.php" class="nav-link px-3 <?php echo isActiveLink('home.php'); ?>">Home</a></li>
                     <?php if (!$isLoggedIn): ?>
                         <li><a href="./about.php" class="nav-link px-3 <?php echo isActiveLink('about.php'); ?>">About
                                 Us</a></li>

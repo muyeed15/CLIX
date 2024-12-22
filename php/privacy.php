@@ -19,8 +19,8 @@ require_once './db-connection.php';
     <!-- css -->
     <link rel="stylesheet" href="../css/bootstrap.css">
     <link rel="stylesheet" href="../css/base.css">
-    <link rel="stylesheet" href="../css/animation.css">
     <link rel="stylesheet" href="../css/privacy.css">
+    <link rel="stylesheet" href="../css/animation.css">
 </head>
 
 <!-- body -->

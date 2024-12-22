@@ -24,6 +24,8 @@ require_once './db-connection.php';
     <link rel="stylesheet" href="../css/animation.css">
 </head>
 
+<!-- body -->
+
 <body>
 <!-- header -->
 <?php
@@ -33,6 +35,7 @@ require_once './header.php';
 <!-- main -->
 <?php
 
+// Process Payment
 $error = null;
 $user_id = $_SESSION['_user_id_'] ?? null;
 $iot_id = $_GET['iot_id'] ?? null;
@@ -46,7 +49,6 @@ try {
         exit;
     }
 
-    // Process Payment
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['amount'])) {
         if (!isset($_SESSION['last_payment_time']) ||
             (time() - $_SESSION['last_payment_time'] > 5)) {
@@ -117,6 +119,7 @@ try {
         }
     }
 
+    // Balance
     $deviceQuery = "SELECT 
         i._iot_label_,
         i._iot_id_,

@@ -1,12 +1,38 @@
 <?php
+global $conn;
 session_start();
 require_once './db-connection.php';
+?>
 
-// Initialize variables
+<!doctype html>
+
+<!-- html -->
+<html lang="en">
+
+<!-- head -->
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CLIX: IoT on CLIX Network</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/animation.css">
+</head>
+
+<!-- body -->
+
+<body>
+<!-- header -->
+<?php require_once './header.php'; ?>
+
+<!-- main -->
+<?php
 $message = '';
 $messageType = '';
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!isset($_SESSION['_user_id_'])) {
         $message = 'Please log in to submit a request.';
@@ -19,10 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $requestStatus = 'pending';
 
         try {
-            // Start transaction
             mysqli_begin_transaction($conn);
 
-            // First, insert into iot_table
             $insertIotQuery = "INSERT INTO iot_table (_utility_id_, _iot_label_, _iot_latitude_, _iot_longitude_, _last_reported_time_)
                              VALUES (?, ?, 0, 0, NOW())";
             $stmt = mysqli_prepare($conn, $insertIotQuery);
@@ -36,7 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $newIotId = mysqli_insert_id($conn);
 
-            // Insert into inactive_iot_table
             $inactiveQuery = "INSERT INTO inactive_iot_table (_inactive_iot_id_) VALUES (?)";
             $stmt = mysqli_prepare($conn, $inactiveQuery);
             mysqli_stmt_bind_param($stmt, "i", $newIotId);
@@ -45,7 +68,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception('Failed to create inactive IoT entry');
             }
 
-            // Insert into request_table
             $insertRequestQuery = "INSERT INTO request_table (_user_id_, _iot_id_, _request_time_, _request_status_)
                                  VALUES (?, ?, ?, ?)";
             $stmt = mysqli_prepare($conn, $insertRequestQuery);
@@ -57,7 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $requestId = mysqli_insert_id($conn);
 
-            // Insert into pending_request_table
             $pendingQuery = "INSERT INTO pending_request_table (_pending_request_id_) VALUES (?)";
             $stmt = mysqli_prepare($conn, $pendingQuery);
             mysqli_stmt_bind_param($stmt, "i", $requestId);
@@ -66,7 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception('Failed to create pending request');
             }
 
-            // Create notification
             $notificationTitle = "New IoT Request";
             $notificationMessage = "Your request for IoT device with label '$iotLabel' has been submitted and is pending approval.";
 
@@ -79,14 +99,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception('Failed to create notification');
             }
 
-            // Commit transaction
             mysqli_commit($conn);
 
             $message = 'IoT request submitted successfully!';
             $messageType = 'success';
 
         } catch (Exception $e) {
-            // Rollback transaction on error
             mysqli_rollback($conn);
             $message = 'Error: ' . $e->getMessage();
             $messageType = 'danger';
@@ -95,25 +113,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CLIX: IoT on CLIX Network</title>
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="../css/bootstrap.css">
-    <link rel="stylesheet" href="../css/base.css">
-    <link rel="stylesheet" href="../css/animation.css">
-    <link rel="stylesheet" href="../css/iot.css">
-</head>
-
-<body>
-<!-- Header -->
-<?php require_once './header.php'; ?>
-
-<!-- Main Section -->
 <main id="main-section" style="position: relative;">
     <h2 id="sub-div-header">IoT on CLIX Network</h2>
 
@@ -127,7 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="card mb-4" id="create-iot-card" style="display: inline-block; vertical-align: top; width: 70%;">
         <div class="card-body">
             <h5 class="card-title">Register IoT</h5>
-            <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" class="needs-validation" novalidate>
+            <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" class="needs-validation"
+                  novalidate>
                 <div class="mb-3">
                     <label for="iot-id" class="form-label">IoT ID</label>
                     <input type="text"
@@ -159,23 +159,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
         </div>
     </div>
-    <img src="../img/NicePng_meter-png_905785.png" alt="IoT Illustration" style="display: inline-block; vertical-align: top; margin-left: 80px; width: 19%; max-width: 300px;">
+    <img src="../img/NicePng_meter-png_905785.png" alt="IoT Illustration"
+         style="display: inline-block; vertical-align: top; margin-left: 80px; width: 19%; max-width: 300px;">
 </main>
 
-<!-- Footer -->
+<!-- footer -->
 <?php require_once './footer.php'; ?>
 
-<!-- Scripts -->
+<!-- scripts -->
 <script src="../js/bootstrap.bundle.js"></script>
 <script>
-    // Form validation script
-    (function() {
+    (function () {
         'use strict';
 
         const forms = document.querySelectorAll('.needs-validation');
 
-        Array.prototype.slice.call(forms).forEach(function(form) {
-            form.addEventListener('submit', function(event) {
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
                 if (!form.checkValidity()) {
                     event.preventDefault();
                     event.stopPropagation();
@@ -185,5 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     })();
 </script>
+
 </body>
+
 </html>
