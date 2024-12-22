@@ -1,10 +1,11 @@
 <?php
-global $conn;
 
-if (!isset($_SESSION)) {
+if (!isset($_SESSION) || !isset($_SESSION['_user_id_'])) {
     header("Location: access-denied.php");
-    exit;
+    exit();
 }
+
+global $conn;
 
 $isLoggedIn = isset($_SESSION['_user_id_']);
 $notifications = [];
