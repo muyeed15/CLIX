@@ -1,6 +1,11 @@
 <?php
 global $conn;
 
+if (!isset($_SESSION)) {
+    header("Location: access-denied.php");
+    exit;
+}
+
 $isLoggedIn = isset($_SESSION['_user_id_']);
 $notifications = [];
 $imageSrc = "";
