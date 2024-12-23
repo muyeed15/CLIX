@@ -1,4 +1,12 @@
 <?php
+global $conn;
+if (!isset($_SESSION['_user_id_'])) {
+    header("Location: access-denied.php");
+    exit;
+}
+?>
+
+<?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'update_usage') {
         $deviceId = mysqli_real_escape_string($conn, $_POST['device_id']);

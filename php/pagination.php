@@ -1,3 +1,11 @@
+<?php
+global $conn;
+if (!isset($_SESSION['_user_id_'])) {
+    header("Location: access-denied.php");
+    exit;
+}
+?>
+
 <?php global $total_pages, $page;
 if ($total_pages > 1): ?>
     <div class="d-flex justify-content-center" id="pagination-section">

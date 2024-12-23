@@ -1,3 +1,20 @@
+<?php
+$currentPage = basename($_SERVER['PHP_SELF']);
+$isHomePage = ($currentPage === 'home.php');
+$isAboutPage = ($currentPage === 'about.php');
+$isContactPage = ($currentPage === 'contact.php');
+$isPrivacyPage = ($currentPage === 'privacy.php');
+$isTermPage = ($currentPage === 'term.php');
+$isFaqPage = ($currentPage === 'faq.php');
+
+if (!$isHomePage && !$isAboutPage && !$isContactPage
+    && !$isPrivacyPage && !$isTermPage && !$isFaqPage &&
+    (!isset($_SESSION) || !isset($_SESSION['_user_id_']))) {
+    header("Location: access-denied.php");
+    exit();
+}
+?>
+
 <footer class="border-top border-bottom" id="footer-section">
     <div class="row justify-content-between py-2">
         <div class="col-3">

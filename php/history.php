@@ -16,6 +16,7 @@ require_once './db-connection.php';
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/animation.css">
     <link rel="stylesheet" href="../css/history.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
 
 <!-- body -->
@@ -107,7 +108,7 @@ try {
                         <a href="invoice.php?recharge_id=<?php echo htmlspecialchars($row['_recharge_id_']); ?>"
                            class="btn btn-sm btn-primary"
                            target="_blank">
-                            View Invoice
+                            <i class="bi bi-receipt"></i>
                         </a>
                     </td>
                 </tr>

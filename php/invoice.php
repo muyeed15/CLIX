@@ -2,6 +2,11 @@
 global $conn, $recharge_id;
 session_start();
 require_once './db-connection.php';
+
+if (!isset($_SESSION['_user_id_'])) {
+    header("Location: access-denied.php");
+    exit;
+}
 ?>
 
 <!doctype html>

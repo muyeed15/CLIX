@@ -33,6 +33,8 @@ require_once './db-connection.php';
 require_once './admin-header.php';
 ?>
 
+<!-- main -->
+
 <!-- Alert Messages -->
 <?php if (isset($_SESSION['success_message'])): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -258,7 +260,26 @@ try {
             mysqli_begin_transaction($conn);
 
             try {
+                $outage_details_query = "SELECT o.*, 
+                    CASE 
+                        WHEN e._electricity_id_ IS NOT NULL THEN 'Electricity'
+                        WHEN g._gas_id_ IS NOT NULL THEN 'Gas'
+                        WHEN w._water_id_ IS NOT NULL THEN 'Water'
+                    END as utility_type
+                    FROM outage_table o
+                    LEFT JOIN electricity_table e ON o._utility_id_ = e._electricity_id_
+                    LEFT JOIN gas_table g ON o._utility_id_ = g._gas_id_
+                    LEFT JOIN water_table w ON o._utility_id_ = w._water_id_
+                    WHERE o._outage_id_ = ?";
+
+                $stmt = mysqli_prepare($conn, $outage_details_query);
+                mysqli_stmt_bind_param($stmt, "i", $outage_id);
+                mysqli_stmt_execute($stmt);
+                $outage_result = mysqli_stmt_get_result($stmt);
+                $outage_details = mysqli_fetch_assoc($outage_result);
+
                 if ($new_status === 'Resolved') {
+                    // Remove from active and add to resolved
                     $stmt = mysqli_prepare($conn, "DELETE FROM active_outage_table WHERE _active_outage_id_ = ?");
                     mysqli_stmt_bind_param($stmt, "i", $outage_id);
                     mysqli_stmt_execute($stmt);
@@ -267,21 +288,12 @@ try {
                     mysqli_stmt_bind_param($stmt, "i", $outage_id);
                     mysqli_stmt_execute($stmt);
 
-                    $stmt = mysqli_prepare($conn,
-                        "INSERT INTO notification_table 
-                        (_notification_time_, _notification_title_, _notification_message_)
-                        VALUES (NOW(), 'Outage Resolved', 'Utility service has been restored')");
-                    mysqli_stmt_execute($stmt);
-
-                    $notification_id = mysqli_insert_id($conn);
-
-                    $stmt = mysqli_prepare($conn,
-                        "INSERT INTO alert_notifiaction_table (_alt_not_id_)
-                        VALUES (?)");
-                    mysqli_stmt_bind_param($stmt, "i", $notification_id);
-                    mysqli_stmt_execute($stmt);
+                    // Create detailed resolution notification
+                    $notification_title = "{$outage_details['utility_type']} Service Restored";
+                    $notification_message = "The {$outage_details['utility_type']} outage in {$outage_details['_affected_area_']} has been resolved. Services have been restored to normal operation.";
 
                 } elseif ($new_status === 'Active') {
+                    // Remove from resolved and add to active
                     $stmt = mysqli_prepare($conn, "DELETE FROM resolved_outage_table WHERE _resolved_outage_id_ = ?");
                     mysqli_stmt_bind_param($stmt, "i", $outage_id);
                     mysqli_stmt_execute($stmt);
@@ -289,7 +301,28 @@ try {
                     $stmt = mysqli_prepare($conn, "INSERT INTO active_outage_table (_active_outage_id_) VALUES (?)");
                     mysqli_stmt_bind_param($stmt, "i", $outage_id);
                     mysqli_stmt_execute($stmt);
+
+                    // Create detailed reactivation notification
+                    $notification_title = "{$outage_details['utility_type']} Service Interruption";
+                    $notification_message = "A previously resolved {$outage_details['utility_type']} outage in {$outage_details['_affected_area_']} has been reactivated. Services may be affected.";
                 }
+
+                // Insert the notification
+                $stmt = mysqli_prepare($conn,
+                    "INSERT INTO notification_table 
+                            (_notification_time_, _notification_title_, _notification_message_)
+                            VALUES (NOW(), ?, ?)");
+                mysqli_stmt_bind_param($stmt, "ss", $notification_title, $notification_message);
+                mysqli_stmt_execute($stmt);
+
+                $notification_id = mysqli_insert_id($conn);
+
+                // Create alert notification
+                $stmt = mysqli_prepare($conn,
+                    "INSERT INTO alert_notifiaction_table (_alt_not_id_)
+                            VALUES (?)");
+                mysqli_stmt_bind_param($stmt, "i", $notification_id);
+                mysqli_stmt_execute($stmt);
 
                 mysqli_commit($conn);
                 redirect("Outage status updated successfully");

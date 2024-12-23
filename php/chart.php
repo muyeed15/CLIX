@@ -1,4 +1,12 @@
 <?php
+global $conn;
+if (!isset($_SESSION['_user_id_'])) {
+    header("Location: access-denied.php");
+    exit;
+}
+?>
+
+<?php
 $userId = $_SESSION['_user_id_'];
 
 // Chart 1 (Last 7 Days)

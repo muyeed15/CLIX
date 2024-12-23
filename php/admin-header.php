@@ -118,8 +118,8 @@ function isActiveLink($pageName): string
                         <img src="<?php echo $imageSrc; ?>" alt="User" class="rounded-circle" style="width: 36px; height: 36px;">
                     </a>
                     <ul class="dropdown-menu text-small">
-                        <li><a class="dropdown-item small" href="./profile.php">Profile</a></li>
-                        <li><a class="dropdown-item small" href="./settings.php">Settings</a></li>
+                        <li><a class="dropdown-item small" href="./admin-profile.php">Profile</a></li>
+                        <li><a class="dropdown-item small" href="./admin-settings.php">Settings</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item small" href="./logout.php">Sign out</a></li>
                     </ul>
