@@ -138,6 +138,7 @@ try {
                 <th>Total Usage</th>
                 <th>Balance</th>
                 <th>Status</th>
+                <th>Settings</th>
                 <th>Pay</th>
             </tr>
             </thead>
@@ -168,7 +169,7 @@ try {
                         <img class="utility-svg" src="<?php echo $utilityIcon; ?>" alt="<?php echo $outageType; ?>">
                     </td>
                     <td><?= htmlspecialchars($row['_iot_id_']); ?></td>
-                    <td><?= htmlspecialchars($row['_label_']); ?></td>
+                    <td><?php echo !empty($row['_label_']) ? htmlspecialchars($row['_label_']) : 'N/A'; ?></td>
                     <td>
                         <?php
                         if ($row['_type_'] === 'Gas') {
@@ -210,6 +211,14 @@ try {
                         <?= htmlspecialchars($row['_status_']); ?>
                     </td>
                     <td>
+                        <a href="iot-settings.php?iot_id=<?= htmlspecialchars($row['_iot_id_']); ?>" class="btn btn-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+                            </svg>
+                        </a>
+                    </td>
+                    <td>
                         <a href="./payment.php?iot_id=<?= htmlspecialchars($row['_iot_id_']); ?>" class="d-flex px-3">
                             <img class="utility-svg-pay" src="../img/creadit-card-debit-svgrepo-green.svg">
                         </a>
@@ -217,6 +226,110 @@ try {
                 </tr>
             <?php endwhile; ?>
             </tbody>
+        </table>
+    </div>
+    <?php
+    try {
+        // Request IoT Devices Query
+        $requestQuery = "SELECT 
+            r._request_id_,
+            i._iot_id_,
+            i._iot_label_ AS _label_,
+            CASE 
+                WHEN g._gas_id_ IS NOT NULL THEN 'Gas'
+                WHEN e._electricity_id_ IS NOT NULL THEN 'Electricity'
+                WHEN w._water_id_ IS NOT NULL THEN 'Water'
+            END AS _type_,
+            r._request_time_ AS _request_time_,
+            CASE 
+                WHEN pr._pending_request_id_ IS NOT NULL THEN 'Pending'
+                WHEN dr._declined_request_id_ IS NOT NULL THEN 'Declined'
+                ELSE 'Unknown'
+            END AS _status_
+        FROM 
+            request_table r
+            INNER JOIN iot_table i ON r._iot_id_ = i._iot_id_
+            INNER JOIN utility_table ut ON i._utility_id_ = ut._utility_id_
+            LEFT JOIN gas_table g ON ut._utility_id_ = g._gas_id_
+            LEFT JOIN electricity_table e ON ut._utility_id_ = e._electricity_id_
+            LEFT JOIN water_table w ON ut._utility_id_ = w._water_id_
+            LEFT JOIN pending_request_table pr ON r._request_id_ = pr._pending_request_id_
+            LEFT JOIN declined_request_table dr ON r._request_id_ = dr._declined_request_id_
+        WHERE 
+            r._user_id_ = ?
+        ORDER BY 
+            r._request_time_ DESC;";
+
+        $stmt = mysqli_prepare($conn, $requestQuery);
+        mysqli_stmt_bind_param($stmt, "i", $user_id);
+        mysqli_stmt_execute($stmt);
+        $requestSummary = mysqli_stmt_get_result($stmt);
+
+        mysqli_stmt_close($stmt);
+
+    } catch (Exception $e) {
+        echo "Error fetching request data: " . $e->getMessage();
+    }
+    ?>
+
+    <div>
+        <h2 id="sub-div-header">Requested IoT Devices</h2>
+        <table class="table table-borderless" id="iot-table" style="color: #282828;"
+        ">
+        <thead id="request-iot-thead">
+            <tr>
+                <th>Device</th>
+                <th>Request ID</th>
+                <th>Device ID</th>
+                <th>Request Time</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php while ($row = mysqli_fetch_assoc($requestSummary)) : ?>
+            <tr>
+                <td>
+                    <?php
+                    $utilityIcon = '';
+                    $outageType = '';
+                    if (isset($row['_type_'])) {
+                        switch ($row['_type_']) {
+                            case 'Gas':
+                                $utilityIcon = '../img/gas-costs-svgrepo-com.svg';
+                                $outageType = 'Gas';
+                                break;
+                            case 'Water':
+                                $utilityIcon = '../img/water-fee-svgrepo-com.svg';
+                                $outageType = 'Water';
+                                break;
+                            case 'Electricity':
+                                $utilityIcon = '../img/hydropower-coal-svgrepo-com.svg';
+                                $outageType = 'Electricity';
+                                break;
+                        }
+                    }
+                    ?>
+                    <img class="utility-svg" src="<?php echo $utilityIcon; ?>" alt="<?php echo $outageType; ?>">
+                </td>
+                <td><?= htmlspecialchars($row['_request_id_']); ?></td>
+                <td><?= htmlspecialchars($row['_iot_id_']); ?></td>
+                <td><?= htmlspecialchars($row['_request_time_']); ?></td>
+                <td
+                    <?php
+                    if ($row['_status_'] === 'Pending') {
+                        echo 'style="color: #f0ad4e;"';
+                    } elseif ($row['_status_'] === 'Declined') {
+                        echo 'style="color: #d9534f;"';
+                    } elseif ($row['_status_'] === 'Active') {
+                        echo 'style="color: #5cb85c;"';
+                    }
+                    ?>
+                >
+                    <?= htmlspecialchars($row['_status_']); ?>
+                </td>
+            </tr>
+        <?php endwhile; ?>
+        </tbody>
         </table>
     </div>
 </main>

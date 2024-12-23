@@ -1,61 +1,162 @@
 <?php
+// Start output buffering at the very top of the script
+ob_start();
+global $conn;
 session_start();
 require_once './db-connection.php';
 
-// Check if user is logged in
-if (!isset($_SESSION['_user_id_'])) {
-    header("Location: login.php");
-    exit;
+// Add handlers for approve and reject actions
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $conn->begin_transaction();
+
+        // Handle IoT creation
+        if (isset($_POST['create_iot'])) {
+            $prefix = match($_POST['iot_type']) {
+                'Electricity' => '1',
+                'Water' => '2',
+                'Gas' => '3'
+            };
+            $utilityId = intval($prefix);
+
+            do {
+                $iotId = $prefix . str_pad(rand(0, 999999999), 9, '0', STR_PAD_LEFT);
+                $check = $conn->query("SELECT _iot_id_ FROM iot_table WHERE _iot_id_ = $iotId");
+            } while ($check->num_rows > 0);
+
+            $stmt = $conn->prepare("INSERT INTO iot_table (_iot_id_, _utility_id_, _iot_label_, _iot_latitude_, _iot_longitude_, _last_reported_time_) VALUES (?, ?, NULL, '0.000000', '0.000000', NOW())");
+            $stmt->bind_param('ii', $iotId, $utilityId);
+            $stmt->execute();
+
+            $stmt = $conn->prepare("INSERT INTO inactive_iot_table (_inactive_iot_id_) VALUES (?)");
+            $stmt->bind_param('i', $iotId);
+            $stmt->execute();
+
+            $_SESSION['success'] = "IoT device created successfully with ID: " . $iotId;
+        }
+
+        if (isset($_POST['approve_request'])) {
+            // Validate input
+            $requestId = filter_input(INPUT_POST, 'request_id', FILTER_VALIDATE_INT);
+            $userId = filter_input(INPUT_POST, 'user_id', FILTER_VALIDATE_INT);
+            $iotId = filter_input(INPUT_POST, 'iot_id', FILTER_VALIDATE_INT);
+
+            // Validate inputs
+            if ($requestId === false || $userId === false || $iotId === false) {
+                throw new Exception("Invalid request parameters");
+            }
+
+            // Verify request exists
+            $checkRequestStmt = $conn->prepare("SELECT * FROM request_table WHERE _request_id_ = ? AND _user_id_ = ? AND _iot_id_ = ?");
+            $checkRequestStmt->bind_param('iii', $requestId, $userId, $iotId);
+            $checkRequestStmt->execute();
+            $requestResult = $checkRequestStmt->get_result();
+
+            if ($requestResult->num_rows === 0) {
+                throw new Exception("Request not found");
+            }
+
+            // Check if IoT device is already active or in use
+            $checkActiveStmt = $conn->prepare("SELECT * FROM active_iot_table WHERE _active_iot_id_ = ?");
+            $checkActiveStmt->bind_param('i', $iotId);
+            $checkActiveStmt->execute();
+            $activeResult = $checkActiveStmt->get_result();
+
+            if ($activeResult->num_rows > 0) {
+                throw new Exception("IoT device is already active");
+            }
+
+            // Remove from pending_request_table if exists
+            $stmt = $conn->prepare("DELETE FROM pending_request_table WHERE _pending_request_id_ = ?");
+            $stmt->bind_param('i', $requestId);
+            $stmt->execute();
+
+            // Remove from request_table
+            $stmt = $conn->prepare("DELETE FROM request_table WHERE _request_id_ = ?");
+            $stmt->bind_param('i', $requestId);
+            $stmt->execute();
+
+            // Insert initial usage record with 0.00 usage amount
+            $stmt = $conn->prepare("INSERT INTO usage_table (_user_id_, _iot_id_, _usage_time_, _usage_amount_) VALUES (?, ?, NOW(), 0.00)");
+            $stmt->bind_param('ii', $userId, $iotId);
+            $stmt->execute();
+
+            // Insert initial balance record with 0.00 balance
+            $stmt = $conn->prepare("INSERT INTO balance_table (_user_id_, _iot_id_, _current_balance_) VALUES (?, ?, 0.00)");
+            $stmt->bind_param('ii', $userId, $iotId);
+            $stmt->execute();
+
+            // Update IoT device status to active
+            $stmt = $conn->prepare("DELETE FROM inactive_iot_table WHERE _inactive_iot_id_ = ?");
+            $stmt->bind_param('i', $iotId);
+            $stmt->execute();
+
+            $stmt = $conn->prepare("INSERT INTO active_iot_table (_active_iot_id_) VALUES (?)");
+            $stmt->bind_param('i', $iotId);
+            $stmt->execute();
+
+            // Optional: Create a notification for the user
+            $stmt = $conn->prepare("INSERT INTO notification_table (_user_id_, _notification_time_, _notification_title_, _notification_message_) VALUES (?, NOW(), 'IoT Request Approved', 'Your IoT device request has been approved.')");
+            $stmt->bind_param('i', $userId);
+            $stmt->execute();
+
+            $_SESSION['success'] = "Request approved successfully. IoT device activated.";
+        }
+
+        if (isset($_POST['reject_request'])) {
+            // Validate input
+            $requestId = filter_input(INPUT_POST, 'request_id', FILTER_VALIDATE_INT);
+
+            if ($requestId === false) {
+                throw new Exception("Invalid request parameters");
+            }
+
+            // Remove from pending_request_table if exists
+            $stmt = $conn->prepare("DELETE FROM pending_request_table WHERE _pending_request_id_ = ?");
+            $stmt->bind_param('i', $requestId);
+            $stmt->execute();
+
+            // Get user ID before deleting request
+            $userStmt = $conn->prepare("SELECT _user_id_ FROM request_table WHERE _request_id_ = ?");
+            $userStmt->bind_param('i', $requestId);
+            $userStmt->execute();
+            $userResult = $userStmt->get_result();
+            $userData = $userResult->fetch_assoc();
+
+            // Add to declined_request_table
+            $stmt = $conn->prepare("INSERT INTO declined_request_table (_declined_request_id_) VALUES (?)");
+            $stmt->bind_param('i', $requestId);
+            $stmt->execute();
+
+            // Optional: Create a notification for the user
+            if ($userData) {
+                $stmt = $conn->prepare("INSERT INTO notification_table (_user_id_, _notification_time_, _notification_title_, _notification_message_) VALUES (?, NOW(), 'IoT Request Rejected', 'Your IoT device request has been rejected.')");
+                $stmt->bind_param('i', $userData['_user_id_']);
+                $stmt->execute();
+            }
+
+            $_SESSION['success'] = "Request rejected successfully.";
+        }
+
+        $conn->commit();
+    } catch (Exception $e) {
+        $conn->rollback();
+        $_SESSION['error'] = "Error processing request: " . $e->getMessage();
+    }
+
+    // Clear the output buffer before redirecting
+    ob_end_clean();
+
+    // Rebuild the current query parameters without the POST data
+    $redirectParams = $_GET;
+    unset($redirectParams['submit']); // Remove any submission-related parameters
+
+    // Redirect using built query parameters
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?' . http_build_query($redirectParams));
+    exit();
 }
 
-$user_id = $_SESSION['_user_id_'];
-$errorMessage = '';
-$successMessage = '';
-
-// Check if user is admin
-$clientCheckQuery = "SELECT a._admin_id_ 
-                    FROM admin_table a 
-                    WHERE a._admin_id_ = ?";
-
 try {
-    $stmt = mysqli_prepare($conn, $clientCheckQuery);
-    mysqli_stmt_bind_param($stmt, "i", $user_id);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    
-    if (mysqli_num_rows($result) === 0) {
-        header("Location: access-denied.php");
-        exit;
-    }
-
-    // Notification
-    $notificationQuery = "SELECT * FROM notification_table
-                        WHERE _user_id_ = ? OR _user_id_ IS NULL
-                        ORDER BY _notification_time_ DESC
-                        LIMIT 10";
-
-    $stmt = mysqli_prepare($conn, $notificationQuery);
-    mysqli_stmt_bind_param($stmt, "s", $user_id);
-    mysqli_stmt_execute($stmt);
-    $notifications = mysqli_stmt_get_result($stmt);
-
-    // User Picture
-    $pictureQuery = "SELECT _profile_picture_ FROM user_table
-                    WHERE _user_id_ = ?";
-
-    $stmt = mysqli_prepare($conn, $pictureQuery);
-    mysqli_stmt_bind_param($stmt, "i", $user_id);
-    mysqli_stmt_execute($stmt);
-    $picture = mysqli_stmt_get_result($stmt);
-
-    if (($row = mysqli_fetch_assoc($picture)) && (!empty($row['_profile_picture_']) && $row['_profile_picture_'] !== NULL)) {
-        $pictureData = $row['_profile_picture_'];
-        $base64Image = base64_encode($pictureData);
-        $imageSrc = 'data:image/jpeg;base64,' . $base64Image;
-    } else {
-        $imageSrc = "../img/user-rounded-svgrepo-com.jpg";
-    }
-
     // Pagination setup
     $page_requests = isset($_GET['page_requests']) ? (int)$_GET['page_requests'] : 1;
     $page_iot = isset($_GET['page_iot']) ? (int)$_GET['page_iot'] : 1;
@@ -68,12 +169,12 @@ try {
     $search_iot = isset($_GET['search_iot']) ? mysqli_real_escape_string($conn, $_GET['search_iot']) : '';
 
     // Build search conditions
-    $requestSearchCondition = !empty($search_requests) ? 
+    $requestSearchCondition = !empty($search_requests) ?
         " AND (r._request_id_ LIKE '%$search_requests%' OR 
                r._user_id_ LIKE '%$search_requests%' OR 
                r._iot_id_ LIKE '%$search_requests%')" : "";
 
-    $iotSearchCondition = !empty($search_iot) ? 
+    $iotSearchCondition = !empty($search_iot) ?
         " AND (i._iot_id_ LIKE '%$search_iot%' OR 
                i._iot_label_ LIKE '%$search_iot%')" : "";
 
@@ -95,19 +196,19 @@ try {
 
     // Get Requests with pagination
     $requestsQuery = "SELECT r.*, 
-                            CASE 
-                                WHEN ar._active_request_id_ IS NOT NULL THEN 'Active'
-                                WHEN pr._pending_request_id_ IS NOT NULL THEN 'Pending'
-                                WHEN dr._declined_request_id_ IS NOT NULL THEN 'Declined'
-                                ELSE 'Unknown'
-                            END as status
-                     FROM request_table r
-                     LEFT JOIN active_request_table ar ON r._request_id_ = ar._active_request_id_
-                     LEFT JOIN pending_request_table pr ON r._request_id_ = pr._pending_request_id_
-                     LEFT JOIN declined_request_table dr ON r._request_id_ = dr._declined_request_id_
-                     WHERE 1=1 $requestSearchCondition
-                     ORDER BY r._request_time_ DESC
-                     LIMIT ? OFFSET ?";
+   u._email_ as request_email,
+   CASE 
+       WHEN pr._pending_request_id_ IS NOT NULL THEN 'Pending'
+       WHEN dr._declined_request_id_ IS NOT NULL THEN 'Declined'
+       ELSE 'Unknown'
+   END as status
+    FROM request_table r
+    JOIN user_table u ON r._user_id_ = u._user_id_
+    LEFT JOIN pending_request_table pr ON r._request_id_ = pr._pending_request_id_
+    LEFT JOIN declined_request_table dr ON r._request_id_ = dr._declined_request_id_
+    WHERE 1=1 $requestSearchCondition
+    ORDER BY r._request_time_ DESC
+    LIMIT ? OFFSET ?;";
 
     $stmt = mysqli_prepare($conn, $requestsQuery);
     mysqli_stmt_bind_param($stmt, "ii", $limit, $offset_requests);
@@ -115,30 +216,41 @@ try {
     $requests = mysqli_stmt_get_result($stmt);
 
     // Get IoT Devices with pagination
-    $iotQuery = "SELECT i.*, 
-                        CASE 
-                            WHEN ai._active_iot_id_ IS NOT NULL THEN 'Active'
-                            WHEN ii._inactive_iot_id_ IS NOT NULL THEN 'Inactive'
-                            WHEN ui._unpaid_iot_id_ IS NOT NULL THEN 'Unpaid'
-                            ELSE 'Unknown'
-                        END as status,
-                        CASE 
-                            WHEN e._electricity_id_ IS NOT NULL THEN 'Electricity'
-                            WHEN w._water_id_ IS NOT NULL THEN 'Water'
-                            WHEN g._gas_id_ IS NOT NULL THEN 'Gas'
-                            ELSE 'Unknown'
-                        END as utility_type
-                 FROM iot_table i
-                 LEFT JOIN active_iot_table ai ON i._iot_id_ = ai._active_iot_id_
-                 LEFT JOIN inactive_iot_table ii ON i._iot_id_ = ii._inactive_iot_id_
-                 LEFT JOIN unpaid_iot_table ui ON i._iot_id_ = ui._unpaid_iot_id_
-                 LEFT JOIN utility_table u ON i._utility_id_ = u._utility_id_
-                 LEFT JOIN electricity_table e ON u._utility_id_ = e._electricity_id_
-                 LEFT JOIN water_table w ON u._utility_id_ = w._water_id_
-                 LEFT JOIN gas_table g ON u._utility_id_ = g._gas_id_
-                 WHERE 1=1 $iotSearchCondition
-                 ORDER BY i._last_reported_time_ DESC
-                 LIMIT ? OFFSET ?";
+    $iotQuery = "SELECT i.*,
+       u._email_ as last_user_email,
+       CASE 
+           WHEN ai._active_iot_id_ IS NOT NULL THEN 'Active'
+           WHEN ii._inactive_iot_id_ IS NOT NULL THEN 'Inactive'
+           WHEN ui._unpaid_iot_id_ IS NOT NULL THEN 'Unpaid'
+           ELSE 'Unknown'
+       END as status,
+       CASE 
+           WHEN e._electricity_id_ IS NOT NULL THEN 'Electricity'
+           WHEN w._water_id_ IS NOT NULL THEN 'Water'
+           WHEN g._gas_id_ IS NOT NULL THEN 'Gas'
+           ELSE 'Unknown'
+       END as utility_type
+        FROM iot_table i
+        LEFT JOIN (
+            SELECT _iot_id_, _user_id_
+            FROM usage_table ut1
+            WHERE _usage_time_ = (
+                SELECT MAX(_usage_time_)
+                FROM usage_table ut2
+                WHERE ut1._iot_id_ = ut2._iot_id_
+            )
+        ) last_usage ON i._iot_id_ = last_usage._iot_id_
+        LEFT JOIN user_table u ON last_usage._user_id_ = u._user_id_
+        LEFT JOIN active_iot_table ai ON i._iot_id_ = ai._active_iot_id_
+        LEFT JOIN inactive_iot_table ii ON i._iot_id_ = ii._inactive_iot_id_
+        LEFT JOIN unpaid_iot_table ui ON i._iot_id_ = ui._unpaid_iot_id_
+        LEFT JOIN utility_table ut ON i._utility_id_ = ut._utility_id_
+        LEFT JOIN electricity_table e ON ut._utility_id_ = e._electricity_id_
+        LEFT JOIN water_table w ON ut._utility_id_ = w._water_id_
+        LEFT JOIN gas_table g ON ut._utility_id_ = g._gas_id_
+        WHERE 1=1 $iotSearchCondition
+        ORDER BY i._last_reported_time_ DESC
+        LIMIT ? OFFSET ?;";
 
     $stmt = mysqli_prepare($conn, $iotQuery);
     mysqli_stmt_bind_param($stmt, "ii", $limit, $offset_iot);
@@ -148,155 +260,174 @@ try {
 } catch (Exception $e) {
     $errorMessage = "Error: " . $e->getMessage();
 }
+
+ob_end_flush();
 ?>
 
 <!doctype html>
+
+<!-- html -->
 <html lang="en">
+
+<!-- head -->
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CLIX: Convenient Living & Integrated Experience</title>
+
+    <!-- css -->
     <link rel="stylesheet" href="../css/bootstrap.css">
     <link rel="stylesheet" href="../css/leaflet.css">
     <link rel="stylesheet" href="../css/admin-base.css">
-    <link rel="stylesheet" href="../css/admin-outage.css">
 </head>
 
+<!-- body -->
+
 <body>
-    <!-- Header -->
-    <header class="border-bottom" id="header-section">
-        <div class="container-fluid">
-            <div class="d-flex flex-wrap align-items-center justify-content-between">
-                <!-- Logo -->
-                <a href="../index.php" class="d-flex align-items-center mb-lg-0">
-                    <img src="../img/CLIX-white.svg" id="header-logo" alt="Logo" class="img-fluid">
-                </a>
-                
-                <!-- Navbar -->
-                <nav class="d-none d-lg-flex flex-grow-1 justify-content-center">
-                    <ul class="nav">
-                        <li><a href="./admin-dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
-                        <li><a href="./admin-outage.php" class="nav-link px-3 link-body-emphasis">Outage</a></li>
-                        <li><a href="./admin-IoT-control.php" class="nav-link px-3 link-secondary">IoT</a></li>
-                        <li><a href="./admin-notification.php" class="nav-link px-3 link-body-emphasis">Notification</a></li>
-                        <li><a href="./admin-login-seasion.php" class="nav-link px-3 link-body-emphasis">Seasion</a></li>
-                        <li><a href="./admin-user-control.php" class="nav-link px-3 link-body-emphasis">Client</a></li>
-                        <li><a href="./admin-feedback.php" class="nav-link px-3 link-body-emphasis">Feedback</a></li>
-                    </ul>
-                </nav>
+<!-- header -->
+<?php
+require_once './admin-header.php';
+?>
 
-                <!-- Notification, Mobile Navbar and User Section -->
-                <div class="d-flex align-items-center">
-                    <!-- Mobile Navbar Toggle -->
-                    <button class="navbar-toggler d-lg-none" type="button" style="width: 50px; height: 50px;" data-bs-toggle="collapse" data-bs-target="#mobileNav" aria-controls="mobileNav" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon d-flex align-items-center justify-content-center" style="width: 100%; height: 100%;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#000000" class="bi bi-list" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
-                            </svg>
-                        </span>
-                    </button>
+<!-- main -->
+<?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $conn->begin_transaction();
 
-                    <!-- Notifications -->
-                    <div class="dropdown text-end me-2" id="notification-icon">
-                        <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="17px" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
-                                <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6" />
-                            </svg>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <?php while ($row = mysqli_fetch_assoc($notifications)) : ?>
-                                <li><a class="dropdown-item small" href="#"><?= htmlspecialchars($row['_notification_message_']); ?></a></li>
-                            <?php endwhile; ?>
-                        </ul>
-                    </div>
+        if (isset($_POST['approve_request'])) {
+            $requestId = intval($_POST['request_id']);
+            $userId = intval($_POST['user_id']);
+            $iotId = intval($_POST['iot_id']);
 
-                    <!-- User Picture -->
-                    <div class="dropdown text-end" id="user-picture">
-                        <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
-                            <img src="<?php echo $imageSrc; ?>" alt="User" class="rounded-circle" style="width: 36px; height: 36px;">
-                        </a>
-                        <ul class="dropdown-menu text-small">
-                            <li><a class="dropdown-item small" href="./profile.php">Profile</a></li>
-                            <li><a class="dropdown-item small" href="./settings.php">Settings</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item small" href="./logout.php">Sign out</a></li>
-                        </ul>
-                    </div>
-                </div>
+            // Remove from pending_request_table if exists
+            $conn->query("DELETE FROM pending_request_table WHERE _pending_request_id_ = $requestId");
 
-            </div>
+            // Insert initial usage record with 0.00 usage amount
+            $stmt = $conn->prepare("INSERT INTO usage_table (_user_id_, _iot_id_, _usage_time_, _usage_amount_) VALUES (?, ?, NOW(), 0.00)");
+            $stmt->bind_param('ii', $userId, $iotId);
+            $stmt->execute();
 
-            <!-- Collapsible Mobile Menu -->
-            <div class="collapse" id="mobileNav">
-                <nav class="navbar-nav">
-                    <ul class="nav flex-column text-center">
-                        <li><a href="./admin-dashboard.php" class="nav-link px-3 link-body-emphasis">Dashboard</a></li>
-                        <li><a href="./admin-outage.php" class="nav-link px-3 link-body-emphasis">Outage</a></li>
-                        <li><a href="./admin-IoT-control.php" class="nav-link px-3 link-secondary">IoT</a></li>
-                        <li><a href="./admin-notification.php" class="nav-link px-3 link-body-emphasis">Notification</a></li>
-                        <li><a href="./admin-login-seasion.php" class="nav-link px-3 link-body-emphasis">Seasion</a></li>
-                        <li><a href="./admin-user-control.php" class="nav-link px-3 link-body-emphasis">Client</a></li>
-                        <li><a href="./admin-feedback.php" class="nav-link px-3 link-body-emphasis">Feedback</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </header>
+            // Update IoT device status to active
+            $conn->query("DELETE FROM inactive_iot_table WHERE _inactive_iot_id_ = $iotId");
+            $conn->query("INSERT INTO active_iot_table (_active_iot_id_) VALUES ($iotId)");
 
-    <!-- Main Section -->
-<!-- Main Section -->
+            $_SESSION['success'] = "Request approved successfully. IoT device activated.";
+        }
+
+        if (isset($_POST['reject_request'])) {
+            $requestId = intval($_POST['request_id']);
+
+            // Remove from pending_request_table if exists
+            $conn->query("DELETE FROM pending_request_table WHERE _pending_request_id_ = $requestId");
+
+            // Add to declined_request_table
+            $conn->query("INSERT INTO declined_request_table (_declined_request_id_) VALUES ($requestId)");
+
+            $_SESSION['success'] = "Request rejected successfully.";
+        }
+
+        $conn->commit();
+    } catch (Exception $e) {
+        $conn->rollback();
+        $_SESSION['error'] = "Error processing request: " . $e->getMessage();
+    }
+
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET));
+    exit();
+}
+?>
 <main id="main-section">
     <h2 id="sub-div-header">IoT Control</h2>
+    <div class="card mb-4" id="create-iot-card">
+        <div class="card-body">
+            <h5 class="card-title">Register IoT</h5>
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="alert alert-danger"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+            <?php endif; ?>
+            <?php if (isset($_SESSION['success'])): ?>
+                <div class="alert alert-success"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
+            <?php endif; ?>
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="iot-type" class="form-label">Type</label>
+                    <select class="form-select" id="iot-type" name="iot_type" required>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Gas">Gas</option>
+                        <option value="Water">Water</option>
+                    </select>
+                </div>
+                <button type="submit" name="create_iot" class="btn btn-primary" onclick="return confirm('Are you sure you want to register this IoT device?')">Register</button>
+            </form>
+        </div>
+    </div>
 
     <!-- Requests Table -->
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">IoT Requests</h5>
             <div class="mb-3">
-                <input type="text" class="form-control" id="search-requests" 
-                       placeholder="🔍 Search requests..." 
+                <input type="text" class="form-control" id="search-requests"
+                       placeholder="🔍 Search requests..."
                        value="<?php echo htmlspecialchars($search_requests); ?>">
             </div>
-            
+
             <div class="table-responsive">
                 <table class="table table-borderless small">
                     <thead>
-                        <tr>
-                            <th>Request ID</th>
-                            <th>User ID</th>
-                            <th>IoT ID</th>
-                            <th>Request Time</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
+                    <tr>
+                        <th>Request ID</th>
+                        <th>User ID</th>
+                        <th>Email</th>
+                        <th>IoT ID</th>
+                        <th>Request Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        <?php while ($row = mysqli_fetch_assoc($requests)) : ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($row['_request_id_']); ?></td>
-                                <td><?php echo htmlspecialchars($row['_user_id_']); ?></td>
-                                <td><?php echo htmlspecialchars($row['_iot_id_']); ?></td>
-                                <td><?php echo htmlspecialchars($row['_request_time_']); ?></td>
-                                <td>
-                                    <span class="badge <?php 
-                                        echo match($row['status']) {
-                                            'Active' => 'bg-success',
-                                            'Pending' => 'bg-warning',
-                                            'Declined' => 'bg-danger',
-                                            default => 'bg-secondary'
-                                        };
+                    <?php while ($row = mysqli_fetch_assoc($requests)) : ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($row['_request_id_']); ?></td>
+                            <td><?php echo htmlspecialchars($row['_user_id_']); ?></td>
+                            <td><?php echo htmlspecialchars($row['request_email']); ?></td>
+                            <td><?php echo htmlspecialchars($row['_iot_id_']); ?></td>
+                            <td><?php echo htmlspecialchars($row['_request_time_']); ?></td>
+                            <td>
+                                    <span class="badge <?php
+                                    echo match ($row['status']) {
+                                        'Active' => 'bg-success',
+                                        'Pending' => 'bg-warning',
+                                        'Declined' => 'bg-danger',
+                                        default => 'bg-secondary'
+                                    };
                                     ?>">
                                         <?php echo htmlspecialchars($row['status']); ?>
                                     </span>
-                                </td>
-                                <td>
-                                    <button class="btn btn-link p-0" onclick="editRequest(<?php echo $row['_request_id_']; ?>)">
-                                        <img src="../img/edit-svgrepo-com.svg" alt="Edit" style="width: 16px; height: 16px;">
-                                    </button>
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
+                            </td>
+                            <td>
+                                <div class="d-flex">
+                                    <form method="POST" class="me-1">
+                                        <input type="hidden" name="request_id" value="<?php echo htmlspecialchars($row['_request_id_']); ?>">
+                                        <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($row['_user_id_']); ?>">
+                                        <input type="hidden" name="iot_id" value="<?php echo htmlspecialchars($row['_iot_id_']); ?>">
+                                        <button type="submit" name="approve_request" class="btn btn-sm btn-success p-0 px-1"
+                                                onclick="return confirm('Are you sure you want to approve this IoT request?')">
+                                            Approve
+                                        </button>
+                                    </form>
+                                    <form method="POST">
+                                        <input type="hidden" name="request_id" value="<?php echo htmlspecialchars($row['_request_id_']); ?>">
+                                        <button type="submit" name="reject_request" class="btn btn-sm btn-danger p-0 px-1"
+                                                onclick="return confirm('Are you sure you want to reject this IoT request?')">
+                                            Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
                     </tbody>
                 </table>
             </div>
@@ -307,7 +438,9 @@ try {
                         <ul class="pagination no-border">
                             <?php if ($page_requests > 1): ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="?page_requests=<?php echo ($page_requests - 1); ?>&search_requests=<?php echo urlencode($search_requests); ?>&page_iot=<?php echo $page_iot; ?>&search_iot=<?php echo urlencode($search_iot); ?>" aria-label="Previous">
+                                    <a class="page-link"
+                                       href="?page_requests=<?php echo($page_requests - 1); ?>&search_requests=<?php echo urlencode($search_requests); ?>&page_iot=<?php echo $page_iot; ?>&search_iot=<?php echo urlencode($search_iot); ?>"
+                                       aria-label="Previous">
                                         <span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
@@ -318,7 +451,8 @@ try {
 
                             if ($start_page > 1): ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="?page_requests=1&search_requests=<?php echo urlencode($search_requests); ?>&page_iot=<?php echo $page_iot; ?>&search_iot=<?php echo urlencode($search_iot); ?>">1</a>
+                                    <a class="page-link"
+                                       href="?page_requests=1&search_requests=<?php echo urlencode($search_requests); ?>&page_iot=<?php echo $page_iot; ?>&search_iot=<?php echo urlencode($search_iot); ?>">1</a>
                                 </li>
                                 <?php if ($start_page > 2): ?>
                                     <li class="page-item disabled"><span class="page-link">...</span></li>
@@ -327,7 +461,8 @@ try {
 
                             for ($i = $start_page; $i <= $end_page; $i++): ?>
                                 <li class="page-item <?php echo ($i == $page_requests) ? 'active' : ''; ?>">
-                                    <a class="page-link" href="?page_requests=<?php echo $i; ?>&search_requests=<?php echo urlencode($search_requests); ?>&page_iot=<?php echo $page_iot; ?>&search_iot=<?php echo urlencode($search_iot); ?>"><?php echo $i; ?></a>
+                                    <a class="page-link"
+                                       href="?page_requests=<?php echo $i; ?>&search_requests=<?php echo urlencode($search_requests); ?>&page_iot=<?php echo $page_iot; ?>&search_iot=<?php echo urlencode($search_iot); ?>"><?php echo $i; ?></a>
                                 </li>
                             <?php endfor;
 
@@ -336,13 +471,16 @@ try {
                                     <li class="page-item disabled"><span class="page-link">...</span></li>
                                 <?php endif; ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="?page_requests=<?php echo $totalPagesRequests; ?>&search_requests=<?php echo urlencode($search_requests); ?>&page_iot=<?php echo $page_iot; ?>&search_iot=<?php echo urlencode($search_iot); ?>"><?php echo $totalPagesRequests; ?></a>
+                                    <a class="page-link"
+                                       href="?page_requests=<?php echo $totalPagesRequests; ?>&search_requests=<?php echo urlencode($search_requests); ?>&page_iot=<?php echo $page_iot; ?>&search_iot=<?php echo urlencode($search_iot); ?>"><?php echo $totalPagesRequests; ?></a>
                                 </li>
                             <?php endif;
 
                             if ($page_requests < $totalPagesRequests): ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="?page_requests=<?php echo ($page_requests + 1); ?>&search_requests=<?php echo urlencode($search_requests); ?>&page_iot=<?php echo $page_iot; ?>&search_iot=<?php echo urlencode($search_iot); ?>" aria-label="Next">
+                                    <a class="page-link"
+                                       href="?page_requests=<?php echo($page_requests + 1); ?>&search_requests=<?php echo urlencode($search_requests); ?>&page_iot=<?php echo $page_iot; ?>&search_iot=<?php echo urlencode($search_iot); ?>"
+                                       aria-label="Next">
                                         <span aria-hidden="true">&raquo;</span>
                                     </a>
                                 </li>
@@ -359,56 +497,59 @@ try {
         <div class="card-body">
             <h5 class="card-title">Registered IoT Devices</h5>
             <div class="mb-3">
-                <input type="text" class="form-control" id="search-iot" 
-                       placeholder="🔍 Search IoT devices..." 
+                <input type="text" class="form-control" id="search-iot"
+                       placeholder="🔍 Search IoT devices..."
                        value="<?php echo htmlspecialchars($search_iot); ?>">
             </div>
-            
+
             <div class="table-responsive">
                 <table class="table table-borderless small">
                     <thead>
-                        <tr>
-                            <th>IoT ID</th>
-                            <th>Label</th>
-                            <th>Utility Type</th>
-                            <th>Location</th>
-                            <th>Last Reported</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
+                    <tr>
+                        <th>IoT ID</th>
+                        <th>Label</th>
+                        <th>Last User Email</th>
+                        <th>Utility Type</th>
+                        <th>Location</th>
+                        <th>Last Reported</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        <?php while ($row = mysqli_fetch_assoc($iotDevices)) : ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($row['_iot_id_']); ?></td>
-                                <td><?php echo htmlspecialchars($row['_iot_label_']); ?></td>
-                                <td><?php echo htmlspecialchars($row['utility_type']); ?></td>
-                                <td>
-                                    <?php 
-                                        echo htmlspecialchars($row['_iot_latitude_']) . ', ' . 
-                                             htmlspecialchars($row['_iot_longitude_']); 
-                                    ?>
-                                </td>
-                                <td><?php echo htmlspecialchars($row['_last_reported_time_']); ?></td>
-                                <td>
-                                    <span class="badge <?php 
-                                        echo match($row['status']) {
-                                            'Active' => 'bg-success',
-                                            'Inactive' => 'bg-warning',
-                                            'Unpaid' => 'bg-danger',
-                                            default => 'bg-secondary'
-                                        };
+                    <?php while ($row = mysqli_fetch_assoc($iotDevices)) : ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($row['_iot_id_']); ?></td>
+                            <td><?php echo !empty($row['_iot_label_']) ? htmlspecialchars($row['_iot_label_']) : 'N/A'; ?></td>
+                            <td><?php echo !empty($row['last_user_email']) ? htmlspecialchars($row['last_user_email']) : 'N/A'; ?></td>
+                            <td><?php echo htmlspecialchars($row['utility_type']); ?></td>
+                            <td>
+                                <?php
+                                echo htmlspecialchars($row['_iot_latitude_']) . ', ' .
+                                    htmlspecialchars($row['_iot_longitude_']);
+                                ?>
+                            </td>
+                            <td><?php echo htmlspecialchars($row['_last_reported_time_']); ?></td>
+                            <td>
+                                    <span class="badge <?php
+                                    echo match ($row['status']) {
+                                        'Active' => 'bg-success',
+                                        'Inactive' => 'bg-warning',
+                                        'Unpaid' => 'bg-danger',
+                                        default => 'bg-secondary'
+                                    };
                                     ?>">
                                         <?php echo htmlspecialchars($row['status']); ?>
                                     </span>
-                                </td>
-                                <td>
-                                    <button class="btn btn-link p-0" onclick="editIoT(<?php echo $row['_iot_id_']; ?>)">
-                                        <img src="../img/edit-svgrepo-com.svg" alt="Edit" style="width: 16px; height: 16px;">
-                                    </button>
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
+                            </td>
+                            <td>
+                                <button class="btn btn-link p-0" onclick="editIoT(<?php echo $row['_iot_id_']; ?>)">
+                                    <img src="../img/edit-svgrepo-com.svg" alt="Edit"
+                                         style="width: 16px; height: 16px;">
+                                </button>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
                     </tbody>
                 </table>
             </div>
@@ -419,7 +560,9 @@ try {
                         <ul class="pagination no-border">
                             <?php if ($page_iot > 1): ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="?page_iot=<?php echo ($page_iot - 1); ?>&search_iot=<?php echo urlencode($search_iot); ?>&page_requests=<?php echo $page_requests; ?>&search_requests=<?php echo urlencode($search_requests); ?>" aria-label="Previous">
+                                    <a class="page-link"
+                                       href="?page_iot=<?php echo($page_iot - 1); ?>&search_iot=<?php echo urlencode($search_iot); ?>&page_requests=<?php echo $page_requests; ?>&search_requests=<?php echo urlencode($search_requests); ?>"
+                                       aria-label="Previous">
                                         <span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
@@ -430,7 +573,8 @@ try {
 
                             if ($start_page > 1): ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="?page_iot=1&search_iot=<?php echo urlencode($search_iot); ?>&page_requests=<?php echo $page_requests; ?>&search_requests=<?php echo urlencode($search_requests); ?>">1</a>
+                                    <a class="page-link"
+                                       href="?page_iot=1&search_iot=<?php echo urlencode($search_iot); ?>&page_requests=<?php echo $page_requests; ?>&search_requests=<?php echo urlencode($search_requests); ?>">1</a>
                                 </li>
                                 <?php if ($start_page > 2): ?>
                                     <li class="page-item disabled"><span class="page-link">...</span></li>
@@ -439,7 +583,8 @@ try {
 
                             for ($i = $start_page; $i <= $end_page; $i++): ?>
                                 <li class="page-item <?php echo ($i == $page_iot) ? 'active' : ''; ?>">
-                                    <a class="page-link" href="?page_iot=<?php echo $i; ?>&search_iot=<?php echo urlencode($search_iot); ?>&page_requests=<?php echo $page_requests; ?>&search_requests=<?php echo urlencode($search_requests); ?>"><?php echo $i; ?></a>
+                                    <a class="page-link"
+                                       href="?page_iot=<?php echo $i; ?>&search_iot=<?php echo urlencode($search_iot); ?>&page_requests=<?php echo $page_requests; ?>&search_requests=<?php echo urlencode($search_requests); ?>"><?php echo $i; ?></a>
                                 </li>
                             <?php endfor;
 
@@ -448,13 +593,16 @@ try {
                                     <li class="page-item disabled"><span class="page-link">...</span></li>
                                 <?php endif; ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="?page_iot=<?php echo $totalPagesIoT; ?>&search_iot=<?php echo urlencode($search_iot); ?>&page_requests=<?php echo $page_requests; ?>&search_requests=<?php echo urlencode($search_requests); ?>"><?php echo $totalPagesIoT; ?></a>
+                                    <a class="page-link"
+                                       href="?page_iot=<?php echo $totalPagesIoT; ?>&search_iot=<?php echo urlencode($search_iot); ?>&page_requests=<?php echo $page_requests; ?>&search_requests=<?php echo urlencode($search_requests); ?>"><?php echo $totalPagesIoT; ?></a>
                                 </li>
                             <?php endif;
 
                             if ($page_iot < $totalPagesIoT): ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="?page_iot=<?php echo ($page_iot + 1); ?>&search_iot=<?php echo urlencode($search_iot); ?>&page_requests=<?php echo $page_requests; ?>&search_requests=<?php echo urlencode($search_requests); ?>" aria-label="Next">
+                                    <a class="page-link"
+                                       href="?page_iot=<?php echo($page_iot + 1); ?>&search_iot=<?php echo urlencode($search_iot); ?>&page_requests=<?php echo $page_requests; ?>&search_requests=<?php echo urlencode($search_requests); ?>"
+                                       aria-label="Next">
                                         <span aria-hidden="true">&raquo;</span>
                                     </a>
                                 </li>
@@ -467,18 +615,14 @@ try {
     </div>
 </main>
 
-    <!-- Footer -->
-    <footer class="border-top border-bottom" id="footer-section">
-        <div class="text-center">
-            <p class="mb-0">© 2024 CLIX. All Rights Reserved.</p>
-        </div>
-    </footer>
+<!-- footer -->
+<?php
+require_once './admin-footer.php';
+?>
 
-    <!-- Scripts -->
-    <script src="../js/bootstrap.bundle.js"></script>
-    <script src="../js/leaflet.js"></script>
-    <script src="../js/admin-outage.js"></script>
-    
+<!-- script -->
+<script src="../js/bootstrap.bundle.js"></script>
+
 </body>
 
 </html>
