@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Handle IoT creation
         if (isset($_POST['create_iot'])) {
-            $prefix = match($_POST['iot_type']) {
+            $prefix = match ($_POST['iot_type']) {
                 'Electricity' => '1',
                 'Water' => '2',
                 'Gas' => '3'
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['success'] = "IoT device created successfully with ID: " . $iotId;
         }
 
-// Inside the POST handler for approve_request
+        // Inside the POST handler for approve_request
         if (isset($_POST['approve_request'])) {
             // Validate input
             $requestId = filter_input(INPUT_POST, 'request_id', FILTER_VALIDATE_INT);
@@ -105,8 +105,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute();
 
             // Optional: Create a notification for the user
-            $stmt = $conn->prepare("INSERT INTO notification_table (_user_id_, _notification_time_, _notification_title_, _notification_message_) VALUES (?, NOW(), 'IoT Request Approved', 'Your IoT device request has been approved.')");
-            $stmt->bind_param('i', $userId);
+            $stmt = $conn->prepare("INSERT INTO notification_table (_user_id_, _notification_time_, _notification_title_, _notification_message_) VALUES (?, NOW(), 'IoT Request Approved', CONCAT('Your IoT device request has been approved. Your Device ID is: ', ?))");
+            $stmt->bind_param('ii', $userId, $iotId);
             $stmt->execute();
 
             $_SESSION['success'] = "Request approved successfully. IoT device activated and location updated.";
@@ -145,6 +145,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $_SESSION['success'] = "Request rejected successfully.";
+        }
+
+        // New handler for toggling IoT device status
+        if (isset($_POST['toggle_iot_status'])) {
+            $iotId = filter_input(INPUT_POST, 'iot_id', FILTER_VALIDATE_INT);
+
+            if ($iotId === false) {
+                throw new Exception("Invalid IoT device ID");
+            }
+
+            // Check current status
+            $statusQuery = $conn->prepare("
+                SELECT 
+                    CASE 
+                        WHEN ai._active_iot_id_ IS NOT NULL THEN 'Active'
+                        WHEN ii._inactive_iot_id_ IS NOT NULL THEN 'Inactive'
+                        ELSE 'Unknown'
+                    END as status
+                FROM iot_table i
+                LEFT JOIN active_iot_table ai ON i._iot_id_ = ai._active_iot_id_
+                LEFT JOIN inactive_iot_table ii ON i._iot_id_ = ii._inactive_iot_id_
+                WHERE i._iot_id_ = ?
+            ");
+            $statusQuery->bind_param('i', $iotId);
+            $statusQuery->execute();
+            $statusResult = $statusQuery->get_result();
+            $statusData = $statusResult->fetch_assoc();
+
+            if ($statusData['status'] === 'Active') {
+                // Deactivate IoT device
+                $conn->query("DELETE FROM active_iot_table WHERE _active_iot_id_ = $iotId");
+                $conn->query("INSERT INTO inactive_iot_table (_inactive_iot_id_) VALUES ($iotId)");
+                $_SESSION['success'] = "IoT device deactivated successfully.";
+            } elseif ($statusData['status'] === 'Inactive') {
+                // Activate IoT device
+                $conn->query("DELETE FROM inactive_iot_table WHERE _inactive_iot_id_ = $iotId");
+                $conn->query("INSERT INTO active_iot_table (_active_iot_id_) VALUES ($iotId)");
+                $_SESSION['success'] = "IoT device activated successfully.";
+            }
+        }
+
+        // New handler for resetting IoT device
+        if (isset($_POST['reset_iot'])) {
+            $iotId = filter_input(INPUT_POST, 'iot_id', FILTER_VALIDATE_INT);
+
+            if ($iotId === false) {
+                throw new Exception("Invalid IoT device ID");
+            }
+
+            // Reset IoT device:
+            // 1. Set location to 0,0
+            // 2. Clear label
+            // 3. Set balance to 0
+            // 4. Move to inactive status
+            // 5. Remove from active table
+            // 6. Insert into inactive table
+
+            // Update IoT table location and label
+            $updateIotStmt = $conn->prepare("UPDATE iot_table SET _iot_latitude_ = 0.000000, _iot_longitude_ = 0.000000, _iot_label_ = NULL WHERE _iot_id_ = ?");
+            $updateIotStmt->bind_param('i', $iotId);
+            $updateIotStmt->execute();
+
+            // Reset balance for this IoT device
+            $resetBalanceStmt = $conn->prepare("
+                UPDATE balance_table 
+                SET _current_balance_ = 0.00 
+                WHERE _iot_id_ = ?
+            ");
+            $resetBalanceStmt->bind_param('i', $iotId);
+            $resetBalanceStmt->execute();
+
+            // Remove from active table if exists
+            $conn->query("DELETE FROM active_iot_table WHERE _active_iot_id_ = $iotId");
+
+            // Ensure it's in inactive table
+            $conn->query("DELETE FROM inactive_iot_table WHERE _inactive_iot_id_ = $iotId");
+            $conn->query("INSERT INTO inactive_iot_table (_inactive_iot_id_) VALUES ($iotId)");
+
+            $_SESSION['success'] = "IoT device reset successfully.";
         }
 
         $conn->commit();
@@ -356,10 +435,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="card-body">
             <h5 class="card-title">Register IoT</h5>
             <?php if (isset($_SESSION['error'])): ?>
-                <div class="alert alert-danger"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+                <div class="alert alert-danger"><?php echo $_SESSION['error'];
+                    unset($_SESSION['error']); ?></div>
             <?php endif; ?>
             <?php if (isset($_SESSION['success'])): ?>
-                <div class="alert alert-success"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
+                <div class="alert alert-success"><?php echo $_SESSION['success'];
+                    unset($_SESSION['success']); ?></div>
             <?php endif; ?>
             <form method="POST">
                 <div class="mb-3">
@@ -370,7 +451,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <option value="Water">Water</option>
                     </select>
                 </div>
-                <button type="submit" name="create_iot" class="btn btn-primary" onclick="return confirm('Are you sure you want to register this IoT device?')">Register</button>
+                <button type="submit" name="create_iot" class="btn btn-primary"
+                        onclick="return confirm('Are you sure you want to register this IoT device?')">Register
+                </button>
             </form>
         </div>
     </div>
@@ -426,17 +509,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <td>
                                 <div class="d-flex">
                                     <form method="POST" class="me-1">
-                                        <input type="hidden" name="request_id" value="<?php echo htmlspecialchars($row['_request_id_']); ?>">
-                                        <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($row['_user_id_']); ?>">
-                                        <input type="hidden" name="iot_id" value="<?php echo htmlspecialchars($row['_iot_id_']); ?>">
-                                        <button type="submit" name="approve_request" class="btn btn-sm btn-success p-0 px-1"
+                                        <input type="hidden" name="request_id"
+                                               value="<?php echo htmlspecialchars($row['_request_id_']); ?>">
+                                        <input type="hidden" name="user_id"
+                                               value="<?php echo htmlspecialchars($row['_user_id_']); ?>">
+                                        <input type="hidden" name="iot_id"
+                                               value="<?php echo htmlspecialchars($row['_iot_id_']); ?>">
+                                        <button type="submit" name="approve_request"
+                                                class="btn btn-sm btn-success p-0 px-1"
                                                 onclick="return confirm('Are you sure you want to approve this IoT request?')">
                                             Approve
                                         </button>
                                     </form>
                                     <form method="POST">
-                                        <input type="hidden" name="request_id" value="<?php echo htmlspecialchars($row['_request_id_']); ?>">
-                                        <button type="submit" name="reject_request" class="btn btn-sm btn-danger p-0 px-1"
+                                        <input type="hidden" name="request_id"
+                                               value="<?php echo htmlspecialchars($row['_request_id_']); ?>">
+                                        <button type="submit" name="reject_request"
+                                                class="btn btn-sm btn-danger p-0 px-1"
                                                 onclick="return confirm('Are you sure you want to reject this IoT request?')">
                                             Reject
                                         </button>
@@ -560,10 +649,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </span>
                             </td>
                             <td>
-                                <button class="btn btn-link p-0" onclick="editIoT(<?php echo $row['_iot_id_']; ?>)">
-                                    <img src="../img/edit-svgrepo-com.svg" alt="Edit"
-                                         style="width: 16px; height: 16px;">
-                                </button>
+                                <div class="d-flex">
+                                    <form method="POST" class="me-1">
+                                        <input type="hidden" name="iot_id"
+                                               value="<?php echo htmlspecialchars($row['_iot_id_']); ?>">
+                                        <button type="submit" name="toggle_iot_status" class="btn btn-sm <?php
+                                        echo $row['status'] === 'Active' ? 'btn-warning' : 'btn-success';
+                                        ?> p-0 px-1"
+                                                onclick="return confirm('Are you sure you want to <?php
+                                                echo $row['status'] === 'Active' ? 'deactivate' : 'activate';
+                                                ?> this IoT device?')">
+                                            <?php echo $row['status'] === 'Active' ? 'Deactivate' : 'Activate'; ?>
+                                        </button>
+                                    </form>
+                                    <form method="POST" class="me-1">
+                                        <input type="hidden" name="iot_id"
+                                               value="<?php echo htmlspecialchars($row['_iot_id_']); ?>">
+                                        <button type="submit" name="reset_iot" class="btn btn-sm btn-danger p-0 px-1"
+                                                onclick="return confirm('Are you sure you want to reset this IoT device? This will clear its location, label, and balance.')">
+                                            Reset
+                                        </button>
+                                    </form>
+                                    <button class="btn btn-link p-0" onclick="editIoT(<?php echo $row['_iot_id_']; ?>)">
+                                        <img src="../img/edit-svgrepo-com.svg" alt="Edit"
+                                             style="width: 16px; height: 16px;">
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     <?php endwhile; ?>
