@@ -3,12 +3,12 @@ global $conn;
 session_start();
 require_once './db-connection.php';
 
-// Input validation and sanitization function
 function sanitize_input($input) {
     return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id = $_SESSION['user_id'] ?? 0;
+
 $iot_id = filter_input(INPUT_GET, 'iot_id', FILTER_VALIDATE_INT);
 
 if (!$iot_id) {
