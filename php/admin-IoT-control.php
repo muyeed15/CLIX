@@ -194,14 +194,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Invalid IoT device ID");
             }
 
-            // Reset IoT device:
-            // 1. Set location to 0,0
-            // 2. Clear label
-            // 3. Set balance to 0
-            // 4. Move to inactive status
-            // 5. Remove from active table
-            // 6. Insert into inactive table
-
             // Update IoT table location and label
             $updateIotStmt = $conn->prepare("UPDATE iot_table SET _iot_latitude_ = 0.000000, _iot_longitude_ = 0.000000, _iot_label_ = NULL WHERE _iot_id_ = ?");
             $updateIotStmt->bind_param('i', $iotId);
@@ -371,6 +363,7 @@ ob_end_flush();
     <link rel="stylesheet" href="../css/bootstrap.css">
     <link rel="stylesheet" href="../css/leaflet.css">
     <link rel="stylesheet" href="../css/admin-base.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
 
 <!-- body -->
@@ -518,7 +511,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <button type="submit" name="approve_request"
                                                 class="btn btn-sm btn-success p-0 px-1"
                                                 onclick="return confirm('Are you sure you want to approve this IoT request?')">
-                                            Approve
+                                            <i class="bi bi-check-circle me-1"></i>Approve
                                         </button>
                                     </form>
                                     <form method="POST">
@@ -527,7 +520,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <button type="submit" name="reject_request"
                                                 class="btn btn-sm btn-danger p-0 px-1"
                                                 onclick="return confirm('Are you sure you want to reject this IoT request?')">
-                                            Reject
+                                            <i class="bi bi-x-circle me-1"></i>Reject
                                         </button>
                                     </form>
                                 </div>
@@ -659,7 +652,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 onclick="return confirm('Are you sure you want to <?php
                                                 echo $row['status'] === 'Active' ? 'deactivate' : 'activate';
                                                 ?> this IoT device?')">
-                                            <?php echo $row['status'] === 'Active' ? 'Deactivate' : 'Activate'; ?>
+                                            <i class="bi bi-power me-1"></i><?php echo $row['status'] === 'Active' ? 'Deactivate' : 'Activate'; ?>
                                         </button>
                                     </form>
                                     <form method="POST" class="me-1">
@@ -667,13 +660,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                value="<?php echo htmlspecialchars($row['_iot_id_']); ?>">
                                         <button type="submit" name="reset_iot" class="btn btn-sm btn-danger p-0 px-1"
                                                 onclick="return confirm('Are you sure you want to reset this IoT device? This will clear its location, label, and balance.')">
-                                            Reset
+                                            <i class="bi bi-arrow-clockwise me-1"></i>Reset
                                         </button>
                                     </form>
-                                    <button class="btn btn-link p-0" onclick="editIoT(<?php echo $row['_iot_id_']; ?>)">
-                                        <img src="../img/edit-svgrepo-com.svg" alt="Edit"
-                                             style="width: 16px; height: 16px;">
-                                    </button>
                                 </div>
                             </td>
                         </tr>
