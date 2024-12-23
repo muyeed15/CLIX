@@ -1,5 +1,4 @@
 <?php
-// Start output buffering at the very top of the script
 ob_start();
 global $conn;
 session_start();
@@ -35,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['success'] = "IoT device created successfully with ID: " . $iotId;
         }
 
+// Inside the POST handler for approve_request
         if (isset($_POST['approve_request'])) {
             // Validate input
             $requestId = filter_input(INPUT_POST, 'request_id', FILTER_VALIDATE_INT);
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Invalid request parameters");
             }
 
-            // Verify request exists
+            // Verify request exists and get its location data
             $checkRequestStmt = $conn->prepare("SELECT * FROM request_table WHERE _request_id_ = ? AND _user_id_ = ? AND _iot_id_ = ?");
             $checkRequestStmt->bind_param('iii', $requestId, $userId, $iotId);
             $checkRequestStmt->execute();
@@ -55,6 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($requestResult->num_rows === 0) {
                 throw new Exception("Request not found");
             }
+
+            $requestData = $requestResult->fetch_assoc();
+            $latitude = $requestData['_latitude_'];
+            $longitude = $requestData['_longitude_'];
 
             // Check if IoT device is already active or in use
             $checkActiveStmt = $conn->prepare("SELECT * FROM active_iot_table WHERE _active_iot_id_ = ?");
@@ -65,6 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($activeResult->num_rows > 0) {
                 throw new Exception("IoT device is already active");
             }
+
+            // Update IoT device location
+            $updateLocationStmt = $conn->prepare("UPDATE iot_table SET _iot_latitude_ = ?, _iot_longitude_ = ? WHERE _iot_id_ = ?");
+            $updateLocationStmt->bind_param('ddi', $latitude, $longitude, $iotId);
+            $updateLocationStmt->execute();
 
             // Remove from pending_request_table if exists
             $stmt = $conn->prepare("DELETE FROM pending_request_table WHERE _pending_request_id_ = ?");
@@ -100,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param('i', $userId);
             $stmt->execute();
 
-            $_SESSION['success'] = "Request approved successfully. IoT device activated.";
+            $_SESSION['success'] = "Request approved successfully. IoT device activated and location updated.";
         }
 
         if (isset($_POST['reject_request'])) {
@@ -196,19 +205,22 @@ try {
 
     // Get Requests with pagination
     $requestsQuery = "SELECT r.*, 
-   u._email_ as request_email,
-   CASE 
-       WHEN pr._pending_request_id_ IS NOT NULL THEN 'Pending'
-       WHEN dr._declined_request_id_ IS NOT NULL THEN 'Declined'
-       ELSE 'Unknown'
-   END as status
-    FROM request_table r
-    JOIN user_table u ON r._user_id_ = u._user_id_
-    LEFT JOIN pending_request_table pr ON r._request_id_ = pr._pending_request_id_
-    LEFT JOIN declined_request_table dr ON r._request_id_ = dr._declined_request_id_
-    WHERE 1=1 $requestSearchCondition
-    ORDER BY r._request_time_ DESC
-    LIMIT ? OFFSET ?;";
+       u._email_ as request_email,
+       r._latitude_ as latitude,
+       r._longitude_ as longitude,
+       CASE 
+           WHEN pr._pending_request_id_ IS NOT NULL THEN 'Pending'
+           WHEN dr._declined_request_id_ IS NOT NULL THEN 'Declined'
+           ELSE 'Unknown'
+       END as status
+        FROM request_table r
+        JOIN user_table u ON r._user_id_ = u._user_id_
+        JOIN iot_table i ON r._iot_id_ = i._iot_id_    -- Added JOIN with iot_table
+        LEFT JOIN pending_request_table pr ON r._request_id_ = pr._pending_request_id_
+        LEFT JOIN declined_request_table dr ON r._request_id_ = dr._declined_request_id_
+        WHERE 1=1 $requestSearchCondition
+        ORDER BY r._request_time_ DESC
+        LIMIT ? OFFSET ?;";
 
     $stmt = mysqli_prepare($conn, $requestsQuery);
     mysqli_stmt_bind_param($stmt, "ii", $limit, $offset_requests);
@@ -381,6 +393,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <th>User ID</th>
                         <th>Email</th>
                         <th>IoT ID</th>
+                        <th>Location</th>
                         <th>Request Time</th>
                         <th>Status</th>
                         <th>Actions</th>
@@ -393,6 +406,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <td><?php echo htmlspecialchars($row['_user_id_']); ?></td>
                             <td><?php echo htmlspecialchars($row['request_email']); ?></td>
                             <td><?php echo htmlspecialchars($row['_iot_id_']); ?></td>
+                            <td>
+                                <?php echo htmlspecialchars($row['latitude']); ?>,
+                                <?php echo htmlspecialchars($row['longitude']); ?>
+                            </td>
                             <td><?php echo htmlspecialchars($row['_request_time_']); ?></td>
                             <td>
                                     <span class="badge <?php

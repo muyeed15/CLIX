@@ -50,8 +50,6 @@ try {
                 CASE 
                     WHEN b._current_balance_ <= 0 OR u._unpaid_iot_id_ IS NOT NULL THEN 'Unpaid'
                     WHEN b._current_balance_ > 0 AND a._active_iot_id_ IS NOT NULL THEN 'Active'
-                    WHEN b._current_balance_ > 0 AND ia._inactive_iot_id_ IS NOT NULL THEN 'Inactive'
-                    ELSE 'Unknown'
                 END AS _status_
             FROM 
                 iot_table i
@@ -71,11 +69,13 @@ try {
                 LEFT JOIN usage_table u_total ON i._iot_id_ = u_total._iot_id_
                 LEFT JOIN balance_table b ON i._iot_id_ = b._iot_id_
                 LEFT JOIN active_iot_table a ON i._iot_id_ = a._active_iot_id_
-                LEFT JOIN inactive_iot_table ia ON i._iot_id_ = ia._inactive_iot_id_
                 LEFT JOIN unpaid_iot_table u ON i._iot_id_ = u._unpaid_iot_id_
                 INNER JOIN balance_table user_iot ON i._iot_id_ = user_iot._iot_id_
             WHERE 
-                user_iot._user_id_ = ?
+                user_iot._user_id_ = ? AND (
+                    b._current_balance_ > 0 AND a._active_iot_id_ IS NOT NULL OR 
+                    b._current_balance_ <= 0 OR u._unpaid_iot_id_ IS NOT NULL
+                )
             GROUP BY 
                 _type_, 
                 i._iot_id_, 
@@ -83,7 +83,6 @@ try {
                 u_current._usage_amount_,
                 b._current_balance_,
                 a._active_iot_id_,
-                ia._inactive_iot_id_,
                 u._unpaid_iot_id_
             ORDER BY 
                 _type_, 

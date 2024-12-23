@@ -99,7 +99,7 @@ try {
                              alt="<?php echo htmlspecialchars($row['utility_type']); ?>">
                     </td>
                     <td><?php echo htmlspecialchars($row['_iot_id_']); ?></td>
-                    <td><?php echo htmlspecialchars($row['_iot_label_']); ?></td>
+                    <td><?php echo !empty($row['_iot_label_']) ? htmlspecialchars($row['_iot_label_']) : 'N/A'; ?></td>
                     <td><?php echo htmlspecialchars($row['utility_type']); ?></td>
                     <td><?php echo number_format($row['_recharge_amount_'], 2) . 'tk'; ?></td>
                     <td><?php echo date('h:ia', strtotime($row['_recharge_time_'])); ?></td>

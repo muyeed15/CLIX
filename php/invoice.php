@@ -107,7 +107,7 @@ try {
                 <h3>Device Details:</h3>
                 <p>
                     ID: <?php echo htmlspecialchars($invoice_data['_iot_id_']); ?><br>
-                    Label: <?php echo htmlspecialchars($invoice_data['_iot_label_']); ?><br>
+                    Label: <?php echo !empty($row['_iot_label_']) ? htmlspecialchars($row['_iot_label_']) : 'N/A'; ?><br>
                     Type: <?php echo htmlspecialchars($invoice_data['utility_type']); ?>
                 </p>
             </div>
