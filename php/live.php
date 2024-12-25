@@ -84,10 +84,11 @@ while ($rate = mysqli_fetch_assoc($ratesResult)) {
 
     function createDevicePattern() {
         return {
-            baseRate: Math.random() * 0.5 + 0.1,
-            burstChance: Math.random() * 0.15,
-            burstMultiplier: Math.random() * 3 + 1.5,
-            idleChance: Math.random() * 0.2
+            // Base rate varies by utility type to reflect real-world usage
+            baseRate: Math.random() * 0.3 + 0.1,  // Will be scaled differently for each utility
+            burstChance: Math.random() * 0.15,    // 15% chance of surge usage
+            burstMultiplier: Math.random() * 2 + 1.5,  // 1.5x to 3.5x multiplier for bursts
+            idleChance: Math.random() * 0.3       // 30% chance of idle period
         };
     }
 
@@ -95,28 +96,38 @@ while ($rate = mysqli_fetch_assoc($ratesResult)) {
         const roll = Math.random();
 
         if (roll < pattern.idleChance) {
-            return 0;
+            return 0;  // Device is idle
         }
 
-        let increase = pattern.baseRate * (0.5 + Math.random());
+        let increase = pattern.baseRate * (0.8 + Math.random() * 0.4);  // 80-120% of base rate
 
         if (roll > (1 - pattern.burstChance)) {
-            increase *= pattern.burstMultiplier;
+            increase *= pattern.burstMultiplier;  // Surge usage period
         }
 
+        // Scale based on typical household consumption:
+        // Electricity: ~1 kWh per hour (20-30 kWh per day)
+        // Water: ~10-20 liters per hour (250-500 liters per day)
+        // Gas: ~0.5-1 cubic meters per hour (12-24 cubic meters per day)
         switch (deviceType) {
-            case 'Gas':
-                increase *= 0.4;
-                break;
-            case 'Water':
-                increase *= 0.3;
-                break;
             case 'Electricity':
-                increase *= 0.5;
+                // Scale to generate 0.8-1.2 kWh per update (assuming updates every 2 seconds)
+                increase *= 2.5;  // Will accumulate to ~20-30 kWh over 24 hours
+                break;
+
+            case 'Water':
+                // Scale to generate 8-12 liters per update
+                increase *= 0.2;   // Will accumulate to ~250-500 liters over 24 hours
+                break;
+
+            case 'Gas':
+                // Scale to generate 0.02-0.04 cubic meters per update
+                // Converting to cm³ (1 m³ = 1,000,000 cm³)
+                increase *= 2; // Will accumulate to ~12-24 m³ over 24 hours
                 break;
         }
 
-        return increase;
+        return Math.max(0, increase);  // Ensure no negative usage
     }
 
     async function updateDatabase(deviceId, currentUsage, totalUsage, newBalance, status) {

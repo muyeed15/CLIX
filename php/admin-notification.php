@@ -132,7 +132,7 @@ try {
     $total_pages = ceil($totalRow['total'] / $itemsPerPage);
     mysqli_stmt_close($stmt);
 
-// Update the total count query to include all search fields
+    // Update the total count query to include all search fields
     $totalQuery = "SELECT COUNT(*) as total 
                FROM notification_table n
                LEFT JOIN alert_notifiaction_table an ON n._notification_id_ = an._alt_not_id_
@@ -155,7 +155,7 @@ try {
         $stmt = mysqli_prepare($conn, $totalQuery);
     }
 
-// Update the total count query to include recipient search
+    // Update the total count query to include recipient search
     $totalQuery = "SELECT COUNT(*) as total 
                FROM notification_table n
                LEFT JOIN alert_notifiaction_table an ON n._notification_id_ = an._alt_not_id_
@@ -316,10 +316,15 @@ try {
                             if ($row['_user_id_'] === null) {
                                 echo "Everyone";
                             } else {
-                                echo htmlspecialchars($row['_first_name_'] . ' ' . $row['_last_name_']) . '<br>' .
-                                    '<small class="text-muted">' . htmlspecialchars($row['_email_']) . '</small>';
+                                $firstName = $row['_first_name_'] ?? '';
+                                $lastName = $row['_last_name_'] ?? '';
+                                $email = $row['_email_'] ?? '';
+
+                                echo htmlspecialchars($firstName . ' ' . $lastName) . '<br>' .
+                                    '<small class="text-muted">' . htmlspecialchars($email) . '</small>';
                             }
-                            ?></td>
+                            ?>
+                        </td>
                         <td><?php echo htmlspecialchars($row['_notification_title_']); ?></td>
                         <td><?php echo htmlspecialchars($row['_notification_message_']); ?></td>
                         <td><?php echo date('H:i', strtotime($row['_notification_time_'])); ?></td>
