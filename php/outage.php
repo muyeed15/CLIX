@@ -21,6 +21,7 @@ require_once './db-connection.php';
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/leaflet.css">
     <link rel="stylesheet" href="../css/outage.css">
+    <link rel="stylesheet" href="../css/history.css">
     <link rel="stylesheet" href="../css/animation.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
@@ -119,7 +120,7 @@ try {
                 </form>
             </div>
         </div>
-        <table class="table table-borderless">
+        <table class="table table-borderless" id="iot-table">
             <thead>
             <tr>
                 <th scope="col" width=1vw>Type</th>
