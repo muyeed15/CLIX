@@ -169,18 +169,6 @@ td .d-flex {
         font-size: clamp(20px, 2.5vw, 28px);
     }
 
-    #footer-section {
-        font-size: clamp(14px, 1.6vw, 18px);
-    }
-
-    #footer-section div div h5 {
-        font-size: clamp(16px, 1.8vw, 20px);
-    }
-
-    .footer-logo {
-        width: clamp(45px, 5.9vw, 65px);
-    }
-
     th,
     td {
         padding: clamp(12px, 2vw, 18px) clamp(14px, 2.2vw, 20px);
@@ -205,19 +193,6 @@ td .d-flex {
     #sub-div-header {
         padding: 1.5vw 0 0 0;
         font-size: clamp(18px, 2.8vw, 24px);
-    }
-
-    #footer-section {
-        font-size: clamp(14px, 2vw, 16px);
-        padding: 20px;
-    }
-
-    #footer-section div div h5 {
-        font-size: clamp(16px, 2.2vw, 18px);
-    }
-
-    .footer-logo {
-        width: clamp(50px, 8vw, 70px);
     }
 
     th,
