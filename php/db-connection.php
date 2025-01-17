@@ -4,7 +4,7 @@ class DatabaseConnection {
         [
             'servername' => 'localhost:3306',
             'username'   => 'root',
-            'password'   => '12345678',
+            'password'   => '',
             'dbname'     => 'clix_database'
         ],
         [
