@@ -9,6 +9,12 @@ class DatabaseConnection {
         ],
         [
             'servername' => 'localhost:3306',
+            'username'   => 'if0_38156219',
+            'password'   => 'VRfZfQjS4u0m',
+            'dbname'     => 'clix_database'
+        ],
+        [
+            'servername' => 'localhost:3306',
             'username'   => 'clix_user',
             'password'   => 'F9sqtmJx9kqj9FP',
             'dbname'     => 'clix_database'
