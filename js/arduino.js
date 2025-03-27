@@ -21,9 +21,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 arduinoOutputBody.innerHTML = `
                     <tr>
                         <td>${rssi}</td>
-                        <td>${parsedValues['Ampere']}</td>
-                        <td>${parsedValues['Watt']}</td>
-                        <td>${parsedValues['Watt-hour']}</td>
+                        <td>${parsedValues['Ampere']} A</td>
+                        <td>${parsedValues['Watt']} W</td>
+                        <td>${parsedValues['Watt-hour']} Wh</td>
                     </tr>
                 `;
             })
