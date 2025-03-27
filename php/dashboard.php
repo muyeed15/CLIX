@@ -335,6 +335,25 @@ try {
         </div>
     <?php endif; ?>
     </div>
+    
+    <!-- LoRa -->
+    <div id="arduino-output-container">
+        <h2 id="sub-div-header">LoRa Meter</h2>
+        <table class="table table-borderless" style="color: #282828;">
+            <thead>
+                <tr>
+                    <th>RSSI</th>
+                    <th>Ampere</th>
+                    <th>Watt</th>
+                    <th>Watt-hour</th>
+                </tr>
+            </thead>
+            <tbody id="arduino-output-body">
+                <!-- This will be populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
 </main>
 
 <!-- footer -->
@@ -345,6 +364,7 @@ require_once './footer.php';
 <!-- script -->
 <script src="../js/bootstrap.bundle.js"></script>
 <script src="../js/chart.js"></script>
+<script src="../js/arduino.js"></script>
 <?php
 require_once './chart.php';
 require_once './live.php';
