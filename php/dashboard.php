@@ -335,10 +335,12 @@ try {
         </div>
     <?php endif; ?>
     </div>
-    
+
     <!-- LoRa -->
     <div id="arduino-output-container">
-        <h2 id="sub-div-header">LoRa Meter</h2>
+        <h2 id="sub-div-header">
+            <img src="../img/LoRaWAN_Logo.svg" alt="LoRaWAN Logo" style="max-width: 250px; height: auto;">
+        </h2>
         <table class="table table-borderless" style="color: #282828;">
             <thead>
                 <tr>
