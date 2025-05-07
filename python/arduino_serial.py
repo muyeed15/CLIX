@@ -36,18 +36,23 @@ def select_port():
 
 def process_data(data):
     try:
-        # Extract RSSI and other values
+        # Extract RSSI and values
         rssi_match = re.search(r'RSSI:(-?\d+) dBm', data)
-        values_match = re.search(r'Message: Ampere:([-\d.]+), Watt:([-\d.]+), Watt-hour:([-\d.]+)', data)
+        values_match = re.search(r'Message: ([-\d.]+),([-\d.]+),([-\d.]+)', data)
         
         if rssi_match and values_match:
             rssi = rssi_match.group(1)
-            ampere = max(0, float(values_match.group(1)))
-            watt = max(0, float(values_match.group(2)))
-            watt_hour = max(0, float(values_match.group(3)))
+            current = max(0, float(values_match.group(1)))
+            voltage = max(0, float(values_match.group(2)))
+            power = max(0, float(values_match.group(3)))
             
-            # Reconstruct the message with processed values
-            processed_data = f"RSSI:{rssi} dBm | Message: Ampere:{ampere:.2f}, Watt:{watt:.2f}, Watt-hour:{watt_hour:.4f}"
+            # Reconstruct message with proper labels
+            processed_data = (
+                f"RSSI:{rssi} dBm | "
+                f"Message: Current (A): {current:.2f}, "
+                f"Voltage (V): {voltage:.2f}, "
+                f"Power (W): {power:.2f}"
+            )
             return processed_data
         
         # If formatting doesn't match, log the issue but return original data
@@ -81,7 +86,7 @@ def main():
                         raw_data = ser.readline().decode("utf-8").strip()
                     except UnicodeDecodeError:
                         try:
-                            # If UTF-8 fails, try latin-1 (which never fails)
+                            # If UTF-8 fails, try latin-1
                             raw_data = ser.readline().decode("latin-1").strip()
                             logging.warning("Fallback to latin-1 decoding")
                         except Exception as decode_error:
