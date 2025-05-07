@@ -336,7 +336,7 @@ try {
     <?php endif; ?>
     </div>
 
-    <!-- LoRa -->
+<!-- LoRa -->
     <div id="arduino-output-container">
         <h2 id="sub-div-header">
             <img src="../img/LoRaWAN_Logo.svg" alt="LoRaWAN Logo" style="max-width: 250px; height: auto;">
@@ -344,14 +344,17 @@ try {
         <table class="table table-borderless" style="color: #282828;">
             <thead>
                 <tr>
-                    <th>RSSI</th>
-                    <th>Ampere</th>
-                    <th>Watt</th>
-                    <th>Watt-hour</th>
+                    <th>Signal Strength</th>
+                    <th>Current</th>
+                    <th>Power</th>
+                    <th>Energy Consumption</th>
                 </tr>
             </thead>
             <tbody id="arduino-output-body">
                 <!-- This will be populated by JavaScript -->
+                <tr>
+                    <td colspan="4">Loading data...</td>
+                </tr>
             </tbody>
         </table>
     </div>

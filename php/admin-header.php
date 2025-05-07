@@ -80,6 +80,8 @@ function isActiveLink($pageName): string
                 <ul class="nav">
                     <li><a href="./admin-dashboard.php"
                            class="nav-link px-3 <?php echo isActiveLink('admin-dashboard.php'); ?>">Dashboard</a></li>
+                    <li><a href="./admin-analytics.php"
+                           class="nav-link px-3 <?php echo isActiveLink('admin-analytics.php'); ?>">Analytics</a></li>
                     <li><a href="./admin-outage.php"
                            class="nav-link px-3 <?php echo isActiveLink('admin-outage.php'); ?>">Outage</a></li>
                     <li><a href="./admin-IoT-control.php"
@@ -155,6 +157,8 @@ function isActiveLink($pageName): string
                 <ul class="nav flex-column text-center">
                     <li><a href="./admin-dashboard.php"
                            class="nav-link px-3 <?php echo isActiveLink('admin-dashboard.php'); ?>">Dashboard</a></li>
+                    <li><a href="./admin-analytics.php"
+                           class="nav-link px-3 <?php echo isActiveLink('admin-analytics.php'); ?>">Analytics</a></li>
                     <li><a href="./admin-outage.php"
                            class="nav-link px-3 <?php echo isActiveLink('admin-outage.php'); ?>">Outage</a></li>
                     <li><a href="./admin-IoT-control.php"

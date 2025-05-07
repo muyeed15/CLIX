@@ -1,1 +1,0 @@
-RSSI:-47 dBm | Message: Ampere:0.00, Watt:0.00, Watt-hour:0.0000

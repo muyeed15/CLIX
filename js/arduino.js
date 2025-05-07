@@ -6,24 +6,47 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.text())
             .then(data => {
                 // Parse the output
-                const outputParts = data.split('|');
-                const rssi = outputParts[0].replace('RSSI:', '').trim();
-                const message = outputParts[1].replace('Message:', '').trim();
+                const parts = data.split('|');
+                if (parts.length < 2) {
+                    throw new Error('Invalid data format');
+                }
 
-                // Create an object to store parsed values
-                const parsedValues = {};
-                message.split(',').forEach(part => {
-                    const [key, value] = part.trim().split(':');
-                    parsedValues[key.trim()] = value.trim();
+                // Extract RSSI from the first part
+                const rssi = parts[0].replace('RSSI:', '').trim();
+                
+                // Extract message data from the second part
+                const messageData = parts[1].replace('Message:', '').trim();
+                
+                // Parse the individual readings
+                const readings = {};
+                const valuePairs = messageData.split(',');
+                
+                valuePairs.forEach(pair => {
+                    // Use regex to extract label and value
+                    const match = pair.match(/([A-Za-z\s()]+):\s*([-\d.]+)/);
+                    if (match) {
+                        const label = match[1].trim();
+                        const value = match[2].trim();
+                        readings[label] = value;
+                    }
                 });
+
+                // Determine values to display (with fallbacks if any value is missing)
+                const current = readings['Current (A)'] || '0.00';
+                const voltage = readings['Voltage (V)'] || '0.00';
+                const power = readings['Power (W)'] || '0.00';
+                
+                // Calculate Watt-hour if not present (for backward compatibility)
+                // This assumes watt-hour is cumulative and should be handled by the backend
+                const wattHour = readings['Watt-hour'] || '0.00';
 
                 // Update the table
                 arduinoOutputBody.innerHTML = `
                     <tr>
-                        <td>${rssi}</td>
-                        <td>${parsedValues['Ampere']} A</td>
-                        <td>${parsedValues['Watt']} W</td>
-                        <td>${parsedValues['Watt-hour']} Wh</td>
+                        <td>${rssi} dBm</td>
+                        <td>${current} A</td>
+                        <td>${power} W</td>
+                        <td>${wattHour} Wh</td>
                     </tr>
                 `;
             })
@@ -31,13 +54,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error fetching Arduino output:', error);
                 arduinoOutputBody.innerHTML = `
                     <tr>
-                        <td colspan="4">Error fetching data</td>
+                        <td colspan="4">Error fetching data: ${error.message}</td>
                     </tr>
                 `;
             });
     }
 
+    // Initial fetch
     fetchArduinoOutput();
 
+    // Refresh every 500ms
     setInterval(fetchArduinoOutput, 500);
 });
