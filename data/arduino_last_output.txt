@@ -1,0 +1,1 @@
+RSSI:-66 dBm | Message: Current (A): 0.00, Voltage (V): 0.00, Power (W): 0.00

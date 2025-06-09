@@ -23,7 +23,8 @@ try {
         if (!mkdir($dataDir, 0777, true)) {
             echo json_encode([
                 'type' => 'progress',
-                'data' => "Warning: Couldn't create data directory with PHP, will try from Terminal\n"
+                'data' => ""
+                // 'data' => "Warning: Couldn't create data directory with PHP, will try from Terminal\n"
             ]) . "\n";
             ob_flush();
             flush();
@@ -39,7 +40,8 @@ try {
         if (!mkdir($graphDir, 0777, true)) {
             echo json_encode([
                 'type' => 'progress',
-                'data' => "Warning: Couldn't create graphs directory with PHP, will try from Terminal\n"
+                'data' => ""
+                // 'data' => "Warning: Couldn't create graphs directory with PHP, will try from Terminal\n"
             ]) . "\n";
             ob_flush();
             flush();
@@ -56,9 +58,10 @@ try {
     ob_flush();
     flush();
     
-    // Create AppleScript to run the Python script in Terminal
+    // Create AppleScript to run the Python script in Terminal with conda environment
     $scriptDir = dirname($pythonScript);
-    $appleScript = 'tell application "Terminal" to do script "cd ' . $scriptDir . ' && python3 ' . basename($pythonScript) . '"';
+    $condaCommand = 'conda activate clix && cd ' . $scriptDir . ' && python3 ' . basename($pythonScript);
+    $appleScript = 'tell application "Terminal" to do script "' . $condaCommand . '"';
     
     // Execute the AppleScript command
     $command = 'osascript -e \'' . $appleScript . '\'';
@@ -70,7 +73,6 @@ try {
     
     // Simulate progress updates so the user feels things are happening
     $steps = [
-        "Python script launched in Terminal",
         "Connecting to database...",
         "Fetching data...",
         "Analyzing data...",
