@@ -201,10 +201,6 @@ require_once './header.php';
                         <span class="overlay-text">Imtiaj</span>
                     </div>
                     <div class="profile-container">
-                        <img class="profile-pic" src="../img/alam_1000px.jpeg" alt="Alam">
-                        <span class="overlay-text">Alam</span>
-                    </div>
-                    <div class="profile-container">
                         <img class="profile-pic" src="../img/shrabon_1000px.jpeg" alt="Shrabon">
                         <span class="overlay-text">Shrabon</span>
                     </div>
