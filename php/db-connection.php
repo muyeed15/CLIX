@@ -1,5 +1,6 @@
 <?php
-class DatabaseConnection {
+class DatabaseConnection
+{
     private $connections = [
         [
             'servername' => 'localhost:3306',
@@ -9,15 +10,16 @@ class DatabaseConnection {
         ],
         [
             'servername' => 'localhost:3306',
-            'username'   => 'clix_user',
-            'password'   => 'F9sqtmJx9kqj9FP',
+            'username'   => 'developer',
+            'password'   => '12345678',
             'dbname'     => 'clix_database'
         ]
     ];
 
     private $connection = null;
 
-    private function tryConnection($config) {
+    private function tryConnection($config)
+    {
         try {
             return mysqli_connect(
                 $config['servername'],
@@ -30,7 +32,8 @@ class DatabaseConnection {
         }
     }
 
-    public function connect() {
+    public function connect()
+    {
         foreach ($this->connections as $config) {
             $this->connection = $this->tryConnection($config);
             if ($this->connection) {
@@ -40,11 +43,13 @@ class DatabaseConnection {
         return false;
     }
 
-    public function getConnection() {
+    public function getConnection()
+    {
         return $this->connection;
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         if ($this->connection) {
             mysqli_close($this->connection);
         }
