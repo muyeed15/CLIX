@@ -19,7 +19,7 @@ if (!$isHomePage && !$isAboutPage && !$isContactPage
     <div class="row justify-content-between py-2">
         <div class="col-3">
             <img class="footer-logo" src="../img/CLIX.svg" alt="">
-            <small class="d-block mb-3 text-body-secondary">©2024</small>
+            <small class="d-block mb-3 text-body-secondary">©2026</small>
             <p class="small text-body-secondary">
                 Why CLIX?<br>
                 Convenient Living<br>
